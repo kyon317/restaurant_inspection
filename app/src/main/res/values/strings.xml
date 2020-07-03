@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">cmpt-276-project</string>
+    <string name="app_name">Restaurants Inspection</string>
+    <string name="restaurants_list">Restaurants List</string>
 </resources>
