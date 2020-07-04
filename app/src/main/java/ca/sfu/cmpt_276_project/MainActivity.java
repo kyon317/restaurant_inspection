@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.text.ParseException;
 
 import ca.sfu.cmpt_276_project.CsvIngester.InspectionDataCSVIngester;
+import ca.sfu.cmpt_276_project.CsvIngester.ViolationTXTIngester;
 import ca.sfu.cmpt_276_project.Model.Restaurant;
 import ca.sfu.cmpt_276_project.CsvIngester.RestaurantCSVIngester;
 
@@ -25,10 +26,20 @@ public class MainActivity extends AppCompatActivity {
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
-        InspectionDataCSVIngester test = new InspectionDataCSVIngester();
+//        InspectionDataCSVIngester test = new InspectionDataCSVIngester();
+
+//        try {
+//            test.readInspectionData(this);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//        }
+
+        ViolationTXTIngester test = new ViolationTXTIngester();
 
         try {
-            test.readInspectionData(this);
+            test.readViolationData(this);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ParseException e) {

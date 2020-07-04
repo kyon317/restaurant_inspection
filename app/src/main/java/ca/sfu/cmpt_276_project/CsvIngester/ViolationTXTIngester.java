@@ -1,0 +1,54 @@
+package ca.sfu.cmpt_276_project.CsvIngester;
+
+import android.content.Context;
+import android.util.Log;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
+
+import ca.sfu.cmpt_276_project.Model.Violation;
+import ca.sfu.cmpt_276_project.R;
+
+public class ViolationTXTIngester {
+    private List<Violation> violationList = new ArrayList<>();
+
+    public void readViolationData(Context context) throws IOException, ParseException {
+        InputStream restaurantDataInput = context.getResources().openRawResource
+                (R.raw.all_violations);
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(restaurantDataInput,
+                Charset.forName("UTF-8")));
+        String inputLine = "";
+
+        //reading and storing CSV data
+        try{
+            //skipping head lines
+            reader.readLine();
+            reader.readLine();
+
+            while((inputLine = reader.readLine())!=null){
+                String[] tokens = inputLine.split(",");
+                Violation tempData = new Violation();
+                tempData.setViolationNumber(tokens[0]);
+                if (tokens[1].equals("Critical")){
+                    tempData.setCritical(true);
+                }
+                tempData.setDescription(tokens[2]);
+                violationList.add(tempData);
+            }
+        }catch (IOException e){
+            Log.wtf("Reading Activity","Fatal Error when reading file on line" +inputLine,e);
+            e.printStackTrace();
+        }
+        for (Violation violation:violationList
+             ) {
+            violation.Display();
+        }
+    }
+}

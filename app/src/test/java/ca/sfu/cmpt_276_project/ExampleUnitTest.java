@@ -41,7 +41,8 @@ public class ExampleUnitTest {
         dummy_data.Display();
 
         dummy_restaurant.setTrackNumber("0001");
-        dummy_restaurant.setInspectionData(dummy_data);
+
+        //dummy_restaurant.setInspectionData(dummy_data);
         dummy_restaurant.Display();
     }
 

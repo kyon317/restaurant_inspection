@@ -1,5 +1,5 @@
 /*
-* Class: csvImporter
+* Class: RestaurantCSVIngester
 *
 * Class Description: The csvImporter Class contains several csv readers that dedicated for fetching data from the provided .csv files.
 *
