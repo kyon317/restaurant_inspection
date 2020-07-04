@@ -18,7 +18,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,32 +52,16 @@ class Inspection{
         return numCritIssues;
     }
 
-    public void setNumCritIssues(int numCritIssues) {
-        this.numCritIssues = numCritIssues;
-    }
-
     public int getNumNonCritIssues() {
         return numNonCritIssues;
-    }
-
-    public void setNumNonCritIssues(int numNonCritIssues) {
-        this.numNonCritIssues = numNonCritIssues;
     }
 
     public String getTimeSinceInspection() {
         return timeSinceInspection;
     }
 
-    public void setTimeSinceInspection(String timeSinceInspection) {
-        this.timeSinceInspection = timeSinceInspection;
-    }
-
     public int getIcon() {
         return icon;
-    }
-
-    public void setIcon(int icon) {
-        this.icon = icon;
     }
 
     public String getHazardLevel() {
@@ -105,41 +88,22 @@ class Restaurant{
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public int getIcon() {
         return icon;
-    }
-
-    public void setIcon(int icon) {
-        this.icon = icon;
     }
 
     public String getAddress() {
         return address;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
     public int getLatitude() {
         return latitude;
-    }
-
-    public void setLatitude(int latitude) {
-        this.latitude = latitude;
     }
 
     public int getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(int longitude) {
-        this.longitude = longitude;
-    }
 }
 
 public class SingleRestaurantActivity extends AppCompatActivity {
@@ -196,7 +160,7 @@ public class SingleRestaurantActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 Intent intent = SingleInspectionActivity.makeIntent(
                         SingleRestaurantActivity.this);
-                startActivity(intent);;
+                startActivity(intent);
 
             }
         });
@@ -218,7 +182,7 @@ public class SingleRestaurantActivity extends AppCompatActivity {
                     R.layout.inspection_listview,
                     inspections);
         }
-        @SuppressLint("SetTextI18n")
+
         @Override
         public View getView(int position, View convertView, ViewGroup parent){
             View itemView = convertView;
@@ -241,10 +205,10 @@ public class SingleRestaurantActivity extends AppCompatActivity {
             TextView inspectionDateText = itemView.findViewById(R.id.inspectionDateValue);
             inspectionDateText.setText(currentInspection.getTimeSinceInspection());
 
-            if(currentInspection.getHazardLevel() == "low"){
+            if(currentInspection.getHazardLevel().equals("low")){
                 itemView.setBackgroundColor(Color.GREEN);
             }
-            else if(currentInspection.getHazardLevel() == "medium"){
+            else if(currentInspection.getHazardLevel().equals("medium")){
                 itemView.setBackgroundColor(Color.YELLOW);
             }
             else{
