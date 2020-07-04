@@ -2,13 +2,13 @@
  * Class: InspectionData
  *
  * Data descriptions:
- * 1. trackingNumber: An integer indicates its unique tracking number
- * 2. inspectionDate: A Date indicates its inspection date
- * 3. inspectionType: A enum of two types - ROUTINE or FOLLOW_UP
- * 4. criticalViolations: An integer indicates number of critical violations
- * 5. nonCriticalViolations: An integer indicates number of non-critical violations
- * 6. hazard: A enum of three types - LOW/MEDIUM/HIGH
- * 7. violation: A Violation type that includes information of a violation
+ * 1. trackingNumber: A String Data type indicates its unique tracking number
+ * 2. inspectionDate: A Date Data type indicates its inspection date
+ * 3. inspectionType: A enum Data type of two types - ROUTINE or FOLLOW_UP
+ * 4. criticalViolations: An integer Data type indicates number of critical violations
+ * 5. nonCriticalViolations: An integer Data type indicates number of non-critical violations
+ * 6. hazard: A enum Data type of three types - LOW/MEDIUM/HIGH
+ * 7. violation: A Violation Data type that includes information of a violation
  *
  * Functions:
  * 1. Getters

@@ -16,7 +16,7 @@
 * 2. Setters
 * 3. Default & Non-Default Constructor
 * 4. Display
-*
+*TRACKINGNUMBER,NAME,PHYSICALADDRESS,PHYSICALCITY,FACTYPE,LATITUDE,LONGITUDE
 * */
 package ca.sfu.cmpt_276_project.Model;
 
