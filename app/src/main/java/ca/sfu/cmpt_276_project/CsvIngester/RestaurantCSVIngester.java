@@ -29,13 +29,19 @@ import java.util.List;
 import ca.sfu.cmpt_276_project.Model.*;
 import ca.sfu.cmpt_276_project.R;
 
-public class csvImporter  {
+public class RestaurantCSVIngester {
+
     private List<Restaurant> restaurantList = new ArrayList<>();
 
     public void readRestaurantList(Context context) throws IOException {
-        InputStream restaurantDataInput = context.getResources().openRawResource(R.raw.restaurants_itr1);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(restaurantDataInput, Charset.forName("UTF-8")));
+        InputStream restaurantDataInput = context.getResources().openRawResource
+                                            (R.raw.restaurants_itr1);
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(restaurantDataInput,
+                                                    Charset.forName("UTF-8")));
         String inputLine = "";
+
+        //reading and storing CSV data
         try{
             reader.readLine();
             while((inputLine = reader.readLine())!=null){
@@ -48,20 +54,20 @@ public class csvImporter  {
                 dummy_restaurant.setFacType(tokens[4]);
                 dummy_restaurant.setLatitude(Double.parseDouble(tokens[5]));
                 dummy_restaurant.setLongitude(Double.parseDouble(tokens[6]));
-                //Dummy Inspection data passed in order to call Display()
-                InspectionData dummyData = new InspectionData();
-                dummy_restaurant.setInspectionData(dummyData);
+
                 restaurantList.add(dummy_restaurant);
             }
         }catch (IOException e){
             Log.wtf("Reading Activity","Fatal Error when reading file on line" +inputLine,e);
             e.printStackTrace();
         }
+
         //Display restaurant list
         for (Restaurant res:restaurantList
              ) {
             res.Display();
         }
-    }
+        System.out.println(this.restaurantList.size());//Debugging purposes
 
+    }//end of function
 }

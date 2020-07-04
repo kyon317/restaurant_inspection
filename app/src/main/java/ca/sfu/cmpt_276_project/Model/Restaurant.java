@@ -20,6 +20,9 @@
 * */
 package ca.sfu.cmpt_276_project.Model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Restaurant {
     private String trackNumber;
     private String restaurantName;
@@ -28,15 +31,14 @@ public class Restaurant {
     private String facType;
     private double latitude;
     private double longitude;
-    private InspectionData inspectionData;
-
+    private List<InspectionData> inspectionDataList = new ArrayList<>();
 
     //Getters
     public String getTrackNumber() {
         return trackNumber;
     }
-    public InspectionData getInspectionData() {
-        return inspectionData;
+    public List<InspectionData> getInspectionDataList() {
+        return inspectionDataList;
     }
     public String getRestaurantName() {
         return restaurantName;
@@ -61,8 +63,8 @@ public class Restaurant {
     public void setTrackNumber(String trackNumber) {
         this.trackNumber = trackNumber;
     }
-    public void setInspectionData(InspectionData inspectionData) {
-        this.inspectionData = inspectionData;
+    public void setInspectionDataList(List<InspectionData> inspectionDataList) {
+        this.inspectionDataList = inspectionDataList;
     }
     public void setRestaurantName(String restaurantName) {
         this.restaurantName = restaurantName;
@@ -92,12 +94,12 @@ public class Restaurant {
         this.facType = null;
         this.latitude = 0;
         this.longitude = 0;
-        this.inspectionData = null;
-
     }
 
     //Non-Default Constructor
-    public Restaurant(String trackNumber, String restaurantName, String physicalAddress, String physicalCity, String facType, double latitude, double longitude, InspectionData inspectionData) {
+    public Restaurant(String trackNumber, String restaurantName, String physicalAddress,
+                      String physicalCity, String facType, double latitude, double longitude,
+                      List<InspectionData> inspectionDataList) {
         this.trackNumber = trackNumber;
         this.restaurantName = restaurantName;
         this.physicalAddress = physicalAddress;
@@ -105,7 +107,7 @@ public class Restaurant {
         this.facType = facType;
         this.latitude = latitude;
         this.longitude = longitude;
-        this.inspectionData = inspectionData;
+        this.inspectionDataList = inspectionDataList;
     }
 
     //Display
@@ -118,6 +120,8 @@ public class Restaurant {
                 +"\nLatitude: "+this.getLatitude()
                 +"\nLongitude: "+this.getLongitude()
                 +"\nInspection Data: ");
-        this.getInspectionData().Display();
+        for(InspectionData inspectionData : this.inspectionDataList){
+            inspectionData.Display();
+        }
     }
 }
