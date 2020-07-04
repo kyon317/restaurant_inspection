@@ -111,6 +111,12 @@ public class Restaurant {
     //Display
     public void Display(){
         System.out.println("Tracking Number: "+this.getTrackNumber()
+                +"\nRestaurant Name: "+this.getRestaurantName()
+                +"\nPhysical Address: "+this.getPhysicalAddress()
+                +"\nPhysical City: "+this.getPhysicalCity()
+                +"\nFac Type: "+this.getFacType()
+                +"\nLatitude: "+this.getLatitude()
+                +"\nLongitude: "+this.getLongitude()
                 +"\nInspection Data: ");
         this.getInspectionData().Display();
     }
