@@ -2,7 +2,7 @@
  * Class: Violation
  *
  * Data descriptions:
- * 1. violationNumber: An integer indicates its unique violation number
+ * 1. violationNumber: A String Data type indicates its unique violation number
  * 2. isCritical: An Boolean Data type, which tells if a violation is critical
  * 3. description : A string Data type, which stores all the description of a violation
  * 4. isRepeat: An Boolean Data type, which tells if a violation is repeated
@@ -17,21 +17,21 @@
 package ca.sfu.cmpt_276_project.Model;
 
 public class Violation {
-    private int violationNumber;
+    private String violationNumber;
     private boolean isCritical;
     private String description;
     private boolean isRepeat;
 
     //Default Constructor
     public Violation() {
-        this.violationNumber = 0;
+        this.violationNumber = null;
         this.isCritical = false;
         this.description = "";
         this.isRepeat = false;
     }
 
     //Non Default Constructor
-    public Violation(int violationNumber, boolean isCritical, String description, boolean isRepeat) {
+    public Violation(String violationNumber, boolean isCritical, String description, boolean isRepeat) {
         this.violationNumber = violationNumber;
         this.isCritical = isCritical;
         this.description = description;
@@ -39,7 +39,7 @@ public class Violation {
     }
 
     //Getters
-    public int getViolationNumber() {
+    public String getViolationNumber() {
         return violationNumber;
     }
     public boolean isCritical() {
@@ -56,7 +56,7 @@ public class Violation {
     public void setCritical(boolean critical) {
         isCritical = critical;
     }
-    public void setViolationNumber(int violationNumber) {
+    public void setViolationNumber(String violationNumber) {
         this.violationNumber = violationNumber;
     }
     public void setDescription(String description) {

@@ -3,7 +3,13 @@
 *
 * Data descriptions:
 * 1. trackNumber: An integer indicates its unique tracking number
-* 2. data: An Inspection Data type, which stores all the details of a restaurant object
+* 2. restaurantName: A String Data type shows the name of the restaurant
+* 3. physicalAddress: A String Data type shows the physical address of the restaurant
+* 4. physicalCity: A String Data type shows the physical city of the restaurant
+* 5. facType: A String Data type shows the type of the restaurant
+* 6. latitude: A double Data type shows the latitude of the restaurant
+* 7. longitude: A double Data type shows the longitude of the restaurant
+* 8. data: An Inspection Data type, which stores all the details of a restaurant object
 *
 * Functions:
 * 1. Getters
@@ -15,41 +21,97 @@
 package ca.sfu.cmpt_276_project.Model;
 
 public class Restaurant {
-    private int trackNumber;
-    private InspectionData data;
+    private String trackNumber;
+    private String restaurantName;
+    private String physicalAddress;
+    private String physicalCity;
+    private String facType;
+    private double latitude;
+    private double longitude;
+    private InspectionData inspectionData;
+
 
     //Getters
-    public int getTrackNumber() {
+    public String getTrackNumber() {
         return trackNumber;
     }
-    public InspectionData getData() {
-        return data;
+    public InspectionData getInspectionData() {
+        return inspectionData;
+    }
+    public String getRestaurantName() {
+        return restaurantName;
+    }
+    public String getPhysicalAddress() {
+        return physicalAddress;
+    }
+    public String getPhysicalCity() {
+        return physicalCity;
+    }
+    public String getFacType() {
+        return facType;
+    }
+    public double getLatitude() {
+        return latitude;
+    }
+    public double getLongitude() {
+        return longitude;
     }
 
     //Setters
-    public void setTrackNumber(int trackNumber) {
+    public void setTrackNumber(String trackNumber) {
         this.trackNumber = trackNumber;
     }
-    public void setData(InspectionData data) {
-        this.data = data;
+    public void setInspectionData(InspectionData inspectionData) {
+        this.inspectionData = inspectionData;
+    }
+    public void setRestaurantName(String restaurantName) {
+        this.restaurantName = restaurantName;
+    }
+    public void setPhysicalAddress(String physicalAddress) {
+        this.physicalAddress = physicalAddress;
+    }
+    public void setPhysicalCity(String physicalCity) {
+        this.physicalCity = physicalCity;
+    }
+    public void setFacType(String facType) {
+        this.facType = facType;
+    }
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
     }
 
     //Default Constructor
     public Restaurant() {
-        this.trackNumber = 0;
-        this.data = null;
+        this.trackNumber = null;
+        this.restaurantName = null;
+        this.physicalAddress = null;
+        this.physicalCity = null;
+        this.facType = null;
+        this.latitude = 0;
+        this.longitude = 0;
+        this.inspectionData = null;
+
     }
 
     //Non-Default Constructor
-    public Restaurant(int trackNumber, InspectionData data) {
+    public Restaurant(String trackNumber, String restaurantName, String physicalAddress, String physicalCity, String facType, double latitude, double longitude, InspectionData inspectionData) {
         this.trackNumber = trackNumber;
-        this.data = data;
+        this.restaurantName = restaurantName;
+        this.physicalAddress = physicalAddress;
+        this.physicalCity = physicalCity;
+        this.facType = facType;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.inspectionData = inspectionData;
     }
 
     //Display
     public void Display(){
         System.out.println("Tracking Number: "+this.getTrackNumber()
                 +"\nInspection Data: ");
-        this.getData().Display();
+        this.getInspectionData().Display();
     }
 }

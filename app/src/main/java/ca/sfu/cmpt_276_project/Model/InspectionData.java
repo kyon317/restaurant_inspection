@@ -22,7 +22,7 @@ import java.text.DateFormat;
 import java.util.Date;
 
 public class InspectionData {
-    private int trackingNumber;
+    private String trackingNumber;
     private Date inspectionDate;
     private Type inspectionType;
     private int criticalViolations;
@@ -32,7 +32,7 @@ public class InspectionData {
 
 
     //Getters
-    public int getTrackingNumber() {
+    public String getTrackingNumber() {
         return trackingNumber;
     }
     public Date getInspectionDate() {
@@ -56,7 +56,7 @@ public class InspectionData {
 
     //Setters
 
-    public void setTrackingNumber(int trackingNumber) {
+    public void setTrackingNumber(String trackingNumber) {
         this.trackingNumber = trackingNumber;
     }
     public void setInspectionDate(Date inspectionDate) {
@@ -80,7 +80,7 @@ public class InspectionData {
 
     //Default Constructor
     public InspectionData() {
-        this.trackingNumber = 0;
+        this.trackingNumber = null;
         Date dummy_date = new Date(1970-01-01);
         this.inspectionDate = dummy_date;
         this.inspectionType = Type.ROUTINE;
@@ -91,7 +91,7 @@ public class InspectionData {
     }
 
     //Non Default Constructor
-    public InspectionData(int trackingNumber, Date inspectionDate, Type inspectionType, int criticalViolations, int nonCriticalViolations, Hazard hazard, Violation violation) {
+    public InspectionData(String trackingNumber, Date inspectionDate, Type inspectionType, int criticalViolations, int nonCriticalViolations, Hazard hazard, Violation violation) {
         this.trackingNumber = trackingNumber;
         this.inspectionDate = inspectionDate;
         this.inspectionType = inspectionType;

@@ -2,18 +2,12 @@ package ca.sfu.cmpt_276_project;
 
 import org.junit.Test;
 
-import java.text.DateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.Date;
 
 import ca.sfu.cmpt_276_project.Model.InspectionData;
 import ca.sfu.cmpt_276_project.Model.Restaurant;
 import ca.sfu.cmpt_276_project.Model.Type;
 import ca.sfu.cmpt_276_project.Model.Violation;
-
-import static org.junit.Assert.*;
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -31,12 +25,12 @@ public class ExampleUnitTest {
 
         dummy_violation.setCritical(true);
         dummy_violation.setDescription("Food poisoned, killed 30 customers and one cat.");
-        dummy_violation.setViolationNumber(0001);
+        dummy_violation.setViolationNumber("0001");
         dummy_violation.setRepeat(true);
         System.out.println("test 1: output violation ");
         dummy_violation.Display();
 
-        dummy_data.setTrackingNumber(0001);
+        dummy_data.setTrackingNumber("0001");
         dummy_data.setInspectionDate(new Date(1970-01-01));
         dummy_data.setInspectionType(Type.ROUTINE);
         dummy_data.setCriticalViolations(0);
@@ -45,8 +39,8 @@ public class ExampleUnitTest {
         System.out.println("test 2: output inspection data ");
         dummy_data.Display();
 
-        dummy_restaurant.setTrackNumber(0001);
-        dummy_restaurant.setData(dummy_data);
+        dummy_restaurant.setTrackNumber("0001");
+        dummy_restaurant.setInspectionData(dummy_data);
         dummy_restaurant.Display();
     }
 }
