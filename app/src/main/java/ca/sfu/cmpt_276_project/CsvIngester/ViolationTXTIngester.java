@@ -1,3 +1,13 @@
+/*
+ * Class: ViolationTXTIngester
+ *
+ * Class Description: The ViolationTXTIngester Class contains a .txt reader that fetches all types of violations from all_violations.txt file.
+ *
+ * Function:
+ * 1. readViolationData(Context context): Given the context, the function fetches data from all_violations.txt and interprets it into a List of Violations.[Done]
+ *
+ * */
+
 package ca.sfu.cmpt_276_project.CsvIngester;
 
 import android.content.Context;

@@ -1,13 +1,10 @@
 /*
 * Class: RestaurantCSVIngester
 *
-* Class Description: The csvImporter Class contains several csv readers that dedicated for fetching data from the provided .csv files.
+* Class Description: The csvImporter Class contains a csv reader that fetches data from the provided restaurants_itr1.csv file.
 *
-* Functionality:
+* Function:
 * 1. readRestaurantList(Context context): Given the context, the function fetches data from restaurants_itr1.csv and interprets it into a List of Restaurants.[Done]
-* 2. readInspectionReports(Context context): Given the context, the function fetches data from rinspectionreports_itr1.csv and binds data with List of Restaurants.[Undone]
-* 3. readViolations(Context context): Given the context, the function fetches data from all_violations.txt and binds data with List of Restaurants.[Undone]
-* 4. csvIngester(Context context): Given the context, the function calls functions above automatically, and return a List of Restaurants that each contains full information.[Undone]
 *
 * */
 
