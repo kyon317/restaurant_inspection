@@ -74,6 +74,8 @@ public class MainActivity extends AppCompatActivity {
         } catch (ParseException e) {
             e.printStackTrace();
         }
+
+
         if (!restaurantList.isEmpty())
             for (Restaurant restaurant:restaurantList
             ) {

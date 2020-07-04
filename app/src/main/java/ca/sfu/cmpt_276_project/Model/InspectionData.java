@@ -102,13 +102,13 @@ public class InspectionData {
     }
 
     public void Display(){
-        System.out.println("Tracking Number: "+this.getTrackingNumber()
+        System.out.println("Inspection Tracking Number: "+this.getTrackingNumber()
                 +"\nInspection Date: "+this.getInspectionDate()
                 +"\nInspection Type: "+this.getInspectionType()
                 +"\nCritical Violation: "+this.getCriticalViolations()
                 +"\nNon Critical Violation: "+this.getNonCriticalViolations()
                 +"\nHazard: "+this.getHazard()
-                +"\nViolation details: ");
+                +"\n*****************************************\nViolation details: \n");
         this.getViolation().Display();
     }
 }
