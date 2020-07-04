@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 import ca.sfu.cmpt_276_project.Model.InspectionData;
@@ -19,6 +20,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         csvImporter test_importer = new csvImporter();
         Restaurant dummy_restaurant = new Restaurant();
-        test_importer.readRestaurantList(this);
+        try {
+            test_importer.readRestaurantList(this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
