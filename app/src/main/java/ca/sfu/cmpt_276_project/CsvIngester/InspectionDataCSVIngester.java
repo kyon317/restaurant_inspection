@@ -1,3 +1,13 @@
+/*
+ * Class: InspectionDataCSVIngester
+ *
+ * Class Description:
+ * 1. The InspectionDataCSVIngester Class contains a .csv reader that fetches all types of violations from inspectionreports_itr1.csv file.
+ *
+ * Function:
+ * 1. readInspectionData(Context context): Given the context, the function fetches data from inspectionreports_itr1.csv and interprets it into a List of InspectionData.[Done]
+ * 2. returnInspectionByID(String id): Given the id, the function searches existing inspections in IngestionList and return a list of inspections, otherwise an empty list will be returned.[Done]
+ * */
 package ca.sfu.cmpt_276_project.CsvIngester;
 
 import android.content.Context;
@@ -19,13 +29,18 @@ import java.util.stream.Collectors;
 import ca.sfu.cmpt_276_project.Model.Hazard;
 import ca.sfu.cmpt_276_project.Model.InspectionData;
 import ca.sfu.cmpt_276_project.Model.Type;
+import ca.sfu.cmpt_276_project.Model.Violation;
 import ca.sfu.cmpt_276_project.R;
 
 public class InspectionDataCSVIngester {
 
     private List<InspectionData> IngestionList = new ArrayList<>();
+    private ViolationTXTIngester violationTXTIngester = new ViolationTXTIngester();
 
     public void readInspectionData(Context context) throws IOException, ParseException {
+        //initializing violationList
+        violationTXTIngester.readViolationData(context);
+
         InputStream InspectionCSV = context.getResources().openRawResource
                 (R.raw.inspectionreports_itr1);
 
@@ -71,15 +86,39 @@ public class InspectionDataCSVIngester {
                 temp.setHazard(Hazard.HIGH);
 
             //TODO: need a Violation parser
-
+            temp.setViolation(new Violation());
+            if (fields.size()==6){
+                continue;   //skip if there's no violation
+            }else if (fields.get(6)!=null){
+                String[] violationLump = fields.get(6).split("\\|");
+                for (String singleViolation:violationLump
+                     ) {
+                    String[] dataCache = singleViolation.split(",");
+                    Violation dummyViolation = new Violation();
+                    //System.out.println("ID: "+dataCache[0]);
+                    dummyViolation = violationTXTIngester.returnViolationByID(dataCache[0]);
+                    //dummyViolation.Display();
+                    temp.setViolation(dummyViolation);
+                }
+            }
             IngestionList.add(temp);
         }//end of scan loop
-
+        //Debugging purpose
+        /*
         for(InspectionData inspectionData : IngestionList){
             inspectionData.Display();
-        }
+        }*/
     }
-
+    public List<InspectionData> returnInspectionByID(String id){
+        List<InspectionData> inspectionData = new ArrayList<>();
+        for (InspectionData inspection:IngestionList
+             ) {
+            if (inspection.getTrackingNumber().equals(id)){
+                inspectionData.add(inspection);
+            }
+        }
+        return inspectionData;
+    }
     public static List<String> getText(InputStream inputStream) throws IOException{
 
         List<String> lines = new ArrayList<>();

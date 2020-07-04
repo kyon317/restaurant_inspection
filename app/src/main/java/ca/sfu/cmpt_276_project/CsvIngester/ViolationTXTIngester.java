@@ -5,7 +5,7 @@
  *
  * Function:
  * 1. readViolationData(Context context): Given the context, the function fetches data from all_violations.txt and interprets it into a List of Violations.[Done]
- *
+ * 2. returnViolationByID(String id): Given the id, the function searches existing violations in violationList and return the designated violation, otherwise an empty violation will be returned.[Done]
  * */
 
 package ca.sfu.cmpt_276_project.CsvIngester;
@@ -56,9 +56,19 @@ public class ViolationTXTIngester {
             Log.wtf("Reading Activity","Fatal Error when reading file on line" +inputLine,e);
             e.printStackTrace();
         }
-        for (Violation violation:violationList
+        //for debugging purpose
+/*        for (Violation violation:violationList
              ) {
             violation.Display();
+        }*/
+    }
+    public Violation returnViolationByID(String id){
+        Violation violation_to_return = new Violation();
+        for (Violation violation:violationList
+        ) {
+            if (violation.getViolationNumber().equals(id))
+                violation_to_return = violation;
         }
+        return violation_to_return;
     }
 }
