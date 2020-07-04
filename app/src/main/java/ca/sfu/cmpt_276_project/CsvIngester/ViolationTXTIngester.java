@@ -61,7 +61,9 @@ public class ViolationTXTIngester {
              ) {
             violation.Display();
         }*/
-    }
+    }//end of function
+
+    //return a violation by tracking number
     public Violation returnViolationByID(String id){
         Violation violation_to_return = new Violation();
         for (Violation violation:violationList
@@ -70,5 +72,5 @@ public class ViolationTXTIngester {
                 violation_to_return = violation;
         }
         return violation_to_return;
-    }
+    }//end of function
 }

@@ -14,7 +14,6 @@ import android.content.Context;
 import android.util.Log;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -109,6 +108,7 @@ public class InspectionDataCSVIngester {
             inspectionData.Display();
         }*/
     }
+    //return a list of inspection by tracking number
     public List<InspectionData> returnInspectionByID(String id){
         List<InspectionData> inspectionData = new ArrayList<>();
         for (InspectionData inspection:IngestionList
@@ -119,6 +119,7 @@ public class InspectionDataCSVIngester {
         }
         return inspectionData;
     }
+
     public static List<String> getText(InputStream inputStream) throws IOException{
 
         List<String> lines = new ArrayList<>();
