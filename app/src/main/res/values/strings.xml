@@ -19,4 +19,7 @@
     <string name="numCritIssueVal">0</string>
     <string name="numNonCritText"># of non-critical issues:</string>
     <string name="numNonCritVal">0</string>
+    <string name="time_since_last_visit">Time since inspection:</string>
+    <string name="inspectionDateVal">30 days</string>
+    <string name="title_activity_single_inspection">SingleInspectionActivity</string>
 </resources>

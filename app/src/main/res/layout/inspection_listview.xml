@@ -61,4 +61,27 @@
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@+id/numNonCritText"
         app:layout_constraintTop_toBottomOf="@id/numCritIssuesValue" />
+
+    <TextView
+        android:id="@+id/dateOfInspection"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="2dp"
+        android:text="@string/time_since_last_visit"
+        android:textSize="18sp"
+        app:layout_constraintStart_toEndOf="@+id/hazardicon"
+        app:layout_constraintTop_toBottomOf="@+id/numNonCritText" />
+
+    <TextView
+        android:id="@+id/inspectionDateValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="2dp"
+        android:text="@string/inspectionDateVal"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@+id/dateOfInspection"
+        app:layout_constraintTop_toBottomOf="@+id/numNonCritText" />
 </androidx.constraintlayout.widget.ConstraintLayout>
