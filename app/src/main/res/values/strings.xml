@@ -13,4 +13,10 @@
     <string name="restaurant_address">Address</string>
     <string name="restaurant_coordinates">Coordinates</string>
     <string name="restaurant">Restaurant</string>
+    <string name="hazard_icon">hazard icon</string>
+    <string name="hazardicon">hazardicon</string>
+    <string name="numCritIssuesText"># of crit issues:</string>
+    <string name="numCritIssueVal">0</string>
+    <string name="numNonCritText"># of non-critical issues:</string>
+    <string name="numNonCritVal">0</string>
 </resources>

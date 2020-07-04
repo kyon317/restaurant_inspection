@@ -1,5 +1,6 @@
 package ca.sfu.cmpt_276_project;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,6 +10,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import org.w3c.dom.Text;
@@ -134,7 +139,7 @@ public class SingleRestaurantActivity extends AppCompatActivity {
             50,
             -123
             );
-    static List<Inspection> inspections = new ArrayList<Inspection>();
+    static List<Inspection> inspections = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,22 +148,64 @@ public class SingleRestaurantActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        TextView restaurantName_textview = (TextView)findViewById(R.id.Restaurant_name);
+        TextView restaurantName_textview = findViewById(R.id.Restaurant_name);
         restaurantName_textview.setText(restaurant.getName());
-        TextView addressText_textview = (TextView)findViewById(R.id.addressText);
+        TextView addressText_textview = findViewById(R.id.addressText);
         addressText_textview.setText(restaurant.getAddress());
-        TextView coords_textView = (TextView)findViewById(R.id.coordinatesText);
+        TextView coords_textView = findViewById(R.id.coordinatesText);
         coords_textView.setText(restaurant.getLatitude() + ", " + restaurant.getLongitude());
+
         inspections.add(new Inspection(2,
                 1,
                 "20 days",
-                0));
+                R.drawable.high_hazard));
         inspections.add(new Inspection(0,
                 0,
                 "1 year",
-                0));
+                R.drawable.low_hazard));
+        populateInspectionsList();
+
+
     }
+
+    private void populateInspectionsList() {
+        ArrayAdapter<Inspection> adapter = new MyListAdapter();
+        ListView list = findViewById(R.id.inspectionsListView);
+        list.setAdapter(adapter);
+    }
+
     public static Intent makeIntent(Context context) {
         return new Intent(context, SingleRestaurantActivity.class);
+    }
+
+    private class MyListAdapter extends ArrayAdapter<Inspection> {
+        public MyListAdapter(){
+            super(SingleRestaurantActivity.this,
+                    R.layout.inspection_listview,
+                    inspections);
+        }
+        @SuppressLint("SetTextI18n")
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent){
+            View itemView = convertView;
+            if(itemView == null){
+                itemView = getLayoutInflater().inflate(R.layout.inspection_listview,
+                        parent,
+                        false);
+            }
+            Inspection currentInspectiion = inspections.get(position);
+
+            ImageView imageView = itemView.findViewById(R.id.hazardicon);
+            imageView.setImageResource(currentInspectiion.getIcon());
+
+            TextView numCritIssueText = itemView.findViewById(R.id.numCritIssuesValue);
+            numCritIssueText.setText("" + currentInspectiion.getNumCritIssues());
+
+            TextView numNonCritIssueText = itemView.findViewById(R.id.numNonCritVal);
+            numNonCritIssueText.setText("" + currentInspectiion.getNumNonCritIssues());
+            //TODO set background based on hazard level
+            //TODO set onclick
+            return itemView;
+        }
     }
 }
