@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">cmpt-276-project</string>
+    <string name="textview">
+        Display Format:\n
+        Restaurant Name\n
+        Hazard Level, # issues, most recent inspection date
+
+    </string>
+    <string name="restaurant_menu">Select to see restaurant details</string>
 </resources>
