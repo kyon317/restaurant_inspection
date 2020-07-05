@@ -67,7 +67,7 @@ public class InspectionDataCSVIngester {
             temp.setInspectionDate(format.parse(fields.get(1)));
 
             //conditions for Inspection Type ENUM
-            if(fields.get(2) == "Routine")
+            if(fields.get(2).equals("Routine"))
                 temp.setInspectionType(Type.ROUTINE);
             else
                 temp.setInspectionType(Type.FOLLOW_UP);
@@ -77,28 +77,30 @@ public class InspectionDataCSVIngester {
 
             //conditions for Hazard ENUM
 
-            if(fields.get(5) == "Low")
+            if(fields.get(5).equals("Low"))
                 temp.setHazard(Hazard.LOW);
-            else if(fields.get(5) == "Moderate")
+            else if(fields.get(5).equals("Moderate"))
                 temp.setHazard(Hazard.MEDIUM);
             else
                 temp.setHazard(Hazard.HIGH);
 
             //TODO: need a Violation parser
-            temp.setViolation(new Violation());
-            if (fields.size()==6){
-                continue;   //skip if there's no violation
+            List<Violation> dummy_violations = new ArrayList<>();
+            Violation dummy_violation = new Violation();
+            if (fields.size()==6){                          //skip if there's no violation
+                dummy_violations.add(dummy_violation);
+                temp.setViolation(dummy_violations);
             }else if (fields.get(6)!=null){
                 String[] violationLump = fields.get(6).split("\\|");
                 for (String singleViolation:violationLump
                      ) {
                     String[] dataCache = singleViolation.split(",");
-                    Violation dummyViolation = new Violation();
                     //System.out.println("ID: "+dataCache[0]);
-                    dummyViolation = violationTXTIngester.returnViolationByID(dataCache[0]);
+                    dummy_violation = violationTXTIngester.returnViolationByID(dataCache[0]);
                     //dummyViolation.Display();
-                    temp.setViolation(dummyViolation);
+                    dummy_violations.add(dummy_violation);
                 }
+                temp.setViolation(dummy_violations);
             }
             IngestionList.add(temp);
         }//end of scan loop
@@ -108,6 +110,7 @@ public class InspectionDataCSVIngester {
             inspectionData.Display();
         }*/
     }
+
     //return a list of inspection by tracking number
     public List<InspectionData> returnInspectionByID(String id){
         List<InspectionData> inspectionData = new ArrayList<>();

@@ -8,7 +8,7 @@
  * 4. criticalViolations: An integer Data type indicates number of critical violations
  * 5. nonCriticalViolations: An integer Data type indicates number of non-critical violations
  * 6. hazard: A enum Data type of three types - LOW/MEDIUM/HIGH
- * 7. violation: A Violation Data type that includes information of a violation
+ * 7. violations: A List of Violation Data type that includes information of all violations in a single inspection
  *
  * Functions:
  * 1. Getters
@@ -19,7 +19,9 @@
  * */
 package ca.sfu.cmpt_276_project.Model;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class InspectionData {
     private String trackingNumber;
@@ -28,7 +30,7 @@ public class InspectionData {
     private int criticalViolations;
     private int nonCriticalViolations;
     private Hazard hazard;
-    private Violation violation;
+    private List<Violation> violations;
 
 
     //Getters
@@ -50,8 +52,8 @@ public class InspectionData {
     public Hazard getHazard() {
         return hazard;
     }
-    public Violation getViolation() {
-        return violation;
+    public List<Violation> getViolation() {
+        return violations;
     }
 
     //Setters
@@ -74,8 +76,8 @@ public class InspectionData {
     public void setHazard(Hazard hazard) {
         this.hazard = hazard;
     }
-    public void setViolation(Violation violation) {
-        this.violation = violation;
+    public void setViolation(List<Violation> violations) {
+        this.violations = violations;
     }
 
     //Default Constructor
@@ -87,18 +89,18 @@ public class InspectionData {
         this.criticalViolations = 0;
         this.nonCriticalViolations = 0;
         this.hazard = Hazard.LOW;
-        this.violation = new Violation();
+        this.violations = new ArrayList<>();
     }
 
     //Non Default Constructor
-    public InspectionData(String trackingNumber, Date inspectionDate, Type inspectionType, int criticalViolations, int nonCriticalViolations, Hazard hazard, Violation violation) {
+    public InspectionData(String trackingNumber, Date inspectionDate, Type inspectionType, int criticalViolations, int nonCriticalViolations, Hazard hazard, List<Violation> violations) {
         this.trackingNumber = trackingNumber;
         this.inspectionDate = inspectionDate;
         this.inspectionType = inspectionType;
         this.criticalViolations = criticalViolations;
         this.nonCriticalViolations = nonCriticalViolations;
         this.hazard = hazard;
-        this.violation = violation;
+        this.violations = violations;
     }
 
     public void Display(){
@@ -108,7 +110,10 @@ public class InspectionData {
                 +"\nCritical Violation: "+this.getCriticalViolations()
                 +"\nNon Critical Violation: "+this.getNonCriticalViolations()
                 +"\nHazard: "+this.getHazard()
-                +"\n*****************************************\nViolation details: \n");
-        this.getViolation().Display();
+                +"\nViolation details: \n*****************************************\n");
+        for (Violation violation:violations
+             ) {
+            violation.Display();
+        }
     }
 }

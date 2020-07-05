@@ -120,7 +120,7 @@ public class Restaurant {
                 +"\nFac Type: "+this.getFacType()
                 +"\nLatitude: "+this.getLatitude()
                 +"\nLongitude: "+this.getLongitude()
-                +"\n=========================================================\nInspection Data: \n");
+                +"\nInspection Data: \n=========================================================\n");
         for(InspectionData inspectionData : this.inspectionDataList){
             inspectionData.Display();
         }

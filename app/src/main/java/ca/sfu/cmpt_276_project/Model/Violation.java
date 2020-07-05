@@ -72,6 +72,7 @@ public class Violation {
         System.out.println("Violation number: "+ this.getViolationNumber()
                             +"\nDescription: "+this.getDescription()
                             +"\nCritical: "+this.isCritical()
-                            +"\nRepeat: "+this.isRepeat());
+                            +"\nRepeat: "+this.isRepeat()
+                            +"\n.........................................");
     }
 }
