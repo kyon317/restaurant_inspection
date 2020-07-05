@@ -75,11 +75,16 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-
-        if (!restaurantList.isEmpty())
-            for (Restaurant restaurant:restaurantList
+        // Debugging Info Display
+        if (!restaurantList.isEmpty()) {
+            int inspection_count = 0;
+            for (Restaurant restaurant : restaurantList
             ) {
                 restaurant.Display();
+                inspection_count += restaurant.getInspectionDataList().size();
             }
+            System.out.println("Restaurant Count: "+restaurantList.size());
+            System.out.println("Inspection Count: "+inspection_count);
+        }
     }
 }
