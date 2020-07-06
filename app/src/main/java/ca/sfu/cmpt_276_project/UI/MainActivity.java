@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
                 Restaurants clickedRestaurant = surreyRestaurants.get(position);
 
                 // Launch dummy restaurant details menu
-                Intent  intent = new Intent(MainActivity.this, RestaurantDetails.class);
+                Intent  intent = RestaurantDetails.makeIntent(MainActivity.this);
                 startActivity(intent);
             }
         });
@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
             Restaurants currentRestaurant = surreyRestaurants.get(position);
 
             // Fill restaurant image
-            ImageView resImageView = (ImageView)findViewById(R.id.restaurant_icon);
+            ImageView resImageView = (ImageView)restaurantView.findViewById(R.id.restaurant_icon);
             resImageView.setImageResource(currentRestaurant.getIcon());
 
             // Fill hazard icon

@@ -1,5 +1,7 @@
 package ca.sfu.cmpt_276_project.UI;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.TextView;
 
@@ -14,6 +16,10 @@ import android.widget.TextView;
 import ca.sfu.cmpt_276_project.R;
 
 public class Inspection_Details extends AppCompatActivity {
+
+    public static Intent makeIntent(Context context) {
+        return new Intent(context, Inspection_Details.class);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,10 +37,10 @@ public class Inspection_Details extends AppCompatActivity {
         TextView inspectType = findViewById(R.id.res_inspect_type);
         inspectType.setText(PizzaHut.getInspectType());
 
-        TextView numCrit = findViewById(R.id.numcrit);
+        TextView numCrit = findViewById(R.id.res_num_critical);
         numCrit.setText("" + PizzaHut.getNumCritical());
 
-        TextView numNonCrit = findViewById(R.id.num_noncrit);
+        TextView numNonCrit = findViewById(R.id.res_num_noncriticial);
         numNonCrit.setText("" + PizzaHut.getNumNonCritical());
 
         TextView hazard = findViewById(R.id.res_hazard_rating);
