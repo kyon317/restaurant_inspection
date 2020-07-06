@@ -1,5 +1,6 @@
 /*
 * This is a testing activity to test singleton class and data consistency
+*
 * */
 
 package ca.sfu.cmpt_276_project;

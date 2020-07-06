@@ -6,6 +6,7 @@
  * Function:
  * 1. readViolationData(Context context): Given the context, the function fetches data from all_violations.txt and interprets it into a List of Violations.[Done]
  * 2. returnViolationByID(String id): Given the id, the function searches existing violations in violationList and return the designated violation, otherwise an empty violation will be returned.[Done]
+ *
  * */
 
 package ca.sfu.cmpt_276_project.CsvIngester;

@@ -7,6 +7,7 @@
  * Function:
  * 1. readInspectionData(Context context): Given the context, the function fetches data from inspectionreports_itr1.csv and interprets it into a List of InspectionData.[Done]
  * 2. returnInspectionByID(String id): Given the id, the function searches existing inspections in IngestionList and return a list of inspections, otherwise an empty list will be returned.[Done]
+ *
  * */
 package ca.sfu.cmpt_276_project.CsvIngester;
 
