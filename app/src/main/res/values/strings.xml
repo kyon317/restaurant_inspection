@@ -1,5 +1,17 @@
 <resources>
     <string name="app_name">cmpt-276-project</string>
+    <string name="textview">
+        Display Format:\n
+        Restaurant Name\n
+        Hazard Level, # issues, most recent inspection date
+
+    </string>
+    <string name="restaurant_menu">Select to see restaurant details</string>
+    <string name="inspection_type">Inspection Type:</string>
+    <string name="critical_issues"># Critical Issues:</string>
+    <string name="hazard_rating">Hazard Rating</string>
+    <string name="non_critical_issues"># Non Critical Issues:</string>
+    <string name="inspection_date">Inspection Date:</string>
     <string name="title_activity_single_restaurant">SingleRestaurantActivity</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>

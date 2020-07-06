@@ -9,15 +9,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity
-            android:name=".SingleInspectionActivity"
-            android:label="@string/title_activity_single_inspection"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
-        <activity
-            android:name=".SingleRestaurantActivity"
-            android:label="@string/title_activity_single_restaurant"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".UI.Inspection_Details"></activity>
+        <activity android:name=".UI.RestaurantDetails" />
+        <activity android:name=".UI.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
