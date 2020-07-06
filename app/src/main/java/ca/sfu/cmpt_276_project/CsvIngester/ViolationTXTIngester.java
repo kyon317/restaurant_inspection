@@ -18,7 +18,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +34,7 @@ public class ViolationTXTIngester {
                 (R.raw.all_violations);
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(restaurantDataInput,
-                Charset.forName("UTF-8")));
+                StandardCharsets.UTF_8));
         String inputLine = "";
 
         //reading and storing CSV data

@@ -9,21 +9,19 @@
 * */
 
 package ca.sfu.cmpt_276_project.CsvIngester;
+
 import android.content.Context;
 import android.util.Log;
-
-
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-
-import ca.sfu.cmpt_276_project.Model.*;
+import ca.sfu.cmpt_276_project.Model.Restaurant;
 import ca.sfu.cmpt_276_project.R;
 
 public class RestaurantCSVIngester {
@@ -35,7 +33,7 @@ public class RestaurantCSVIngester {
                                             (R.raw.restaurants_itr1);
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(restaurantDataInput,
-                                                    Charset.forName("UTF-8")));
+                StandardCharsets.UTF_8));
         String inputLine = "";
 
         //reading and storing CSV data
