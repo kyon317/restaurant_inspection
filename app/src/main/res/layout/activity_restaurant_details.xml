@@ -13,4 +13,12 @@
         android:text="TextView"
         tools:layout_editor_absoluteX="159dp"
         tools:layout_editor_absoluteY="71dp" />
+
+    <Button
+        android:id="@+id/goto_inspect_details"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Button"
+        tools:layout_editor_absoluteX="176dp"
+        tools:layout_editor_absoluteY="186dp" />
 </androidx.constraintlayout.widget.ConstraintLayout>

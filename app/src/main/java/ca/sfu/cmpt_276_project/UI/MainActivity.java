@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,9 +37,9 @@ public class MainActivity extends AppCompatActivity {
 
     // add dummy restaurants data
     private void populateRestaurantList() {
-        surreyRestaurants.add(new Restaurants("A&W Restaurant", R.drawable.aw, R.drawable.hazardlow, 2, "Mar 20"));
-        surreyRestaurants.add(new Restaurants("Lee Yuen Restaurant", R.drawable.dimsum, R.drawable.hazardyellow,1, "Dec 2018"));
-        surreyRestaurants.add(new Restaurants("Pizza Hut Restaurant", R.drawable.pizza, R.drawable.hazardhigh,3, "20 days"));
+        surreyRestaurants.add(new Restaurants("A&W Restaurant", R.drawable.aw, R.drawable.hazardlow, "Low", 2, "Mar 20"));
+        surreyRestaurants.add(new Restaurants("Lee Yuen Restaurant", R.drawable.dimsum, R.drawable.hazardyellow, "Moderate",1, "Dec 2018"));
+        surreyRestaurants.add(new Restaurants("Pizza Hut Restaurant", R.drawable.pizza, R.drawable.hazardhigh,"High",3, "20 days"));
 
     }
 
@@ -83,12 +84,27 @@ public class MainActivity extends AppCompatActivity {
             Restaurants currentRestaurant = surreyRestaurants.get(position);
 
             // Fill restaurant image
-            ImageView resImageView = (ImageView)restaurantView.findViewById(R.id.restaurant_icon);
+            ImageView resImageView = (ImageView)findViewById(R.id.restaurant_icon);
             resImageView.setImageResource(currentRestaurant.getIcon());
 
-            // Fill restaurant image
+            // Fill hazard icon
             ImageView hazardIconView = (ImageView)restaurantView.findViewById(R.id.restaurant_hazardicon);
             hazardIconView.setImageResource(currentRestaurant.getHazardIcon());
+
+            //Fill hazard level with color
+            TextView hazardLevelView = (TextView)restaurantView.findViewById(R.id.hazard_level);
+
+            if(currentRestaurant.getHazard() == "Low"){
+                hazardLevelView.setTextColor(Color.GREEN);
+            }
+            else if(currentRestaurant.getHazard() == "Moderate"){
+                hazardLevelView.setTextColor(Color.MAGENTA);
+            }
+            else{
+                hazardLevelView.setTextColor((Color.RED));
+            }
+
+            hazardLevelView.setText(currentRestaurant.getHazard());
 
             // Fill name
             TextView nameText = (TextView)restaurantView.findViewById(R.id.restaurant_txtName);

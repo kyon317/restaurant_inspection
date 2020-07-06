@@ -7,4 +7,9 @@
 
     </string>
     <string name="restaurant_menu">Select to see restaurant details</string>
+    <string name="inspection_type">Inspection Type:</string>
+    <string name="critical_issues"># Critical Issues:</string>
+    <string name="hazard_rating">Hazard Rating</string>
+    <string name="non_critical_issues"># Non Critical Issues:</string>
+    <string name="inspection_date">Inspection Date:</string>
 </resources>
