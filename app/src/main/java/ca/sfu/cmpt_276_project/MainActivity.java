@@ -10,81 +10,63 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ca.sfu.cmpt_276_project.CsvIngester.InspectionDataCSVIngester;
-import ca.sfu.cmpt_276_project.CsvIngester.ViolationTXTIngester;
 import ca.sfu.cmpt_276_project.Model.Restaurant;
 import ca.sfu.cmpt_276_project.CsvIngester.RestaurantCSVIngester;
+import ca.sfu.cmpt_276_project.Model.RestaurantManager;
 
 public class MainActivity extends AppCompatActivity {
+
+    private RestaurantManager restaurantManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        data_mitigate_test();
-//        RestaurantCSVIngester test_restaurant_ingester = new RestaurantCSVIngester();
-//        try {
-//            test_restaurant_ingester.readRestaurantList(this);
-//        } catch (IOException e) {
-//           e.printStackTrace();
-//        }
-
-//        InspectionDataCSVIngester test_inspection_ingester = new InspectionDataCSVIngester();
-//
-//        try {
-//           test_inspection_ingester.readInspectionData(this);
-//       } catch (IOException e) {
-//           e.printStackTrace();
-//        } catch (ParseException e) {
-//           e.printStackTrace();
-//       }
-
-
-//        ViolationTXTIngester test = new ViolationTXTIngester();
-
-//        try {
-//            test.readViolationData(this);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } catch (ParseException e) {
-//            e.printStackTrace();
-//        }
+        restaurantManager = RestaurantManager.getInstance();
+        initializeRestaurantList();//method necessary to initialize instance
     }
 
-    public void data_mitigate_test(){
-        RestaurantCSVIngester test_importer = new RestaurantCSVIngester();
+    public void initializeRestaurantList(){
+        //get Restaurants from CSV
+        RestaurantCSVIngester restaurantImport = new RestaurantCSVIngester();
         List<Restaurant> restaurantList = new ArrayList<>();
         try {
-            test_importer.readRestaurantList(this);
-            restaurantList = test_importer.getRestaurantList();
+            restaurantImport.readRestaurantList(this);
+            restaurantList = restaurantImport.getRestaurantList();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        InspectionDataCSVIngester test_inspection_ingester = new InspectionDataCSVIngester();
 
+        //get Inspection Data of Restaurants from CSV
+        InspectionDataCSVIngester inspectionDataImport = new InspectionDataCSVIngester();
         try {
-            test_inspection_ingester.readInspectionData(this);
-            if (!restaurantList.isEmpty())
-                for (Restaurant restaurant:restaurantList
-                ) {
-                    restaurant.setInspectionDataList(test_inspection_ingester.returnInspectionByID(restaurant.getTrackNumber()));
+            inspectionDataImport.readInspectionData(this);
+
+            //Sort inspection data into proper Restaurant objects
+            if (!restaurantList.isEmpty()) {
+                for (Restaurant restaurant : restaurantList) {
+                    restaurant.setInspectionDataList(inspectionDataImport.returnInspectionByID
+                            (restaurant.getTrackNumber()));
                 }
+            }
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ParseException e) {
             e.printStackTrace();
         }
 
-        // Debugging Info Display
-        if (!restaurantList.isEmpty()) {
+        //Update existing Restaurant Manager obj instance
+        restaurantManager.setRestaurants(restaurantList);
+
+        /* Debugging Pretty Printer, uncomment to test further
+        if (!restaurantManager.getRestaurants().isEmpty()) {
             int inspection_count = 0;
-            for (Restaurant restaurant : restaurantList
-            ) {
+            for (Restaurant restaurant : restaurantManager.getRestaurants()) {
                 restaurant.Display();
                 inspection_count += restaurant.getInspectionDataList().size();
             }
             System.out.println("Restaurant Count: "+restaurantList.size());
             System.out.println("Inspection Count: "+inspection_count);
-        }
+        }*/
     }
 }
