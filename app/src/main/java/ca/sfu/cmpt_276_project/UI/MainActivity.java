@@ -3,9 +3,7 @@ package ca.sfu.cmpt_276_project.UI;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -19,14 +17,22 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+import ca.sfu.cmpt_276_project.CsvIngester.InspectionDataCSVIngester;
+import ca.sfu.cmpt_276_project.CsvIngester.RestaurantCSVIngester;
+import ca.sfu.cmpt_276_project.Model.RestaurantManager;
+import ca.sfu.cmpt_276_project.Model.Restaurant;
 import ca.sfu.cmpt_276_project.R;
+import ca.sfu.cmpt_276_project.TestingActivity;
 
 public class MainActivity extends AppCompatActivity {
 
-    private List<Restaurants> surreyRestaurants = new ArrayList<Restaurants>();
+    private List<DummyRestaurants> surreyRestaurants = new ArrayList<DummyRestaurants>();//dummy var list for UI
+    private RestaurantManager restaurantManager;//actual list you wanna use
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +52,69 @@ public class MainActivity extends AppCompatActivity {
         populateRestaurantList();
         populateListView();
         registerClickCallback();
+        restaurantManager = RestaurantManager.getInstance();
+        initializeRestaurantList();//method necessary to initialize instance
+        //launchTestingActivity();
     }
+
+    public void initializeRestaurantList(){
+        //get Restaurants from CSV
+        RestaurantCSVIngester restaurantImport = new RestaurantCSVIngester();
+        List<Restaurant> restaurantList = new ArrayList<>();
+
+        try {
+            restaurantImport.readRestaurantList(this);
+            restaurantList = restaurantImport.getRestaurantList();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //get Inspection Data of Restaurants from CSV
+        InspectionDataCSVIngester inspectionDataImport = new InspectionDataCSVIngester();
+        try {
+            inspectionDataImport.readInspectionData(this);
+            //Sort inspection data into proper Restaurant objects
+            if (!restaurantList.isEmpty()) {
+                for (Restaurant restaurant : restaurantList) {
+                    restaurant.setInspectionDataList(inspectionDataImport.returnInspectionByID
+                            (restaurant.getTrackNumber()));
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        //Update existing Restaurant Manager obj instance
+        restaurantManager.setRestaurants(restaurantList);
+
+        /* Debugging Pretty Printer, uncomment to test further
+        if (!restaurantManager.getRestaurants().isEmpty()) {
+            int inspection_count = 0;
+            for (Restaurant restaurant : restaurantManager.getRestaurants()) {
+                restaurant.Display();
+                //System.out.println(restaurant.getRestaurantName()); sort check
+                inspection_count += restaurant.getInspectionDataList().size();
+            }
+            System.out.println("Restaurant Count: "+restaurantList.size());
+            System.out.println("Inspection Count: "+inspection_count);
+        }*/
+    }
+
+    /**
+     * Vincent testing code below
+     */
+    public void makeDummyChanges(){
+        restaurantManager.getRestaurants().remove(0);
+    }
+    public void launchTestingActivity(){
+        makeDummyChanges();         //make changes on instance to test data consistency
+        Intent intent = new Intent(this, TestingActivity.class);
+        startActivity(intent);
+    }
+    //end of testing code
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -65,14 +133,14 @@ public class MainActivity extends AppCompatActivity {
 
     // add dummy restaurants data
     private void populateRestaurantList() {
-        surreyRestaurants.add(new Restaurants("A&W Restaurant", R.drawable.aw, R.drawable.hazardlow, "Low", 2, "Mar 20"));
-        surreyRestaurants.add(new Restaurants("Lee Yuen Restaurant", R.drawable.dimsum, R.drawable.hazardyellow, "Moderate",1, "Dec 2018"));
-        surreyRestaurants.add(new Restaurants("Pizza Hut Restaurant", R.drawable.pizza, R.drawable.hazardhigh,"High",3, "20 days"));
+        surreyRestaurants.add(new DummyRestaurants("A&W Restaurant", R.drawable.aw, R.drawable.hazardlow, "Low", 2, "Mar 20"));
+        surreyRestaurants.add(new DummyRestaurants("Lee Yuen Restaurant", R.drawable.dimsum, R.drawable.hazardyellow, "Moderate",1, "Dec 2018"));
+        surreyRestaurants.add(new DummyRestaurants("Pizza Hut Restaurant", R.drawable.pizza, R.drawable.hazardhigh,"High",3, "20 days"));
 
     }
 
     private void populateListView() {
-        ArrayAdapter<Restaurants> adapter = new MyListAdapter();
+        ArrayAdapter<DummyRestaurants> adapter = new MyListAdapter();
         ListView list = (ListView) findViewById(R.id.restaurantsListView);
         list.setAdapter(adapter);
     }
@@ -84,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View viewClicked, int position, long id) {
-                Restaurants clickedRestaurant = surreyRestaurants.get(position);
+                DummyRestaurants clickedRestaurant = surreyRestaurants.get(position);
 
                 // Launch dummy restaurant details menu
                 Intent  intent = SingleRestaurantActivity.makeIntent(MainActivity.this);
@@ -94,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private class MyListAdapter extends ArrayAdapter<Restaurants> {
+    private class MyListAdapter extends ArrayAdapter<DummyRestaurants> {
 
         public MyListAdapter() {
             super(MainActivity.this, R.layout.restaurants_view, surreyRestaurants);
@@ -109,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
 
-            Restaurants currentRestaurant = surreyRestaurants.get(position);
+            DummyRestaurants currentRestaurant = surreyRestaurants.get(position);
 
             // Fill restaurant image
             ImageView resImageView = (ImageView)restaurantView.findViewById(R.id.restaurant_icon);

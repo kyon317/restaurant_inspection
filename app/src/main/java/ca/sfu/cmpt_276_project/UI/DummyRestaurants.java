@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 // Dummy object to work with listRestaurant layout
 
-public class Restaurants {
+public class DummyRestaurants {
 
     private String name;
     private int icon;
@@ -14,7 +14,7 @@ public class Restaurants {
 
     private int hazardIcon;
 
-    public Restaurants(String name, int icon, int hazardIcon, String hazard, int criticalViolationCount, String mostRecentDate) {
+    public DummyRestaurants(String name, int icon, int hazardIcon, String hazard, int criticalViolationCount, String mostRecentDate) {
         this.name = name;
         this.icon = icon;
         this.hazardIcon = hazardIcon;

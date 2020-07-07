@@ -9,13 +9,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light">
+        <activity android:name=".TestingActivity"></activity>
         <activity
             android:name=".UI.SingleRestaurantActivity"
             android:label="@string/title_activity_single_restaurant"
             android:parentActivityName=".UI.MainActivity" />
-
-
-        <activity android:name=".UI.Inspection_Details"
+        <activity android:name=".UI.Inspection_Details_Activity"
             android:parentActivityName=".UI.SingleRestaurantActivity"></activity>
         <activity android:name=".UI.MainActivity">
             <intent-filter>

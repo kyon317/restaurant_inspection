@@ -1,6 +1,6 @@
 package ca.sfu.cmpt_276_project.UI;
 
-public class Violations {
+public class DummyViolations {
 
     private String shortDetail;
     private String longDetail;
@@ -9,7 +9,7 @@ public class Violations {
 
     private String isCritical;
 
-    public Violations(String shortDetail, String longDetail, int violationICon, int violationLevelIcon, String isCritical) {
+    public DummyViolations(String shortDetail, String longDetail, int violationICon, int violationLevelIcon, String isCritical) {
         this.shortDetail = shortDetail;
         this.longDetail = longDetail;
         this.violationICon = violationICon;

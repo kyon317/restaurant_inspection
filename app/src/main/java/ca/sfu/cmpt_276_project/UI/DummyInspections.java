@@ -1,8 +1,8 @@
 package ca.sfu.cmpt_276_project.UI;
 
-public class Inspections {
+public class DummyInspections {
 
-    public Inspections( String inspectDate,  String inspectType, int numCritical, int numNonCritical, String hazard, int hazardIcon) {
+    public DummyInspections(String inspectDate, String inspectType, int numCritical, int numNonCritical, String hazard, int hazardIcon) {
         this.inspectType = inspectType;
         this.inspectDate = inspectDate;
         this.numCritical = numCritical;

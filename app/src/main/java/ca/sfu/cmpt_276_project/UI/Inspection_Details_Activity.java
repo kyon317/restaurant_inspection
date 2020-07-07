@@ -14,7 +14,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,15 +23,15 @@ import android.widget.Toast;
 
 import ca.sfu.cmpt_276_project.R;
 
-public class Inspection_Details extends AppCompatActivity {
+public class Inspection_Details_Activity extends AppCompatActivity {
 
     public static Intent makeIntent(Context context) {
-        return new Intent(context, Inspection_Details.class);
+        return new Intent(context, Inspection_Details_Activity.class);
     }
 
 
     // dummy violation list
-    private List<Violations> restaurantViolationsList = new ArrayList<Violations>();
+    private List<DummyViolations> restaurantDummyViolationsList = new ArrayList<DummyViolations>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +53,7 @@ public class Inspection_Details extends AppCompatActivity {
 
 
         // dummy single inspection data;
-        Inspections PizzaHut = new Inspections("March 20 2019",
+        DummyInspections PizzaHut = new DummyInspections("March 20 2019",
                 "Routine", 1, 2,"Low",R.drawable.hazardlow);
 
         TextView inspectDate = findViewById(R.id.res_inspect_date);
@@ -93,36 +92,36 @@ public class Inspection_Details extends AppCompatActivity {
 
     // add dummy violations data
     private void populateViolationsList() {
-        restaurantViolationsList.add(new Violations("101, Plans/construction ",
+        restaurantDummyViolationsList.add(new DummyViolations("101, Plans/construction ",
                 "101,Not Critical,Plans/construction/alterations not in accordance with the Regulation [s. 3; s. 4],Not Repeat",
                 R.drawable.equipments,R.drawable.hazardlow, "Non Critical"));
-        restaurantViolationsList.add(new Violations("208,Foods ",
+        restaurantDummyViolationsList.add(new DummyViolations("208,Foods ",
                 "208,Not Critical,Foods obtained from unapproved sources [s. 11],Not Repeat",
                 R.drawable.foods,R.drawable.hazardhigh, "Critical"));
-        restaurantViolationsList.add(new Violations("304,Premises ",
+        restaurantDummyViolationsList.add(new DummyViolations("304,Premises ",
                 "304,Not Critical,Premises not free of pests [s. 26(a)],Not Repeat",
                 R.drawable.pest,R.drawable.hazardlow, "Non Critical"));
 
-        restaurantViolationsList.add(new Violations("101, Plans/construction ",
+        restaurantDummyViolationsList.add(new DummyViolations("101, Plans/construction ",
                 "101,Not Critical,Plans/construction/alterations not in accordance with the Regulation [s. 3; s. 4],Not Repeat",
                 R.drawable.equipments,R.drawable.hazardlow, "Non Critical"));
-        restaurantViolationsList.add(new Violations("208,Foods ",
+        restaurantDummyViolationsList.add(new DummyViolations("208,Foods ",
                 "208,Not Critical,Foods obtained from unapproved sources [s. 11],Not Repeat",
                 R.drawable.foods,R.drawable.hazardhigh, "Critical"));
-        restaurantViolationsList.add(new Violations("101, Plans/construction ",
+        restaurantDummyViolationsList.add(new DummyViolations("101, Plans/construction ",
                 "101,Not Critical,Plans/construction/alterations not in accordance with the Regulation [s. 3; s. 4],Not Repeat",
                 R.drawable.equipments,R.drawable.hazardlow, "Non Critical"));
-        restaurantViolationsList.add(new Violations("208,Foods ",
+        restaurantDummyViolationsList.add(new DummyViolations("208,Foods ",
                 "208,Not Critical,Foods obtained from unapproved sources [s. 11],Not Repeat",
                 R.drawable.foods,R.drawable.hazardhigh, "Critical"));
-        restaurantViolationsList.add(new Violations("304,Premises ",
+        restaurantDummyViolationsList.add(new DummyViolations("304,Premises ",
                 "304,Not Critical,Premises not free of pests [s. 26(a)],Not Repeat",
                 R.drawable.pest,R.drawable.hazardlow, "Non Critical"));
 
     }
 
     private void populateListView() {
-        ArrayAdapter<Violations> adapter = new MyListAdapter();
+        ArrayAdapter<DummyViolations> adapter = new MyListAdapter();
         ListView list = (ListView) findViewById(R.id.violationList);
         list.setAdapter(adapter);
     }
@@ -133,19 +132,19 @@ public class Inspection_Details extends AppCompatActivity {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View viewClicked, int position, long id) {
-                Violations clickedViolation = restaurantViolationsList.get(position);
+                DummyViolations clickedViolation = restaurantDummyViolationsList.get(position);
 
                 // Toast full detail of the clicked violation
-                Toast.makeText(Inspection_Details.this, clickedViolation.getLongDetail(),
+                Toast.makeText(Inspection_Details_Activity.this, clickedViolation.getLongDetail(),
                         Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private class MyListAdapter extends ArrayAdapter<Violations> {
+    private class MyListAdapter extends ArrayAdapter<DummyViolations> {
 
         public MyListAdapter() {
-            super(Inspection_Details.this, R.layout.violation_view, restaurantViolationsList);
+            super(Inspection_Details_Activity.this, R.layout.violation_view, restaurantDummyViolationsList);
 
         }
 
@@ -158,7 +157,7 @@ public class Inspection_Details extends AppCompatActivity {
                         parent,false);
             }
 
-            Violations currentViolation = restaurantViolationsList.get(position);
+            DummyViolations currentViolation = restaurantDummyViolationsList.get(position);
 
             // Fill short details and change text color based on critical rating
             TextView violationTxt = (TextView)violationsView.findViewById((R.id.violation_txt));

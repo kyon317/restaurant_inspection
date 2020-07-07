@@ -8,7 +8,6 @@ import android.os.Bundle;
 
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
 import android.view.View;
 import android.view.ViewGroup;
@@ -171,7 +170,7 @@ public class SingleRestaurantActivity extends AppCompatActivity {
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Intent intent = Inspection_Details.makeIntent(
+                Intent intent = Inspection_Details_Activity.makeIntent(
                         SingleRestaurantActivity.this);
                 startActivity(intent);
 
