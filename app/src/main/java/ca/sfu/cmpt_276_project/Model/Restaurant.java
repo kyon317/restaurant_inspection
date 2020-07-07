@@ -23,7 +23,7 @@ package ca.sfu.cmpt_276_project.Model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Restaurant {
+public class Restaurant implements Comparable<Restaurant>{
     private String trackNumber;
     private String restaurantName;
     private String physicalAddress;
@@ -124,5 +124,10 @@ public class Restaurant {
         for(InspectionData inspectionData : this.inspectionDataList){
             inspectionData.Display();
         }
+    }
+
+    @Override
+    public int compareTo(Restaurant other){
+        return restaurantName.compareTo(other.restaurantName);
     }
 }

@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
             int inspection_count = 0;
             for (Restaurant restaurant : restaurantManager.getRestaurants()) {
                 restaurant.Display();
+                //System.out.println(restaurant.getRestaurantName()); sort check
                 inspection_count += restaurant.getInspectionDataList().size();
             }
             System.out.println("Restaurant Count: "+restaurantList.size());

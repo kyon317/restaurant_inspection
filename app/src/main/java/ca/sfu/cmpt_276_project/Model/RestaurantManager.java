@@ -28,11 +28,12 @@ public class RestaurantManager {
 
     public void setRestaurants(List<Restaurant> restaurantList){
         this.restaurants = restaurantList;
+        java.util.Collections.sort(this.restaurants);
     }
 
     public List<Restaurant> getRestaurants(){ return this.restaurants; }
 
-    //THIS IS TO RETRIEVE RESTAURANTS BY TRACKING NUMER
+    //THIS IS TO RETRIEVE RESTAURANTS BY TRACKING NUMBER
     public Restaurant getRestaurantByTrackingNumber(String trackNumber)
             throws IndexOutOfBoundsException{
 
