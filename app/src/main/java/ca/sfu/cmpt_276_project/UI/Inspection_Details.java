@@ -13,6 +13,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +37,9 @@ public class Inspection_Details extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inspection__details);
+
+        getSupportActionBar().setTitle("Surrey Restaurant Inspections");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
         // dummy single inspection data;

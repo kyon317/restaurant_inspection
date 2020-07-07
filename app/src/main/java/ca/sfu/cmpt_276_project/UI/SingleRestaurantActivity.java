@@ -114,14 +114,15 @@ public class SingleRestaurantActivity extends AppCompatActivity {
             50,
             -123
             );
-    static List<Inspection> inspections = new ArrayList<>();
+    private List<Inspection> inspections = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_single_restaurant);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+
+        getSupportActionBar().setTitle("Surrey Restaurant Inspections");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         TextView restaurantName_textview = findViewById(R.id.Restaurant_name);
         restaurantName_textview.setText(restaurant.getName());
