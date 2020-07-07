@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
     private class MyListAdapter extends ArrayAdapter<Restaurants> {
 
         public MyListAdapter() {
-            super(MainActivity.this,R.layout.restaurants_view, surreyRestaurants);
+            super(MainActivity.this, R.layout.restaurants_view, surreyRestaurants);
         }
 
         @NonNull
@@ -101,10 +101,10 @@ public class MainActivity extends AppCompatActivity {
             //Fill hazard level with color
             TextView hazardLevelView = (TextView)restaurantView.findViewById(R.id.hazard_level);
 
-            if(currentRestaurant.getHazard() == "Low"){
+            if(currentRestaurant.getHazard().equals("Low")){
                 hazardLevelView.setTextColor(Color.GREEN);
             }
-            else if(currentRestaurant.getHazard() == "Moderate"){
+            else if(currentRestaurant.getHazard().equals("Moderate")){
                 hazardLevelView.setTextColor(Color.MAGENTA);
             }
             else{
