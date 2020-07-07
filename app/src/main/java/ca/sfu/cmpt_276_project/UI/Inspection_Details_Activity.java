@@ -21,6 +21,10 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import ca.sfu.cmpt_276_project.Model.Hazard;
+import ca.sfu.cmpt_276_project.Model.InspectionData;
+import ca.sfu.cmpt_276_project.Model.RestaurantManager;
+import ca.sfu.cmpt_276_project.Model.Violation;
 import ca.sfu.cmpt_276_project.R;
 
 public class Inspection_Details_Activity extends AppCompatActivity {
@@ -32,6 +36,13 @@ public class Inspection_Details_Activity extends AppCompatActivity {
 
     // dummy violation list
     private List<DummyViolations> restaurantDummyViolationsList = new ArrayList<DummyViolations>();
+
+    private RestaurantManager restaurantManager;
+    private List<Violation> violations = new ArrayList<>();
+    InspectionData inspection;
+    int restaurantNum;
+    int inspectionNum;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,48 +59,55 @@ public class Inspection_Details_Activity extends AppCompatActivity {
 
         // Set BackgroundDrawable
         getSupportActionBar().setBackgroundDrawable(colorDrawable);
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-
-        // dummy single inspection data;
-        DummyInspections PizzaHut = new DummyInspections("March 20 2019",
-                "Routine", 1, 2,"Low",R.drawable.hazardlow);
+        restaurantManager = RestaurantManager.getInstance();
+        Intent intent = getIntent();
+        restaurantNum = intent.getIntExtra("position", restaurantNum);
+        inspectionNum = intent.getIntExtra("inspection", inspectionNum);
+        inspection = restaurantManager.getRestaurantByID(
+                restaurantNum).getInspectionDataList().get(inspectionNum);
+        violations = inspection.getViolation();
 
         TextView inspectDate = findViewById(R.id.res_inspect_date);
-        inspectDate.setText(PizzaHut.getInspectDate());
+        inspectDate.setText("" + inspection.getInspectionDate());
 
         TextView inspectType = findViewById(R.id.res_inspect_type);
-        inspectType.setText(PizzaHut.getInspectType());
+        inspectType.setText("" + inspection.getInspectionType());
 
         TextView numCrit = findViewById(R.id.res_num_critical);
-        numCrit.setText("" + PizzaHut.getNumCritical());
+        numCrit.setText("" + inspection.getCriticalViolations());
 
         TextView numNonCrit = findViewById(R.id.res_num_noncriticial);
-        numNonCrit.setText("" + PizzaHut.getNumNonCritical());
+        numNonCrit.setText("" + inspection.getNonCriticalViolations());
 
         //Fill hazard level and change color based on it's value
         TextView hazard = findViewById(R.id.res_hazard_rating);
-        if(PizzaHut.getHazard().equals("Low")){
+        ImageView hazardIcon = findViewById(R.id.hazard_icon);
+        Hazard hazardLevel = inspection.getHazard();
+        if(hazardLevel == Hazard.LOW){
             hazard.setTextColor(Color.rgb(37, 148, 55));
+            hazard.setText("Low");
+            hazardIcon.setImageResource(R.drawable.hazardlow);
         }
-        else if(PizzaHut.getHazard().equals("Moderate")){
+        else if(hazardLevel == Hazard.MEDIUM){
             hazard.setTextColor(Color.MAGENTA);
+            hazard.setText("Moderate");
+            hazardIcon.setImageResource(R.drawable.hazardyellow);
         }
         else{
             hazard.setTextColor((Color.RED));
+            hazard.setText("High");
+            hazardIcon.setImageResource(R.drawable.hazardhigh);
         }
-        hazard.setText(PizzaHut.getHazard());
 
-        ImageView hazardIcon = findViewById(R.id.hazard_icon);
-        hazardIcon.setImageResource((PizzaHut.getHazardIcon()));
 
-        populateViolationsList();
+        //populateViolationsList();
         populateListView();
         registerClickCallback();
 
     }
-
+/*
     // add dummy violations data
     private void populateViolationsList() {
         restaurantDummyViolationsList.add(new DummyViolations("101, Plans/construction ",
@@ -118,10 +136,10 @@ public class Inspection_Details_Activity extends AppCompatActivity {
                 "304,Not Critical,Premises not free of pests [s. 26(a)],Not Repeat",
                 R.drawable.pest,R.drawable.hazardlow, "Non Critical"));
 
-    }
+    }*/
 
     private void populateListView() {
-        ArrayAdapter<DummyViolations> adapter = new MyListAdapter();
+        ArrayAdapter<Violation> adapter = new MyListAdapter();
         ListView list = (ListView) findViewById(R.id.violationList);
         list.setAdapter(adapter);
     }
@@ -132,19 +150,19 @@ public class Inspection_Details_Activity extends AppCompatActivity {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View viewClicked, int position, long id) {
-                DummyViolations clickedViolation = restaurantDummyViolationsList.get(position);
+                Violation clickedViolation = violations.get(position);
 
                 // Toast full detail of the clicked violation
-                Toast.makeText(Inspection_Details_Activity.this, clickedViolation.getLongDetail(),
+                Toast.makeText(Inspection_Details_Activity.this, clickedViolation.getDescription(),
                         Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private class MyListAdapter extends ArrayAdapter<DummyViolations> {
+    private class MyListAdapter extends ArrayAdapter<Violation> {
 
         public MyListAdapter() {
-            super(Inspection_Details_Activity.this, R.layout.violation_view, restaurantDummyViolationsList);
+            super(Inspection_Details_Activity.this, R.layout.violation_view, violations);
 
         }
 
@@ -157,23 +175,28 @@ public class Inspection_Details_Activity extends AppCompatActivity {
                         parent,false);
             }
 
-            DummyViolations currentViolation = restaurantDummyViolationsList.get(position);
+            Violation currentViolation = violations.get(position);
 
             // Fill short details and change text color based on critical rating
             TextView violationTxt = (TextView)violationsView.findViewById((R.id.violation_txt));
-            if(currentViolation.getIsCritical() == "Critical"){
+            ImageView violationIcon = (ImageView)violationsView.findViewById(R.id.violation_icon);
+            if(!currentViolation.isCritical()){
                 violationTxt.setTextColor(Color.rgb(37, 148, 55));
+                violationIcon.setImageResource(R.drawable.low_hazard);
             }
             else{
                 violationTxt.setTextColor(Color.RED);
+                violationIcon.setImageResource(R.drawable.high_hazard);
             }
-            violationTxt.setText((currentViolation.getShortDetail()));
+            //TODO: Have a way to differentiate between short and long description
+            violationTxt.setText((currentViolation.getDescription()));
 
-            ImageView violationIcon = (ImageView)violationsView.findViewById(R.id.violation_icon);
-            violationIcon.setImageResource(currentViolation.getViolationICon());
+
 
             ImageView violationLevelImage = (ImageView)violationsView.findViewById((R.id.violation_level));
-            violationLevelImage.setImageResource(currentViolation.getViolationLevelIcon());
+            //TODO: set the violation icon to match violation type
+            violationLevelImage.setImageResource(R.drawable.foods);
+
 
             return violationsView;
         }

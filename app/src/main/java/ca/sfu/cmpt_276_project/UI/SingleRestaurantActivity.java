@@ -180,7 +180,7 @@ public class SingleRestaurantActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 Intent intent = Inspection_Details_Activity.makeIntent(
                         SingleRestaurantActivity.this);
-                intent.putExtra("position", position);
+                intent.putExtra("inspection", position);
                 startActivity(intent);
 
             }
