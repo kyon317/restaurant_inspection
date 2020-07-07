@@ -106,7 +106,7 @@ public class Inspection_Details extends AppCompatActivity {
 
                 // Toast full detail of the clicked violation
                 Toast.makeText(Inspection_Details.this, clickedViolation.getLongDetail(),
-                        Toast.LENGTH_LONG).show();
+                        Toast.LENGTH_SHORT).show();
             }
         });
     }
