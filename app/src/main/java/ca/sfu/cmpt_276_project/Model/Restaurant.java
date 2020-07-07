@@ -31,7 +31,9 @@ public class Restaurant implements Comparable<Restaurant>{
     private String facType;
     private double latitude;
     private double longitude;
+    private int icon;
     private List<InspectionData> inspectionDataList = new ArrayList<>();
+
 
     //Getters
     public String getTrackNumber() {
@@ -57,6 +59,9 @@ public class Restaurant implements Comparable<Restaurant>{
     }
     public double getLongitude() {
         return longitude;
+    }
+    public int getIcon(){
+        return icon;
     }
 
     //Setters
@@ -84,6 +89,9 @@ public class Restaurant implements Comparable<Restaurant>{
     public void setLongitude(double longitude) {
         this.longitude = longitude;
     }
+    public void setIcon(int icon){
+        this.icon = icon;
+    }
 
     //Default Constructor
     public Restaurant() {
@@ -94,6 +102,7 @@ public class Restaurant implements Comparable<Restaurant>{
         this.facType = null;
         this.latitude = 0;
         this.longitude = 0;
+        this.icon = 0;
     }
 
     //Non-Default Constructor

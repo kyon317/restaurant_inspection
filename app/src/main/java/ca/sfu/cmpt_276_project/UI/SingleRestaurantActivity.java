@@ -116,6 +116,8 @@ public class SingleRestaurantActivity extends AppCompatActivity {
             );
     private List<Inspection> inspections = new ArrayList<>();
 
+    private int position;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -133,6 +135,9 @@ public class SingleRestaurantActivity extends AppCompatActivity {
         getSupportActionBar().setBackgroundDrawable(colorDrawable);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        Intent intent = getIntent();
+        position = intent.getIntExtra("position", position);
 
         TextView restaurantName_textview = findViewById(R.id.Restaurant_name);
         restaurantName_textview.setText(restaurant.getName());
