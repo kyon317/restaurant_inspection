@@ -21,6 +21,10 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import ca.sfu.cmpt_276_project.Model.Hazard;
+import ca.sfu.cmpt_276_project.Model.InspectionData;
+import ca.sfu.cmpt_276_project.Model.Restaurant;
+import ca.sfu.cmpt_276_project.Model.RestaurantManager;
 import ca.sfu.cmpt_276_project.R;
 
 /*
@@ -30,7 +34,7 @@ Each inspection on the list shows: #critical issues, #non-critical issues, how l
 since inspection, and an icon with hazard level and colour. When clicked, an inspection will take
 the user to IndividualInspectionActivity.
  */
-class Inspection{
+/*class Inspection{
     private int numCritIssues;
     private int numNonCritIssues;
     private String timeSinceInspection;
@@ -105,18 +109,15 @@ class Restaurant{
         return longitude;
     }
 
-}
+}*/
 
 public class SingleRestaurantActivity extends AppCompatActivity {
-    static Restaurant restaurant = new Restaurant("Denny's",
-            0,
-            "1234 Main St.",
-            50,
-            -123
-            );
-    private List<Inspection> inspections = new ArrayList<>();
+
+    private List<InspectionData> inspections = new ArrayList<>();
+    private RestaurantManager restaurantManager;
 
     private int position;
+    private Restaurant restaurant;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,32 +140,34 @@ public class SingleRestaurantActivity extends AppCompatActivity {
         Intent intent = getIntent();
         position = intent.getIntExtra("position", position);
 
-        TextView restaurantName_textview = findViewById(R.id.Restaurant_name);
-        restaurantName_textview.setText(restaurant.getName());
-        TextView addressText_textview = findViewById(R.id.addressText);
-        addressText_textview.setText(restaurant.getAddress());
-        TextView coords_textView = findViewById(R.id.coordinatesText);
-        coords_textView.setText(restaurant.getLatitude() + ", " + restaurant.getLongitude());
+        //give the view the restaurant info
+        restaurantManager = RestaurantManager.getInstance();
+        restaurant = restaurantManager.getRestaurantByID(position);
+        inspections = restaurant.getInspectionDataList();
 
-        inspections.add(new Inspection(2,
-                1,
-                "20 days",
-                R.drawable.high_hazard,
-                "high"));
-        inspections.add(new Inspection(0,
-                0,
-                "1 year",
-                R.drawable.low_hazard,
-                "low"));
+
+
+        populatateView();
         populateInspectionsList();
         registerOnClick();
 
 
     }
 
+    private void populatateView() {
+        TextView restaurantName_textview = findViewById(R.id.Restaurant_name);
+        restaurantName_textview.setText(restaurant.getRestaurantName());
+        TextView addressText_textview = findViewById(R.id.addressText);
+        addressText_textview.setText(restaurant.getPhysicalAddress()
+                +" " + restaurant.getPhysicalCity());
+        TextView coords_textView = findViewById(R.id.coordinatesText);
+        coords_textView.setText(restaurant.getLatitude() + ", " + restaurant.getLongitude());
+    }
+
     @Override
     protected void onResume(){
         super.onResume();
+        populatateView();
         populateInspectionsList();
         registerOnClick();
     }
@@ -177,6 +180,7 @@ public class SingleRestaurantActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 Intent intent = Inspection_Details_Activity.makeIntent(
                         SingleRestaurantActivity.this);
+                intent.putExtra("position", position);
                 startActivity(intent);
 
             }
@@ -184,7 +188,7 @@ public class SingleRestaurantActivity extends AppCompatActivity {
     }
     //creates a ListView and an ArrayAdapter to fill inspectionsListView
     private void populateInspectionsList() {
-        ArrayAdapter<Inspection> adapter = new MyListAdapter();
+        ArrayAdapter<InspectionData> adapter = new MyListAdapter();
         ListView list = findViewById(R.id.inspectionsListView);
         list.setAdapter(adapter);
     }
@@ -195,7 +199,7 @@ public class SingleRestaurantActivity extends AppCompatActivity {
     }
 
     //fills inspectionListView with data of each of the restaurants inspections.
-    private class MyListAdapter extends ArrayAdapter<Inspection> {
+    private class MyListAdapter extends ArrayAdapter<InspectionData> {
         public MyListAdapter(){
             super(SingleRestaurantActivity.this,
                     R.layout.inspection_listview,
@@ -210,29 +214,33 @@ public class SingleRestaurantActivity extends AppCompatActivity {
                         parent,
                         false);
             }
-            Inspection currentInspection = inspections.get(position);
+            InspectionData currentInspection = inspections.get(position);
 
             ImageView imageView = itemView.findViewById(R.id.hazardicon);
-            imageView.setImageResource(currentInspection.getIcon());
+            Hazard hazard = inspections.get(position).getHazard();
+            if(hazard == Hazard.LOW){
+                imageView.setImageResource(R.drawable.low_hazard);
+                itemView.setBackgroundColor(Color.rgb(152, 255, 156));
+            }
+            else if(hazard == Hazard.MEDIUM){
+                imageView.setImageResource(R.drawable.moderate_hazard);
+                itemView.setBackgroundColor(Color.rgb(255, 202, 125));
+            }
+            else {
+                imageView.setImageResource(R.drawable.high_hazard);
+                itemView.setBackgroundColor(Color.rgb(250, 143, 110));
+            }
+
 
             TextView numCritIssueText = itemView.findViewById(R.id.numCritIssuesValue);
-            numCritIssueText.setText("" + currentInspection.getNumCritIssues());
+            numCritIssueText.setText("" + currentInspection.getCriticalViolations());
 
             TextView numNonCritIssueText = itemView.findViewById(R.id.numNonCritVal);
-            numNonCritIssueText.setText("" + currentInspection.getNumNonCritIssues());
+            numNonCritIssueText.setText("" + currentInspection.getNonCriticalViolations());
 
             TextView inspectionDateText = itemView.findViewById(R.id.inspectionDateValue);
-            inspectionDateText.setText(currentInspection.getTimeSinceInspection());
+            inspectionDateText.setText(""+ currentInspection.getInspectionDate());
 
-            if(currentInspection.getHazardLevel().equals("low")){
-                itemView.setBackgroundColor(Color.GREEN);
-            }
-            else if(currentInspection.getHazardLevel().equals("medium")){
-                itemView.setBackgroundColor(Color.YELLOW);
-            }
-            else{
-                itemView.setBackgroundColor(Color.RED);
-            }
 
 
             return itemView;
