@@ -8,6 +8,7 @@ import androidx.appcompat.widget.Toolbar;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,6 +33,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getSupportActionBar().setTitle("Surrey Restaurant Inspections");
+
+        // Define ColorDrawable object and parse color
+        // using parseColor method
+        // with color hash code as its parameter
+        ColorDrawable colorDrawable
+                = new ColorDrawable(Color.parseColor("#31b1c4"));
+
+        // Set BackgroundDrawable
+        getSupportActionBar().setBackgroundDrawable(colorDrawable);
         
         populateRestaurantList();
         populateListView();
@@ -113,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
             TextView hazardLevelView = (TextView)restaurantView.findViewById(R.id.hazard_level);
 
             if(currentRestaurant.getHazard().equals("Low")){
-                hazardLevelView.setTextColor(Color.GREEN);
+                hazardLevelView.setTextColor(Color.rgb(37, 148, 55));
             }
             else if(currentRestaurant.getHazard().equals("Moderate")){
                 hazardLevelView.setTextColor(Color.MAGENTA);

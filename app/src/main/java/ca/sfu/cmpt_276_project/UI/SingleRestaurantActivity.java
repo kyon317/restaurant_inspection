@@ -3,6 +3,7 @@ package ca.sfu.cmpt_276_project.UI;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 
@@ -122,6 +123,16 @@ public class SingleRestaurantActivity extends AppCompatActivity {
         setContentView(R.layout.activity_single_restaurant);
 
         getSupportActionBar().setTitle("Surrey Restaurant Inspections");
+
+        // Define ColorDrawable object and parse color
+        // using parseColor method
+        // with color hash code as its parameter
+        ColorDrawable colorDrawable
+                = new ColorDrawable(Color.parseColor("#31b1c4"));
+
+        // Set BackgroundDrawable
+        getSupportActionBar().setBackgroundDrawable(colorDrawable);
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         TextView restaurantName_textview = findViewById(R.id.Restaurant_name);

@@ -3,6 +3,7 @@ package ca.sfu.cmpt_276_project.UI;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,7 +39,17 @@ public class Inspection_Details extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inspection__details);
 
-        getSupportActionBar().setTitle("Surrey Restaurant Inspections");
+        getSupportActionBar().setTitle("Inspection Details");
+
+        // Define ColorDrawable object and parse color
+        // using parseColor method
+        // with color hash code as its parameter
+        ColorDrawable colorDrawable
+                = new ColorDrawable(Color.parseColor("#31b1c4"));
+
+        // Set BackgroundDrawable
+        getSupportActionBar().setBackgroundDrawable(colorDrawable);
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
@@ -60,9 +71,8 @@ public class Inspection_Details extends AppCompatActivity {
 
         //Fill hazard level and change color based on it's value
         TextView hazard = findViewById(R.id.res_hazard_rating);
-
         if(PizzaHut.getHazard().equals("Low")){
-            hazard.setTextColor(Color.GREEN);
+            hazard.setTextColor(Color.rgb(37, 148, 55));
         }
         else if(PizzaHut.getHazard().equals("Moderate")){
             hazard.setTextColor(Color.MAGENTA);
@@ -92,6 +102,23 @@ public class Inspection_Details extends AppCompatActivity {
         restaurantViolationsList.add(new Violations("304,Premises ",
                 "304,Not Critical,Premises not free of pests [s. 26(a)],Not Repeat",
                 R.drawable.pest,R.drawable.hazardlow, "Non Critical"));
+
+        restaurantViolationsList.add(new Violations("101, Plans/construction ",
+                "101,Not Critical,Plans/construction/alterations not in accordance with the Regulation [s. 3; s. 4],Not Repeat",
+                R.drawable.equipments,R.drawable.hazardlow, "Non Critical"));
+        restaurantViolationsList.add(new Violations("208,Foods ",
+                "208,Not Critical,Foods obtained from unapproved sources [s. 11],Not Repeat",
+                R.drawable.foods,R.drawable.hazardhigh, "Critical"));
+        restaurantViolationsList.add(new Violations("101, Plans/construction ",
+                "101,Not Critical,Plans/construction/alterations not in accordance with the Regulation [s. 3; s. 4],Not Repeat",
+                R.drawable.equipments,R.drawable.hazardlow, "Non Critical"));
+        restaurantViolationsList.add(new Violations("208,Foods ",
+                "208,Not Critical,Foods obtained from unapproved sources [s. 11],Not Repeat",
+                R.drawable.foods,R.drawable.hazardhigh, "Critical"));
+        restaurantViolationsList.add(new Violations("304,Premises ",
+                "304,Not Critical,Premises not free of pests [s. 26(a)],Not Repeat",
+                R.drawable.pest,R.drawable.hazardlow, "Non Critical"));
+
     }
 
     private void populateListView() {
@@ -133,7 +160,14 @@ public class Inspection_Details extends AppCompatActivity {
 
             Violations currentViolation = restaurantViolationsList.get(position);
 
+            // Fill short details and change text color based on critical rating
             TextView violationTxt = (TextView)violationsView.findViewById((R.id.violation_txt));
+            if(currentViolation.getIsCritical() == "Critical"){
+                violationTxt.setTextColor(Color.rgb(37, 148, 55));
+            }
+            else{
+                violationTxt.setTextColor(Color.RED);
+            }
             violationTxt.setText((currentViolation.getShortDetail()));
 
             ImageView violationIcon = (ImageView)violationsView.findViewById(R.id.violation_icon);
