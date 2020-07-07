@@ -26,8 +26,8 @@ import ca.sfu.cmpt_276_project.R;
 
 /*
 Shows the details of a single restaurant.Shows restaurant name, address, and coordinates.
-Has a scroll-able list that show all it's inspections by recency.
-Each inspection on the list should show: #critical issues, #non-critical issues, how long
+Has a scroll-able list that shows all it's inspections by recency.
+Each inspection on the list shows: #critical issues, #non-critical issues, how long
 since inspection, and an icon with hazard level and colour. When clicked, an inspection will take
 the user to IndividualInspectionActivity.
  */
@@ -178,17 +178,19 @@ public class SingleRestaurantActivity extends AppCompatActivity {
             }
         });
     }
-
+    //creates a ListView and an ArrayAdapter to fill inspectionsListView
     private void populateInspectionsList() {
         ArrayAdapter<Inspection> adapter = new MyListAdapter();
         ListView list = findViewById(R.id.inspectionsListView);
         list.setAdapter(adapter);
     }
 
+    //allows SingleRestaurantActivity to be accessed.
     public static Intent makeIntent(Context context) {
         return new Intent(context, SingleRestaurantActivity.class);
     }
 
+    //fills inspectionListView with data of each of the restaurants inspections.
     private class MyListAdapter extends ArrayAdapter<Inspection> {
         public MyListAdapter(){
             super(SingleRestaurantActivity.this,
@@ -229,7 +231,6 @@ public class SingleRestaurantActivity extends AppCompatActivity {
             }
 
 
-            //TODO set onclick
             return itemView;
         }
     }
