@@ -2,6 +2,7 @@ package ca.sfu.cmpt_276_project;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import java.io.IOException;
@@ -24,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         restaurantManager = RestaurantManager.getInstance();
         initializeRestaurantList();//method necessary to initialize instance
+        launchTestingActivity();
     }
 
     public void initializeRestaurantList(){
@@ -69,5 +71,13 @@ public class MainActivity extends AppCompatActivity {
             System.out.println("Restaurant Count: "+restaurantList.size());
             System.out.println("Inspection Count: "+inspection_count);
         }*/
+    }
+    public void makeDummyChanges(){
+        restaurantManager.getRestaurants().remove(0);
+    }
+    public void launchTestingActivity(){
+        makeDummyChanges();         //make changes on instance to test data consistency
+        Intent intent = new Intent(this,TestingActivity.class);
+        startActivity(intent);
     }
 }

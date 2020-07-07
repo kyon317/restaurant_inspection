@@ -6,6 +6,7 @@
  * Function:
  * 1. readViolationData(Context context): Given the context, the function fetches data from all_violations.txt and interprets it into a List of Violations.[Done]
  * 2. returnViolationByID(String id): Given the id, the function searches existing violations in violationList and return the designated violation, otherwise an empty violation will be returned.[Done]
+ *
  * */
 
 package ca.sfu.cmpt_276_project.CsvIngester;
@@ -17,7 +18,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +34,7 @@ public class ViolationTXTIngester {
                 (R.raw.all_violations);
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(restaurantDataInput,
-                Charset.forName("UTF-8")));
+                StandardCharsets.UTF_8));
         String inputLine = "";
 
         //reading and storing CSV data

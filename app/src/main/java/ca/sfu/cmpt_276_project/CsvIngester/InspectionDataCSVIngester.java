@@ -7,6 +7,7 @@
  * Function:
  * 1. readInspectionData(Context context): Given the context, the function fetches data from inspectionreports_itr1.csv and interprets it into a List of InspectionData.[Done]
  * 2. returnInspectionByID(String id): Given the id, the function searches existing inspections in IngestionList and return a list of inspections, otherwise an empty list will be returned.[Done]
+ *
  * */
 package ca.sfu.cmpt_276_project.CsvIngester;
 
@@ -17,7 +18,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -35,6 +36,37 @@ public class InspectionDataCSVIngester {
 
     private List<InspectionData> IngestionList = new ArrayList<>();
     private ViolationTXTIngester violationTXTIngester = new ViolationTXTIngester();
+
+    public static List<String> getText(InputStream inputStream) throws IOException{
+
+        List<String> lines = new ArrayList<>();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream,
+                StandardCharsets.UTF_8));
+
+        try {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                lines.add(line);
+            }
+        } catch (IOException e) {
+            Log.wtf("Reading Activity","Fatal Error when reading file on line");
+            e.printStackTrace();
+        }
+
+        return lines;
+    }
+
+    //return a list of inspection by tracking number
+    public List<InspectionData> returnInspectionByID(String id){
+        List<InspectionData> inspectionData = new ArrayList<>();
+        for (InspectionData inspection:IngestionList
+             ) {
+            if (inspection.getTrackingNumber().equals(id)){
+                inspectionData.add(inspection);
+            }
+        }
+        return inspectionData;
+    }
 
     public void readInspectionData(Context context) throws IOException, ParseException {
         //initializing violationList
@@ -84,7 +116,7 @@ public class InspectionDataCSVIngester {
             else
                 temp.setHazard(Hazard.HIGH);
 
-            //TODO: need a Violation parser
+            //Violation parser
             List<Violation> dummy_violations = new ArrayList<>();
             Violation dummy_violation = new Violation();
             if (fields.size()==6){                          //skip if there's no violation
@@ -109,36 +141,5 @@ public class InspectionDataCSVIngester {
         for(InspectionData inspectionData : IngestionList){
             inspectionData.Display();
         }*/
-    }
-
-    //return a list of inspection by tracking number
-    public List<InspectionData> returnInspectionByID(String id){
-        List<InspectionData> inspectionData = new ArrayList<>();
-        for (InspectionData inspection:IngestionList
-             ) {
-            if (inspection.getTrackingNumber().equals(id)){
-                inspectionData.add(inspection);
-            }
-        }
-        return inspectionData;
-    }
-
-    public static List<String> getText(InputStream inputStream) throws IOException{
-
-        List<String> lines = new ArrayList<>();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream,
-                Charset.forName("UTF-8")));
-
-        try {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                lines.add(line);
-            }
-        } catch (IOException e) {
-            Log.wtf("Reading Activity","Fatal Error when reading file on line");
-            e.printStackTrace();
-        }
-
-        return lines;
     }
 }

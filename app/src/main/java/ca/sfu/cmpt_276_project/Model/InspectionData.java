@@ -18,7 +18,7 @@
  *
  * */
 package ca.sfu.cmpt_276_project.Model;
-import java.text.DateFormat;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -57,7 +57,6 @@ public class InspectionData {
     }
 
     //Setters
-
     public void setTrackingNumber(String trackingNumber) {
         this.trackingNumber = trackingNumber;
     }

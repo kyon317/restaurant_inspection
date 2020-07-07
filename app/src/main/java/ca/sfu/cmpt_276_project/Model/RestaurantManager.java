@@ -1,3 +1,9 @@
+/*
+ * Class: RestaurantManager
+ *
+ * Class description: A Singleton class that uses to maintain data derived from csv ingesters.
+ *
+ * */
 package ca.sfu.cmpt_276_project.Model;
 
 import java.util.ArrayList;
