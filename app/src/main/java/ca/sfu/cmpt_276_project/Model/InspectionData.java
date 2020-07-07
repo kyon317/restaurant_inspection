@@ -28,7 +28,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class InspectionData {
+public class InspectionData implements Comparable<InspectionData>{
     private String trackingNumber;
     private Date inspectionDate;
     private Type inspectionType;
@@ -128,5 +128,10 @@ public class InspectionData {
              ) {
             violation.Display();
         }
+    }
+
+    @Override
+    public int compareTo(InspectionData other) {
+        return inspectionDate.compareTo(other.inspectionDate);
     }
 }

@@ -35,6 +35,11 @@ public class RestaurantManager {
     public void setRestaurants(List<Restaurant> restaurantList){
         this.restaurants = restaurantList;
         java.util.Collections.sort(this.restaurants);
+        for (Restaurant restaurant:restaurants
+             ) {
+            List<InspectionData> inspectionDataList = restaurant.getInspectionDataList();
+            java.util.Collections.sort(inspectionDataList);
+        }
     }
 
     public List<Restaurant> getRestaurants(){ return this.restaurants; }
