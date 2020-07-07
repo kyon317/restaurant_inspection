@@ -11,6 +11,7 @@ import android.os.Bundle;
 
 import java.util.List;
 
+import ca.sfu.cmpt_276_project.Model.InspectionData;
 import ca.sfu.cmpt_276_project.Model.Restaurant;
 import ca.sfu.cmpt_276_project.Model.RestaurantManager;
 
@@ -31,8 +32,10 @@ public class TestingActivity extends AppCompatActivity {
             for (Restaurant restaurant : restaurantManager.getRestaurants()) {
                 restaurant.Display();
                 if (restaurant.getInspectionDataList().size()!=0){
-                    long day_diffs = restaurant.getInspectionDataList().get(0).timeSinceInspection();
-                    System.out.println("Days from inspection: "+ day_diffs);
+                    for (InspectionData inspection:restaurant.getInspectionDataList()
+                         ) {
+                        System.out.println("Days from inspection: "+ inspection.timeSinceInspection());
+                    }
                 }
                 inspection_count += restaurant.getInspectionDataList().size();
             }

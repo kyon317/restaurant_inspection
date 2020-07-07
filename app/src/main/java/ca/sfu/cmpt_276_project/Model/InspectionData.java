@@ -132,6 +132,6 @@ public class InspectionData implements Comparable<InspectionData>{
 
     @Override
     public int compareTo(InspectionData other) {
-        return inspectionDate.compareTo(other.inspectionDate);
+        return other.inspectionDate.compareTo(inspectionDate);  //return the latest
     }
 }
