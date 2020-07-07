@@ -30,6 +30,10 @@ public class TestingActivity extends AppCompatActivity {
             int inspection_count = 0;
             for (Restaurant restaurant : restaurantManager.getRestaurants()) {
                 restaurant.Display();
+                if (restaurant.getInspectionDataList().size()!=0){
+                    long day_diffs = restaurant.getInspectionDataList().get(0).timeSinceInspection();
+                    System.out.println("Days from inspection: "+ day_diffs);
+                }
                 inspection_count += restaurant.getInspectionDataList().size();
             }
             System.out.println("Restaurant Count: "+restaurantList.size());

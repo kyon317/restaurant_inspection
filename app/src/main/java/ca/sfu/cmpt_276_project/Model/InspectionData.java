@@ -19,9 +19,14 @@
  * */
 package ca.sfu.cmpt_276_project.Model;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class InspectionData {
     private String trackingNumber;
@@ -100,6 +105,15 @@ public class InspectionData {
         this.nonCriticalViolations = nonCriticalViolations;
         this.hazard = hazard;
         this.violations = violations;
+    }
+
+    public long timeSinceInspection(){
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        Date currentDate = new Date();
+        formatter.format(currentDate);
+        long diffInMillies = Math.abs(this.inspectionDate.getTime() - currentDate.getTime());
+        long diffInDays = TimeUnit.DAYS.convert(diffInMillies,TimeUnit.MILLISECONDS);
+        return diffInDays;
     }
 
     public void Display(){
