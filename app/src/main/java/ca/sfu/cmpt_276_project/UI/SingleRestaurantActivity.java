@@ -1,6 +1,5 @@
-package ca.sfu.cmpt_276_project;
+package ca.sfu.cmpt_276_project.UI;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -21,6 +20,8 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import ca.sfu.cmpt_276_project.R;
 
 /*
 Shows the details of a single restaurant.Shows restaurant name, address, and coordinates.
@@ -158,7 +159,7 @@ public class SingleRestaurantActivity extends AppCompatActivity {
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Intent intent = SingleInspectionActivity.makeIntent(
+                Intent intent = Inspection_Details.makeIntent(
                         SingleRestaurantActivity.this);
                 startActivity(intent);
 

@@ -35,6 +35,13 @@ public class MainActivity extends AppCompatActivity {
         registerClickCallback();
     }
 
+    @Override
+    protected void onResume(){
+        super.onResume();
+        populateListView();
+        registerClickCallback();
+    }
+
     // add dummy restaurants data
     private void populateRestaurantList() {
         surreyRestaurants.add(new Restaurants("A&W Restaurant", R.drawable.aw, R.drawable.hazardlow, "Low", 2, "Mar 20"));
@@ -59,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
                 Restaurants clickedRestaurant = surreyRestaurants.get(position);
 
                 // Launch dummy restaurant details menu
-                Intent  intent = RestaurantDetails.makeIntent(MainActivity.this);
+                Intent  intent = SingleRestaurantActivity.makeIntent(MainActivity.this);
                 startActivity(intent);
             }
         });
