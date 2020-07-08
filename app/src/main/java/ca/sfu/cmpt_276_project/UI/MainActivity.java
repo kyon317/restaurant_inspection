@@ -1,3 +1,9 @@
+/*
+ * Activity: Main Activity
+ *
+ * Activity description: Give a list of restaurant and brief information.
+ *
+ * */
 package ca.sfu.cmpt_276_project.UI;
 
 import androidx.annotation.NonNull;

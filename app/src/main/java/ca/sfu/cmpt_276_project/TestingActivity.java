@@ -35,6 +35,7 @@ public class TestingActivity extends AppCompatActivity {
                     for (InspectionData inspection:restaurant.getInspectionDataList()
                          ) {
                         System.out.println("Days from inspection: "+ inspection.timeSinceInspection());
+
                     }
                 }
                 inspection_count += restaurant.getInspectionDataList().size();

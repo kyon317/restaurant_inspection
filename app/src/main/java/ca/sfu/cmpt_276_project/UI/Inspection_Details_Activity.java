@@ -1,3 +1,10 @@
+/*
+* Activity: Inspection_Details_Activity
+*
+* Activity description: Give specific inspection details.
+*
+* */
+
 package ca.sfu.cmpt_276_project.UI;
 
 import android.content.Context;
@@ -5,6 +12,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -50,7 +58,6 @@ public class Inspection_Details_Activity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inspection__details);
-
         getSupportActionBar().setTitle("Inspection Details");
 
         // Define ColorDrawable object and parse color
@@ -106,7 +113,17 @@ public class Inspection_Details_Activity extends AppCompatActivity {
 
         populateListView();
         registerClickCallback();
+    }
 
+    //Customize toolbar item operations
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch (item.getItemId()){
+            case android.R.id.home:
+                finish();
+                break;
+        }
+        return true;
     }
 
     private void populateListView() {

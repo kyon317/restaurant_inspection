@@ -1,3 +1,9 @@
+/*
+ * Activity: Main Activity
+ *
+ * Activity description: Give a list of inspections of selected restaurant.
+ *
+ * */
 package ca.sfu.cmpt_276_project.UI;
 
 import android.content.Context;
