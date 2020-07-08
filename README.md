@@ -1,6 +1,6 @@
 **CMPT 276 Group Project [Group 10]**
 
-**Team members: **
+**Team members**
 * Jimmy(qhbui@sfu.ca)
 * Kabir(snooh@sfu.ca)
 * Simon(simon_eaton@sfu.ca)
