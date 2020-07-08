@@ -53,10 +53,11 @@
     <ListView
         android:id="@+id/inspectionsListView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="367dp"
         android:layout_marginTop="11dp"
         android:paddingBottom="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/Inspections"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintVertical_bias="1.0" />
 </androidx.constraintlayout.widget.ConstraintLayout>
