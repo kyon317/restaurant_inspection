@@ -10,6 +10,7 @@
 * 6. latitude: A double Data type shows the latitude of the restaurant
 * 7. longitude: A double Data type shows the longitude of the restaurant
 * 8. data: An Inspection Data type, which stores all the details of a restaurant object
+* 9. icon: An integer indicates id of the restaurant icon
 *
 * Functions:
 * 1. Getters
