@@ -23,25 +23,28 @@ import android.widget.Toast;
 
 import ca.sfu.cmpt_276_project.Model.Hazard;
 import ca.sfu.cmpt_276_project.Model.InspectionData;
+import ca.sfu.cmpt_276_project.Model.Restaurant;
 import ca.sfu.cmpt_276_project.Model.RestaurantManager;
 import ca.sfu.cmpt_276_project.Model.Violation;
 import ca.sfu.cmpt_276_project.R;
 
 public class Inspection_Details_Activity extends AppCompatActivity {
 
-    public static Intent makeIntent(Context context) {
-        return new Intent(context, Inspection_Details_Activity.class);
+    public static Intent makeIntent(Context context, int position, int restaurantPosition) {
+        Intent intent= new Intent(context, Inspection_Details_Activity.class);
+        intent.putExtra(EXTRA_RES_NUM, restaurantPosition);
+        intent.putExtra(EXTRA_INSPECTION_NUM,position);
+        return intent;
     }
 
-    // dummy violation list
-    private List<DummyViolations> restaurantDummyViolationsList = new ArrayList<DummyViolations>();
+    private static final String EXTRA_RES_NUM = "ca.sfu.cmpt_276_project.UI.extraResNum";
+    private static final String EXTRA_INSPECTION_NUM = "ca.sfu.cmpt_276_project.UI.extraInspectionNum";
 
     private RestaurantManager restaurantManager;
     private List<Violation> violations = new ArrayList<>();
     InspectionData inspection;
     int restaurantNum;
     int inspectionNum;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,8 +65,9 @@ public class Inspection_Details_Activity extends AppCompatActivity {
 
         restaurantManager = RestaurantManager.getInstance();
         Intent intent = getIntent();
-        restaurantNum = intent.getIntExtra("position", restaurantNum);
-        inspectionNum = intent.getIntExtra("inspection", inspectionNum);
+        restaurantNum = intent.getIntExtra(EXTRA_RES_NUM, 0);
+        inspectionNum = intent.getIntExtra(EXTRA_INSPECTION_NUM, 0);
+
         inspection = restaurantManager.getRestaurantByID(
                 restaurantNum).getInspectionDataList().get(inspectionNum);
         violations = inspection.getViolation();
@@ -100,8 +104,6 @@ public class Inspection_Details_Activity extends AppCompatActivity {
             hazardIcon.setImageResource(R.drawable.hazardhigh);
         }
 
-
-        //populateViolationsList();
         populateListView();
         registerClickCallback();
 
@@ -128,6 +130,7 @@ public class Inspection_Details_Activity extends AppCompatActivity {
         });
     }
 
+    // Fill violation_view with violations data
     private class MyListAdapter extends ArrayAdapter<Violation> {
 
         public MyListAdapter() {
@@ -142,6 +145,10 @@ public class Inspection_Details_Activity extends AppCompatActivity {
             if(violationsView == null){
                 violationsView = getLayoutInflater().inflate(R.layout.violation_view,
                         parent,false);
+            }
+
+            if(inspection.getNonCriticalViolations() == 0 && inspection.getCriticalViolations() == 0){
+                return violationsView;
             }
 
             Violation currentViolation = violations.get(position);
@@ -228,8 +235,7 @@ public class Inspection_Details_Activity extends AppCompatActivity {
                     violationLevelImage.setImageResource(R.drawable.icon_employee);
                     break;
                 default:
-                    violationTxt.setText((currentViolation.getDescription()));
-                    violationLevelImage.setImageResource(R.drawable.foods);
+
                     break;
             }
 

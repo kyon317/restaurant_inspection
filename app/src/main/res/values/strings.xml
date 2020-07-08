@@ -34,4 +34,10 @@
     <string name="time_since_last_visit">Time since inspection:</string>
     <string name="inspectionDateVal">30 days</string>
     <string name="title_activity_single_inspection">SingleInspectionActivity</string>
+    <string name="no_violation">No violation</string>
+    <string name="inspections">Inspections:</string>
+    <string name="inspect_date">inspect date</string>
+    <string name="issues"># issues</string>
+    <string name="txtname">txtName</string>
+    <string name="h_level">h_level</string>
 </resources>

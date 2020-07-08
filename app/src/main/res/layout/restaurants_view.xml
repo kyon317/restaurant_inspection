@@ -25,7 +25,7 @@
         android:layout_marginStart="85dp"
         android:layout_marginTop="7dp"
         android:layout_marginEnd="59dp"
-        android:text="txtName"
+        android:text="@string/txtname"
         android:textSize="28sp" />
 
     <TextView
@@ -39,7 +39,7 @@
         android:layout_marginTop="59dp"
         android:layout_marginEnd="167dp"
         android:layout_marginBottom="5dp"
-        android:text="# issues"
+        android:text="@string/issues"
         android:textAlignment="center"
         android:textSize="16sp" />
 
@@ -51,7 +51,7 @@
         android:layout_alignParentEnd="true"
         android:layout_marginTop="56dp"
         android:layout_marginEnd="1dp"
-        android:text="inspect date"
+        android:text="@string/inspect_date"
         android:textSize="22sp" />
 
     <ImageView
@@ -75,6 +75,6 @@
         android:layout_centerHorizontal="true"
         android:layout_marginStart="132dp"
         android:layout_marginTop="59dp"
-        android:text="h_level"
+        android:text="@string/h_level"
         android:textSize="16dp" />
 </RelativeLayout>

@@ -28,97 +28,15 @@ import ca.sfu.cmpt_276_project.Model.Restaurant;
 import ca.sfu.cmpt_276_project.Model.RestaurantManager;
 import ca.sfu.cmpt_276_project.R;
 
-/*
-Shows the details of a single restaurant.Shows restaurant name, address, and coordinates.
-Has a scroll-able list that shows all it's inspections by recency.
-Each inspection on the list shows: #critical issues, #non-critical issues, how long
-since inspection, and an icon with hazard level and colour. When clicked, an inspection will take
-the user to IndividualInspectionActivity.
- */
-/*class Inspection{
-    private int numCritIssues;
-    private int numNonCritIssues;
-    private String timeSinceInspection;
-    private int icon;
-    private String hazardLevel;
-
-    public Inspection(int numCritIssues,
-                      int numNonCritIssues,
-                      String timeSinceInspection,
-                      int icon,
-                      String hazardLevel){
-        this.numCritIssues = numCritIssues;
-        this.numNonCritIssues = numNonCritIssues;
-        this.timeSinceInspection = timeSinceInspection;
-        this.icon = icon;
-        this.hazardLevel = hazardLevel;
-    }
-
-    public int getNumCritIssues() {
-        return numCritIssues;
-    }
-
-    public int getNumNonCritIssues() {
-        return numNonCritIssues;
-    }
-
-    public String getTimeSinceInspection() {
-        return timeSinceInspection;
-    }
-
-    public int getIcon() {
-        return icon;
-    }
-
-    public String getHazardLevel() {
-        return hazardLevel;
-    }
-}
-class Restaurant{
-    //temporary restaurant class, will be replaced with model package.
-    private String name;
-    private int icon;
-    private String address;
-    private int latitude;
-    private int longitude;
-
-    public Restaurant(String name, int icon, String address, int latitude, int longitude){
-        this.name = name;
-        this.icon = icon;
-        this.address = address;
-        this.latitude = latitude;
-        this.longitude = longitude;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getIcon() {
-        return icon;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public int getLatitude() {
-        return latitude;
-    }
-
-    public int getLongitude() {
-        return longitude;
-    }
-
-}*/
-
 public class SingleRestaurantActivity extends AppCompatActivity {
 
     private List<InspectionData> inspections = new ArrayList<>();
     private RestaurantManager restaurantManager;
 
-    private int position;
+    private int restaurantPosition;
     private Restaurant restaurant;
+
+    private static final String EXTRA_RES_NUM = "ca.sfu.cmpt_276_project.UI.extraResNum";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,19 +57,16 @@ public class SingleRestaurantActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Intent intent = getIntent();
-        position = intent.getIntExtra("position", position);
+        restaurantPosition = intent.getIntExtra(EXTRA_RES_NUM, 0);
 
         //give the view the restaurant info
         restaurantManager = RestaurantManager.getInstance();
-        restaurant = restaurantManager.getRestaurantByID(position);
+        restaurant = restaurantManager.getRestaurantByID(restaurantPosition);
         inspections = restaurant.getInspectionDataList();
-
-
 
         populatateView();
         populateInspectionsList();
         registerOnClick();
-
 
     }
 
@@ -179,9 +94,10 @@ public class SingleRestaurantActivity extends AppCompatActivity {
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+
+                // pass positions of clicked inspection and current restaurant to Inspection_Details_Activity
                 Intent intent = Inspection_Details_Activity.makeIntent(
-                        SingleRestaurantActivity.this);
-                intent.putExtra("inspection", position);
+                        SingleRestaurantActivity.this, position, restaurantPosition);
                 startActivity(intent);
 
             }
@@ -195,8 +111,10 @@ public class SingleRestaurantActivity extends AppCompatActivity {
     }
 
     //allows SingleRestaurantActivity to be accessed.
-    public static Intent makeIntent(Context context) {
-        return new Intent(context, SingleRestaurantActivity.class);
+    public static Intent makeIntent(Context context, int restaurantPosition) {
+        Intent intent =  new Intent(context, SingleRestaurantActivity.class);
+        intent.putExtra(EXTRA_RES_NUM, restaurantPosition);
+        return intent;
     }
 
     //fills inspectionListView with data of each of the restaurants inspections.
@@ -215,6 +133,7 @@ public class SingleRestaurantActivity extends AppCompatActivity {
                         parent,
                         false);
             }
+
             InspectionData currentInspection = inspections.get(position);
 
             ImageView imageView = itemView.findViewById(R.id.hazardicon);

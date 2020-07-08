@@ -34,8 +34,7 @@ import ca.sfu.cmpt_276_project.TestingActivity;
 
 public class MainActivity extends AppCompatActivity {
 
-    private List<DummyRestaurants> surreyRestaurants = new ArrayList<DummyRestaurants>();//dummy var list for UI
-    private RestaurantManager restaurantManager;//actual list you wanna use
+    private RestaurantManager restaurantManager;
     private int[] restaurantIcons;
     private List<Restaurant> restaurants;
 
@@ -57,9 +56,7 @@ public class MainActivity extends AppCompatActivity {
 
         restaurantManager = RestaurantManager.getInstance();
         initializeRestaurantList();//method necessary to initialize instance
-        //launchTestingActivity();
 
-        //TODO delete populateRestaurantList(); after working model implementation
         populateRestaurantIcons();
         populateListView();
         registerClickCallback();
@@ -109,32 +106,7 @@ public class MainActivity extends AppCompatActivity {
         //Update existing Restaurant Manager obj instance
         restaurantManager.setRestaurants(restaurantList);
 
-        /* Debugging Pretty Printer, uncomment to test further
-        if (!restaurantManager.getRestaurants().isEmpty()) {
-            int inspection_count = 0;
-            for (Restaurant restaurant : restaurantManager.getRestaurants()) {
-                restaurant.Display();
-                //System.out.println(restaurant.getRestaurantName()); sort check
-                inspection_count += restaurant.getInspectionDataList().size();
-            }
-            System.out.println("Restaurant Count: "+restaurantList.size());
-            System.out.println("Inspection Count: "+inspection_count);
-        }*/
     }
-
-    /**
-     * Vincent testing code below
-     */
-    public void makeDummyChanges(){
-        restaurantManager.getRestaurants().remove(0);
-    }
-    public void launchTestingActivity(){
-        makeDummyChanges();         //make changes on instance to test data consistency
-        Intent intent = new Intent(this, TestingActivity.class);
-        startActivity(intent);
-    }
-    //end of testing code
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -167,14 +139,12 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View viewClicked, int position, long id) {
                 Restaurant clickedRestaurant = restaurantManager.getRestaurantByID(position);
 
-                // Launch dummy restaurant details menu
-                Intent  intent = SingleRestaurantActivity.makeIntent(MainActivity.this);
-                intent.putExtra("position", position);
+                // pass clicked restaurant's position to SingleRestaurantActivity
+                Intent intent = SingleRestaurantActivity.makeIntent(MainActivity.this, position);
                 startActivity(intent);
             }
         });
     }
-
 
     private class MyListAdapter extends ArrayAdapter<Restaurant> {
 
@@ -206,7 +176,6 @@ public class MainActivity extends AppCompatActivity {
             //Fill hazard level with color
             TextView hazardLevelView = (TextView)restaurantView.findViewById(R.id.hazard_level);
             if(currentRestaurant.getInspectionDataList().isEmpty()){
-
                 hazardLevelView.setText("None");
             }
             else{
@@ -263,7 +232,6 @@ public class MainActivity extends AppCompatActivity {
 
             // Fill # issues
             TextView numIssuesText = (TextView)restaurantView.findViewById(R.id.restaurant_txtIssues);
-           // numIssuesText.setText("" + currentRestaurant.getCriticalViolationCount());
 
             if(currentRestaurant.getInspectionDataList().isEmpty()){
                 numIssuesText.setText("");
