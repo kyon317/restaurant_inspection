@@ -6,10 +6,11 @@
 
     <ImageView
         android:id="@+id/restaurant_icon"
-        android:layout_width="117dp"
+        android:layout_width="77dp"
         android:layout_height="95dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
+        android:layout_marginTop="0dp"
         android:maxWidth="80dp"
         android:maxHeight="80dp"
         app:srcCompat="@drawable/icon_aw" />
@@ -21,37 +22,37 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginStart="138dp"
+        android:layout_marginStart="85dp"
         android:layout_marginTop="7dp"
-        android:layout_marginEnd="7dp"
+        android:layout_marginEnd="59dp"
         android:text="txtName"
         android:textSize="28sp" />
 
     <TextView
         android:id="@+id/restaurant_txtIssues"
-        android:layout_width="26dp"
-        android:layout_height="29dp"
+        android:layout_width="27dp"
+        android:layout_height="31dp"
         android:layout_alignBottom="@+id/restaurant_icon"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="58dp"
-        android:layout_marginEnd="142dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginTop="59dp"
+        android:layout_marginEnd="167dp"
+        android:layout_marginBottom="5dp"
         android:text="# issues"
         android:textAlignment="center"
         android:textSize="16sp" />
 
     <TextView
         android:id="@+id/restaurant_txtDate"
-        android:layout_width="114dp"
-        android:layout_height="32dp"
+        android:layout_width="152dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_marginTop="56dp"
         android:layout_marginEnd="1dp"
         android:text="inspect date"
-        android:textSize="24sp" />
+        android:textSize="22sp" />
 
     <ImageView
         android:id="@+id/restaurant_hazardicon"
@@ -60,7 +61,7 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_marginTop="58dp"
-        android:layout_marginEnd="251dp"
+        android:layout_marginEnd="285dp"
         android:maxWidth="40dp"
         android:maxHeight="30dp"
         app:srcCompat="@drawable/hazardlow" />
@@ -72,7 +73,7 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginStart="158dp"
+        android:layout_marginStart="132dp"
         android:layout_marginTop="59dp"
         android:text="h_level"
         android:textSize="16dp" />

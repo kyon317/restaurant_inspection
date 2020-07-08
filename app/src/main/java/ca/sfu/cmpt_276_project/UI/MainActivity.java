@@ -216,6 +216,7 @@ public class MainActivity extends AppCompatActivity {
             TextView hazardLevelView = (TextView)restaurantView.findViewById(R.id.hazard_level);
             if(currentRestaurant.getInspectionDataList().isEmpty()){
 
+                hazardLevelView.setText("None");
             }
             else{
                 Hazard hazard = currentRestaurant.getInspectionDataList().get(0).getHazard();
@@ -238,32 +239,51 @@ public class MainActivity extends AppCompatActivity {
 
             }
 
+            //Fill the most recent inspection date, and sum of critical and non-critical issues
+            TextView dateText = (TextView)restaurantView.findViewById(R.id.restaurant_txtDate);
 
             // Fill name
             TextView nameText = (TextView)restaurantView.findViewById(R.id.restaurant_txtName);
             nameText.setText(currentRestaurant.getRestaurantName());
 
-            // Fill inspection date
-            TextView dateText = (TextView)restaurantView.findViewById(R.id.restaurant_txtDate);
-
             if(currentRestaurant.getInspectionDataList().isEmpty()){
-                dateText.setText("No recent inspections.");
+                dateText.setText("");
             }
             else{
+                // Get the most recent inspection date
+                Date recentInspectDate = currentRestaurant.getInspectionDataList().get(0).getInspectionDate();
+
                 long date = currentRestaurant.getInspectionDataList().get(0).timeSinceInspection();
                 if(date < 30){
-                    dateText.setText("No recent inspections.");
+                    dateText.setText(String.valueOf(date));
                 }
-                else if(date < 365){
-                    SimpleDateFormat formatter = new SimpleDateFormat("MM/dd");
-                    formatter.format(date);
+                else if (date < 365){
+                    SimpleDateFormat formatter = new SimpleDateFormat("MMMM dd");
+                    String strDate = formatter.format(recentInspectDate);
+                    dateText.setText(strDate);
                 }
+                else{
+                    SimpleDateFormat formatter = new SimpleDateFormat("MMMM YYYY");
+                    String strDate = formatter.format(recentInspectDate);
+                    dateText.setText(strDate);
+                }
+
             }
-           //TODO set date text: dateText.setText(currentRestaurant.getMostRecentDate());
 
             // Fill # issues
             TextView numIssuesText = (TextView)restaurantView.findViewById(R.id.restaurant_txtIssues);
            // numIssuesText.setText("" + currentRestaurant.getCriticalViolationCount());
+
+            if(currentRestaurant.getInspectionDataList().isEmpty()){
+                numIssuesText.setText("");
+            }
+            else {
+                int currentCritical = currentRestaurant.getInspectionDataList().get(0).getCriticalViolations();
+                int currentNonCritical = currentRestaurant.getInspectionDataList().get(0).getNonCriticalViolations();
+                int numIssues = currentCritical + currentNonCritical;
+
+                numIssuesText.setText("" + numIssues);
+            }
 
             return restaurantView;
         }
