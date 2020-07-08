@@ -33,7 +33,6 @@ public class Inspection_Details_Activity extends AppCompatActivity {
         return new Intent(context, Inspection_Details_Activity.class);
     }
 
-
     // dummy violation list
     private List<DummyViolations> restaurantDummyViolationsList = new ArrayList<DummyViolations>();
 
@@ -107,36 +106,6 @@ public class Inspection_Details_Activity extends AppCompatActivity {
         registerClickCallback();
 
     }
-/*
-    // add dummy violations data
-    private void populateViolationsList() {
-        restaurantDummyViolationsList.add(new DummyViolations("101, Plans/construction ",
-                "101,Not Critical,Plans/construction/alterations not in accordance with the Regulation [s. 3; s. 4],Not Repeat",
-                R.drawable.equipments,R.drawable.hazardlow, "Non Critical"));
-        restaurantDummyViolationsList.add(new DummyViolations("208,Foods ",
-                "208,Not Critical,Foods obtained from unapproved sources [s. 11],Not Repeat",
-                R.drawable.foods,R.drawable.hazardhigh, "Critical"));
-        restaurantDummyViolationsList.add(new DummyViolations("304,Premises ",
-                "304,Not Critical,Premises not free of pests [s. 26(a)],Not Repeat",
-                R.drawable.pest,R.drawable.hazardlow, "Non Critical"));
-
-        restaurantDummyViolationsList.add(new DummyViolations("101, Plans/construction ",
-                "101,Not Critical,Plans/construction/alterations not in accordance with the Regulation [s. 3; s. 4],Not Repeat",
-                R.drawable.equipments,R.drawable.hazardlow, "Non Critical"));
-        restaurantDummyViolationsList.add(new DummyViolations("208,Foods ",
-                "208,Not Critical,Foods obtained from unapproved sources [s. 11],Not Repeat",
-                R.drawable.foods,R.drawable.hazardhigh, "Critical"));
-        restaurantDummyViolationsList.add(new DummyViolations("101, Plans/construction ",
-                "101,Not Critical,Plans/construction/alterations not in accordance with the Regulation [s. 3; s. 4],Not Repeat",
-                R.drawable.equipments,R.drawable.hazardlow, "Non Critical"));
-        restaurantDummyViolationsList.add(new DummyViolations("208,Foods ",
-                "208,Not Critical,Foods obtained from unapproved sources [s. 11],Not Repeat",
-                R.drawable.foods,R.drawable.hazardhigh, "Critical"));
-        restaurantDummyViolationsList.add(new DummyViolations("304,Premises ",
-                "304,Not Critical,Premises not free of pests [s. 26(a)],Not Repeat",
-                R.drawable.pest,R.drawable.hazardlow, "Non Critical"));
-
-    }*/
 
     private void populateListView() {
         ArrayAdapter<Violation> adapter = new MyListAdapter();
@@ -182,21 +151,87 @@ public class Inspection_Details_Activity extends AppCompatActivity {
             ImageView violationIcon = (ImageView)violationsView.findViewById(R.id.violation_icon);
             if(!currentViolation.isCritical()){
                 violationTxt.setTextColor(Color.rgb(37, 148, 55));
-                violationIcon.setImageResource(R.drawable.low_hazard);
+                violationIcon.setImageResource(R.drawable.icon_warning);
             }
             else{
                 violationTxt.setTextColor(Color.RED);
-                violationIcon.setImageResource(R.drawable.high_hazard);
+                violationIcon.setImageResource(R.drawable.icon_critical);
             }
-            //TODO: Have a way to differentiate between short and long description
-            violationTxt.setText((currentViolation.getDescription()));
-
-
 
             ImageView violationLevelImage = (ImageView)violationsView.findViewById((R.id.violation_level));
-            //TODO: set the violation icon to match violation type
-            violationLevelImage.setImageResource(R.drawable.foods);
 
+            // Short description and icon based on the number of violation
+            int violationNum = Integer.valueOf(currentViolation.getViolationNumber());
+            switch (violationNum){
+                case 101:
+                    violationTxt.setText("Plans not in regulation.");
+                    violationLevelImage.setImageResource(R.drawable.icon_plans);
+                    break;
+                case 102:
+                    violationTxt.setText("Unapproved food premises.");
+                    violationLevelImage.setImageResource(R.drawable.icon_premises);
+                    break;
+                case 103:
+                case 104:
+                    violationTxt.setText("Invalid permits.");
+                    violationLevelImage.setImageResource(R.drawable.icon_plans);
+                    break;
+                case 201:
+                case 202:
+                case 203:
+                case 204:
+                case 205:
+                case 206:
+                case 207:
+                case 208:
+                case 209:
+                case 210:
+                case 211:
+                case 212:
+                case 306:
+                    violationTxt.setText("Unsafe foods.");
+                    violationLevelImage.setImageResource(R.drawable.foods);
+                    break;
+                case 301:
+                case 302:
+                case 303:
+                    violationTxt.setText("Equipment is not clean.");
+                    violationLevelImage.setImageResource(R.drawable.equipments);
+                    break;
+                case 307:
+                case 308:
+                case 309:
+                case 310:
+                case 315:
+                    violationTxt.setText("Unsafe equipment");
+                    violationLevelImage.setImageResource(R.drawable.equipments);
+                    break;
+                case 311:
+                case 312:
+                case 313:
+                case 314:
+                    violationTxt.setText("Premises not maintain well.");
+                    violationLevelImage.setImageResource(R.drawable.icon_premises);
+                    break;
+                case 304:
+                case 305:
+                    violationTxt.setText("Pests control failed.");
+                    violationLevelImage.setImageResource(R.drawable.pest);
+                    break;
+                case 401:
+                case 402:
+                case 403:
+                case 404:
+                case 501:
+                case 502:
+                    violationTxt.setText("Employee safety failed.");
+                    violationLevelImage.setImageResource(R.drawable.icon_employee);
+                    break;
+                default:
+                    violationTxt.setText((currentViolation.getDescription()));
+                    violationLevelImage.setImageResource(R.drawable.foods);
+                    break;
+            }
 
             return violationsView;
         }

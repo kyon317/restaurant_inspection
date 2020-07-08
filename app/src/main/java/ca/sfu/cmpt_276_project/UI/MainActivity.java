@@ -68,8 +68,8 @@ public class MainActivity extends AppCompatActivity {
     private void populateRestaurantIcons() {
         restaurantIcons = new int[8];
         restaurantIcons[0] = R.drawable.icon_sushi;
-        restaurantIcons[1] = R.drawable.icon_fish;
-        restaurantIcons[2] = R.drawable.icon_fish;
+        restaurantIcons[1] = R.drawable.icon_dimsum;
+        restaurantIcons[2] = R.drawable.icon_dimsum;
         restaurantIcons[3] = R.drawable.icon_aw;
         restaurantIcons[4] = R.drawable.icon_beer;
         restaurantIcons[5] = R.drawable.icon_pizza;
@@ -151,15 +151,6 @@ public class MainActivity extends AppCompatActivity {
         registerClickCallback();
     }
 
-    // add dummy restaurants data
-    /* TODO delete after working
-    private void populateRestaurantList() {
-        surreyRestaurants.add(new DummyRestaurants("A&W Restaurant", R.drawable.icon_aw, R.drawable.hazardlow, "Low", 2, "Mar 20"));
-        surreyRestaurants.add(new DummyRestaurants("Lee Yuen Restaurant", R.drawable.icon_dimsum, R.drawable.hazardyellow, "Moderate",1, "Dec 2018"));
-        surreyRestaurants.add(new DummyRestaurants("Pizza Hut Restaurant", R.drawable.icon_pizza, R.drawable.hazardhigh,"High",3, "20 days"));
-
-    }*/
-
     private void populateListView() {
         restaurants = restaurantManager.getRestaurants();
         ArrayAdapter<Restaurant> adapter = new MyListAdapter();
@@ -239,12 +230,12 @@ public class MainActivity extends AppCompatActivity {
 
             }
 
-            //Fill the most recent inspection date, and sum of critical and non-critical issues
-            TextView dateText = (TextView)restaurantView.findViewById(R.id.restaurant_txtDate);
-
             // Fill name
             TextView nameText = (TextView)restaurantView.findViewById(R.id.restaurant_txtName);
             nameText.setText(currentRestaurant.getRestaurantName());
+
+            //Fill the most recent inspection date
+            TextView dateText = (TextView)restaurantView.findViewById(R.id.restaurant_txtDate);
 
             if(currentRestaurant.getInspectionDataList().isEmpty()){
                 dateText.setText("");
