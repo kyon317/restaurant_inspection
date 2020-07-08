@@ -18,6 +18,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -239,8 +240,21 @@ public class SingleRestaurantActivity extends AppCompatActivity {
             numNonCritIssueText.setText("" + currentInspection.getNonCriticalViolations());
 
             TextView inspectionDateText = itemView.findViewById(R.id.inspectionDateValue);
-            inspectionDateText.setText(""+ currentInspection.getInspectionDate());
 
+            long date = currentInspection.timeSinceInspection();
+            if(date < 30){
+                inspectionDateText.setText(String.valueOf(date));
+            }
+            else if(date < 365){
+                SimpleDateFormat formatter = new SimpleDateFormat("MMMM dd");
+                String strDate = formatter.format(currentInspection.getInspectionDate());
+                inspectionDateText.setText(strDate);
+            }
+            else{
+                SimpleDateFormat formatter = new SimpleDateFormat("MMMM YYYY");
+                String strDate = formatter.format(currentInspection.getInspectionDate());
+                inspectionDateText.setText(strDate);
+            }
 
 
             return itemView;
