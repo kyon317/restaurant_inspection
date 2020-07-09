@@ -23,7 +23,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -80,7 +82,12 @@ public class Inspection_Details_Activity extends AppCompatActivity {
         violations = inspection.getViolation();
 
         TextView inspectDate = findViewById(R.id.res_inspect_date);
-        inspectDate.setText("" + inspection.getInspectionDate());
+
+        Date inspectionDate = inspection.getInspectionDate();
+        SimpleDateFormat formatter = new SimpleDateFormat("dd MMMM, YYYY");
+        String strDate = formatter.format(inspectionDate);
+        inspectDate.setText("" + strDate);
+
 
         TextView inspectType = findViewById(R.id.res_inspect_type);
         inspectType.setText("" + inspection.getInspectionType());
