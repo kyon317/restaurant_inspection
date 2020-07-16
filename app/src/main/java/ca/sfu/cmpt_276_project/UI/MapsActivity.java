@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -24,9 +25,20 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+import java.io.IOException;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
+
+import ca.sfu.cmpt_276_project.CsvIngester.InspectionDataCSVIngester;
+import ca.sfu.cmpt_276_project.CsvIngester.RestaurantCSVIngester;
+import ca.sfu.cmpt_276_project.Model.Restaurant;
+import ca.sfu.cmpt_276_project.Model.RestaurantManager;
 import ca.sfu.cmpt_276_project.R;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -40,6 +52,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private static final float DEFAULT_ZOOM = 15f;
+
+    private RestaurantManager restaurantManager;
+    private int[] restaurantIcons;
+    private List<Restaurant> restaurants;
 
     // allows MapsActivity to be accessed
     public static Intent makeIntent(Context context) {
@@ -66,8 +82,49 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         getLocationPermission();
 
+        restaurantManager = RestaurantManager.getInstance();
+        initializeRestaurantList();
+
         init();
+
+
+
     }
+
+    public void initializeRestaurantList(){
+        //get Restaurants from CSV
+        RestaurantCSVIngester restaurantImport = new RestaurantCSVIngester();
+        List<Restaurant> restaurantList = new ArrayList<>();
+
+        try {
+            restaurantImport.readRestaurantList(this);
+            restaurantList = restaurantImport.getRestaurantList();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //get Inspection Data of Restaurants from CSV
+        InspectionDataCSVIngester inspectionDataImport = new InspectionDataCSVIngester();
+        try {
+            inspectionDataImport.readInspectionData(this);
+            //Sort inspection data into proper Restaurant objects
+            if (!restaurantList.isEmpty()) {
+                for (Restaurant restaurant : restaurantList) {
+                    restaurant.setInspectionDataList(inspectionDataImport.returnInspectionByID
+                            (restaurant.getTrackNumber()));
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        //Update existing Restaurant Manager obj instance
+        restaurantManager.setRestaurants(restaurantList);
+
+    }
+
 
     private void getDeviceLocation() {
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
@@ -124,6 +181,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             // somehow UI gesture doesn't work,
             // can't pinch to zoom in and out
             mMap.getUiSettings().setZoomGesturesEnabled(true);
+            showRestaurants();
+        }
+    }
+
+    private void showRestaurants() {
+        //takes each restaurant in the manager and places it on the map.
+
+        MarkerOptions options;
+
+
+        for(int i = 0; i < restaurantManager.getRestaurants().size();i++){
+            options = new MarkerOptions()
+                    .position(new LatLng(restaurantManager.getRestaurantByID(i).getLatitude(),
+                    restaurantManager.getRestaurantByID(i).getLongitude()))
+                    .title(restaurantManager.getRestaurantByID(i).getRestaurantName());
+            mMap.addMarker(options);
         }
     }
 

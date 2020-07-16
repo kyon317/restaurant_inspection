@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         restaurantManager = RestaurantManager.getInstance();
-        initializeRestaurantList();//method necessary to initialize instance
+        //initializeRestaurantList();//method necessary to initialize instance
 
         populateRestaurantIcons();
         populateListView();
@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
         restaurantIcons[7] = R.drawable.icon_chicken;
     }
 
-    public void initializeRestaurantList(){
+    /*public void initializeRestaurantList(){
         //get Restaurants from CSV
         RestaurantCSVIngester restaurantImport = new RestaurantCSVIngester();
         List<Restaurant> restaurantList = new ArrayList<>();
@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
         //Update existing Restaurant Manager obj instance
         restaurantManager.setRestaurants(restaurantList);
 
-    }
+    }*/
 
     // start Maps activity
     private void init(){
