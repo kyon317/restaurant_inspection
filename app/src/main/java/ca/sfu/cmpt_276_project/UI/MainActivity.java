@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -19,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -66,6 +68,8 @@ public class MainActivity extends AppCompatActivity {
         populateRestaurantIcons();
         populateListView();
         registerClickCallback();
+
+        init();
     }
 
     private void populateRestaurantIcons() {
@@ -112,6 +116,24 @@ public class MainActivity extends AppCompatActivity {
         //Update existing Restaurant Manager obj instance
         restaurantManager.setRestaurants(restaurantList);
 
+    }
+
+    // start Maps activity
+    private void init(){
+        Button btnMaps = (Button) findViewById(R.id.btnMaps);
+        btnMaps.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = MapsActivity.makeIntent(MainActivity.this);
+                startActivity(intent);
+            }
+        });
+    }
+
+    // allows MainActivity to be accessed
+    public static Intent makeIntent(Context context){
+        Intent intent = new Intent(context, MainActivity.class);
+        return intent;
     }
 
     @Override
