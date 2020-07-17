@@ -43,6 +43,7 @@ import java.util.List;
 
 import ca.sfu.cmpt_276_project.CsvIngester.InspectionDataCSVIngester;
 import ca.sfu.cmpt_276_project.CsvIngester.RestaurantCSVIngester;
+import ca.sfu.cmpt_276_project.Model.Hazard;
 import ca.sfu.cmpt_276_project.Model.Restaurant;
 import ca.sfu.cmpt_276_project.Model.RestaurantManager;
 import ca.sfu.cmpt_276_project.R;
@@ -215,6 +216,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     restaurantManager.getRestaurantByID(i).getLongitude()));
             options.title(restaurantManager.getRestaurantByID(i).getRestaurantName());
             options.snippet(snippet);
+            if(currentRestaurant.getInspectionDataList().isEmpty()) {
+            }
+            else {
+                Hazard hazard = currentRestaurant.getInspectionDataList().get(0).getHazard();
+                if(hazard == Hazard.HIGH) {
+                    options.icon(bitmapDescriptorFromVector(getApplicationContext(),
+                            R.drawable.icon_map_high));
+                }
+                else if(hazard == Hazard.MEDIUM){
+                    options.icon(bitmapDescriptorFromVector(getApplicationContext(),
+                            R.drawable.icon_map_medium));
+                }
+                else {
+                    options.icon(bitmapDescriptorFromVector(getApplicationContext(),
+                            R.drawable.icon_map_low));
+                }
+            }
+
 
             mMarker = mMap.addMarker(options);
         }
@@ -223,7 +242,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     // TODO: 2020-07-17  registerClickCallback doesn't work
     private void registerClickCallback() {
-
+        //right now it is registering click on peg, not on info
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
