@@ -9,6 +9,9 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,8 +27,11 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -44,6 +50,7 @@ import ca.sfu.cmpt_276_project.R;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    private Marker mMarker;
     private UiSettings mUiSettings;
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
@@ -51,7 +58,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Boolean mLocationPermissionGranted = false;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
     private FusedLocationProviderClient mFusedLocationProviderClient;
-    private static final float DEFAULT_ZOOM = 15f;
+    private static final float DEFAULT_ZOOM = 18f;
 
     private RestaurantManager restaurantManager;
     private int[] restaurantIcons;
@@ -72,6 +79,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 startActivity(intent);
             }
         });
+
     }
 
 
@@ -86,8 +94,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         initializeRestaurantList();
 
         init();
-
-
 
     }
 
@@ -157,6 +163,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,zoom));
         CameraUpdate location = CameraUpdateFactory.newLatLngZoom(latLng, zoom);
         mMap.animateCamera(location);
+
     }
 
     // set Map UI
@@ -181,23 +188,67 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             // somehow UI gesture doesn't work,
             // can't pinch to zoom in and out
             mMap.getUiSettings().setZoomGesturesEnabled(true);
+
             showRestaurants();
+
+            registerClickCallback();
+
         }
     }
 
+
     private void showRestaurants() {
         //takes each restaurant in the manager and places it on the map.
-
         MarkerOptions options;
 
-
         for(int i = 0; i < restaurantManager.getRestaurants().size();i++){
-            options = new MarkerOptions()
-                    .position(new LatLng(restaurantManager.getRestaurantByID(i).getLatitude(),
-                    restaurantManager.getRestaurantByID(i).getLongitude()))
-                    .title(restaurantManager.getRestaurantByID(i).getRestaurantName());
-            mMap.addMarker(options);
+
+            Restaurant currentRestaurant = restaurantManager.getRestaurantByID(i);
+            String snippet = restaurantManager.getRestaurantByID(i).getPhysicalAddress() + "\n";
+
+            if(currentRestaurant.getInspectionDataList().isEmpty() == false){
+                snippet = snippet + currentRestaurant.getInspectionDataList().get(0);
+            }
+
+            options = new MarkerOptions();
+            options.position(new LatLng(restaurantManager.getRestaurantByID(i).getLatitude(),
+                    restaurantManager.getRestaurantByID(i).getLongitude()));
+            options.title(restaurantManager.getRestaurantByID(i).getRestaurantName());
+            options.snippet(snippet);
+
+            mMarker = mMap.addMarker(options);
         }
+
+    }
+
+    // TODO: 2020-07-17  registerClickCallback doesn't work
+    private void registerClickCallback() {
+
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                moveCamera(marker.getPosition(),DEFAULT_ZOOM);
+
+                // check if clicked
+                Toast.makeText(MapsActivity.this,
+                        "Peg is clicked", Toast.LENGTH_SHORT).show();
+
+                marker.showInfoWindow();
+                return true;
+            }
+        });
+    }
+
+    // this will be used for peg icon
+    // Guide link: https://www.youtube.com/watch?v=26bl4r3VtGQ
+    private BitmapDescriptor bitmapDescriptorFromVector(Context context, int vectorResId) {
+        Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
+        vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
+        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(),
+                vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        vectorDrawable.draw(canvas);
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 
     private void initMap(){
