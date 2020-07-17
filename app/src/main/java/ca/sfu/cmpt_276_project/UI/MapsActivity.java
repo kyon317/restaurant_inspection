@@ -15,8 +15,10 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -205,16 +207,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         for(int i = 0; i < restaurantManager.getRestaurants().size();i++){
 
             Restaurant currentRestaurant = restaurantManager.getRestaurantByID(i);
-            String snippet = restaurantManager.getRestaurantByID(i).getPhysicalAddress() + "\n";
+            String snippet = "Address: " + currentRestaurant.getPhysicalAddress() + "\n";
 
             if(currentRestaurant.getInspectionDataList().isEmpty() == false){
                 snippet = snippet + currentRestaurant.getInspectionDataList().get(0);
             }
 
             options = new MarkerOptions();
-            options.position(new LatLng(restaurantManager.getRestaurantByID(i).getLatitude(),
-                    restaurantManager.getRestaurantByID(i).getLongitude()));
-            options.title(restaurantManager.getRestaurantByID(i).getRestaurantName());
+            options.position(new LatLng(currentRestaurant.getLatitude(),
+                    currentRestaurant.getLongitude()));
+            options.title(currentRestaurant.getRestaurantName());
             options.snippet(snippet);
             if(currentRestaurant.getInspectionDataList().isEmpty()) {
             }
@@ -252,6 +254,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Toast.makeText(MapsActivity.this,
                         "Peg is clicked", Toast.LENGTH_SHORT).show();
 
+                mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(MapsActivity.this));
                 marker.showInfoWindow();
                 return true;
             }
@@ -317,6 +320,41 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     initMap();
                 }
             }
+        }
+    }
+
+    public class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter{
+        private final View mWindow;
+        private Context mContext;
+
+        public CustomInfoWindowAdapter(Context context) {
+            mContext = context;
+            mWindow = LayoutInflater.from(context).inflate(R.layout.info_window,null);
+        }
+
+        private void renderWindowText(Marker marker, View view) {
+            String title = marker.getTitle();
+            TextView tvTitle = (TextView) view.findViewById(R.id.title);
+            if(!title.equals("")){
+                tvTitle.setText(title);
+            }
+            String snippet = marker.getSnippet();
+            TextView tvSnippet = (TextView) view.findViewById(R.id.snippet);
+            if(!snippet.equals("")){
+                tvSnippet.setText(snippet);
+            }
+        }
+
+        @Override
+        public View getInfoWindow(Marker marker) {
+            renderWindowText(marker, mWindow);
+            return mWindow;
+        }
+
+        @Override
+        public View getInfoContents(Marker marker) {
+            renderWindowText(marker, mWindow);
+            return mWindow;
         }
     }
 }
