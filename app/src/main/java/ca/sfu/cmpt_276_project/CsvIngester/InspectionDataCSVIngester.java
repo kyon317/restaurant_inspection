@@ -71,7 +71,6 @@ public class InspectionDataCSVIngester {
     public void readInspectionData(Context context) throws IOException, ParseException {
         //initializing violationList
         violationTXTIngester.readViolationData(context);
-
         InputStream InspectionCSV = context.getResources().openRawResource
                 (R.raw.inspectionreports_itr1);
 

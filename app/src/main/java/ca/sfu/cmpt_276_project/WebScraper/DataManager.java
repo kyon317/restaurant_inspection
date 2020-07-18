@@ -1,4 +1,8 @@
 package ca.sfu.cmpt_276_project.WebScraper;
 
-public class DataManager {
+import android.app.Activity;
+
+public class DataManager extends Activity {
+
+
 }

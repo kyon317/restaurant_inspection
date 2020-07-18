@@ -29,6 +29,7 @@ public class RestaurantCSVIngester {
     private List<Restaurant> restaurantList = new ArrayList<>();
 
     public void readRestaurantList(Context context) throws IOException {
+
         InputStream restaurantDataInput = context.getResources().openRawResource
                                             (R.raw.restaurants_itr1);
 

@@ -9,8 +9,12 @@ package ca.sfu.cmpt_276_project.UI;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -39,7 +43,7 @@ import ca.sfu.cmpt_276_project.R;
 import ca.sfu.cmpt_276_project.TestingActivity;
 
 public class MainActivity extends AppCompatActivity {
-    private final static boolean DEBUG = false; // Access for debugging mode
+    private final static boolean DEBUG = true; // Access for debugging mode
     private RestaurantManager restaurantManager;
     private int[] restaurantIcons;
     private List<Restaurant> restaurants;
@@ -47,6 +51,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED){
+            // Permission is not granted
+            //System.out.println("not permitted");
+            //System.out.println(PackageManager.PERMISSION_GRANTED);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+        }
         setContentView(R.layout.activity_main);
         getSupportActionBar().setTitle("Surrey Restaurant Inspections");
 
@@ -64,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
         populateRestaurantIcons();
         populateListView();
         registerClickCallback();
-        
+
         if (DEBUG){
             RunDebugMode();
         }
