@@ -9,11 +9,16 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+
 import java.util.List;
 
 import ca.sfu.cmpt_276_project.Model.InspectionData;
 import ca.sfu.cmpt_276_project.Model.Restaurant;
 import ca.sfu.cmpt_276_project.Model.RestaurantManager;
+import ca.sfu.cmpt_276_project.WebScraper.*;
 
 public class TestingActivity extends AppCompatActivity {
     private RestaurantManager restaurantManager;
@@ -21,8 +26,10 @@ public class TestingActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_testing);
-        restaurantManager = RestaurantManager.getInstance();
-        SingletonTest();
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        //restaurantManager = RestaurantManager.getInstance();
+        //SingletonTest();
+        WebTest();
     }
 
     public void SingletonTest(){
@@ -43,5 +50,11 @@ public class TestingActivity extends AppCompatActivity {
             System.out.println("Restaurant Count: "+restaurantList.size());
             System.out.println("Inspection Count: "+inspection_count);
         }
+    }
+    public void WebTest(){
+        String url = "http://data.surrey.ca/api/3/action/package_show?id=fraser-health-restaurant-inspection-reports";
+        WebScraper webScraper = new WebScraper();
+        webScraper.setPd(this);
+        webScraper.execute(url);
     }
 }
