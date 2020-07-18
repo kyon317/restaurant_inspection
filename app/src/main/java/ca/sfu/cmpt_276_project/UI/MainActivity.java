@@ -39,7 +39,7 @@ import ca.sfu.cmpt_276_project.R;
 import ca.sfu.cmpt_276_project.TestingActivity;
 
 public class MainActivity extends AppCompatActivity {
-
+    private final static boolean DEBUG = false; // Access for debugging mode
     private RestaurantManager restaurantManager;
     private int[] restaurantIcons;
     private List<Restaurant> restaurants;
@@ -58,18 +58,18 @@ public class MainActivity extends AppCompatActivity {
 
         // Set BackgroundDrawable
         getSupportActionBar().setBackgroundDrawable(colorDrawable);
-
         restaurantManager = RestaurantManager.getInstance();
         initializeRestaurantList();//method necessary to initialize instance
 
         populateRestaurantIcons();
         populateListView();
         registerClickCallback();
-        //new TestingActivity();
+        
+        if (DEBUG){
+            RunDebugMode();
+        }
     }
-
-
-    public void TestActivity(){
+    private void RunDebugMode(){
         Intent intent = new Intent(this,TestingActivity.class);
         startActivity(intent);
     }
