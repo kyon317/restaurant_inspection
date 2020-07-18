@@ -207,62 +207,71 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         for(int i = 0; i < restaurantManager.getRestaurants().size();i++){
 
             Restaurant currentRestaurant = restaurantManager.getRestaurantByID(i);
-            String snippet = "Address: " + currentRestaurant.getPhysicalAddress() + "\n";
 
-            if(currentRestaurant.getInspectionDataList().isEmpty() == false){
-                snippet = snippet + currentRestaurant.getInspectionDataList().get(0);
-            }
+            // remember restaurant position in list view
+            currentRestaurant.setId(i);
+
+            String snippet = "Address: " + currentRestaurant.getPhysicalAddress() + "\n";
 
             options = new MarkerOptions();
             options.position(new LatLng(currentRestaurant.getLatitude(),
                     currentRestaurant.getLongitude()));
             options.title(currentRestaurant.getRestaurantName());
-            options.snippet(snippet);
-            if(currentRestaurant.getInspectionDataList().isEmpty()) {
-            }
-            else {
+
+            if(currentRestaurant.getInspectionDataList().isEmpty() == false) {
+
                 Hazard hazard = currentRestaurant.getInspectionDataList().get(0).getHazard();
                 if(hazard == Hazard.HIGH) {
                     options.icon(bitmapDescriptorFromVector(getApplicationContext(),
                             R.drawable.icon_map_high));
+                    snippet = snippet + "High";
                 }
                 else if(hazard == Hazard.MEDIUM){
                     options.icon(bitmapDescriptorFromVector(getApplicationContext(),
                             R.drawable.icon_map_medium));
+                    snippet = snippet + "Medium";
                 }
                 else {
                     options.icon(bitmapDescriptorFromVector(getApplicationContext(),
                             R.drawable.icon_map_low));
+                    snippet = snippet + "Low";
                 }
             }
 
+            options.snippet(snippet);
 
             mMarker = mMap.addMarker(options);
         }
 
     }
 
-    // TODO: 2020-07-17  registerClickCallback doesn't work
     private void registerClickCallback() {
-        //right now it is registering click on peg, not on info
+
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
                 moveCamera(marker.getPosition(),DEFAULT_ZOOM);
-
-                // check if clicked
-                Toast.makeText(MapsActivity.this,
-                        "Peg is clicked", Toast.LENGTH_SHORT).show();
 
                 mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(MapsActivity.this));
                 marker.showInfoWindow();
                 return true;
             }
         });
+
+        // show restaurant details from info window
+        mMap.setOnInfoWindowClickListener(marker -> {
+            LatLng latLng = marker.getPosition();
+            double lat = latLng.latitude;
+            double lng = latLng.longitude;
+            Restaurant restaurant = restaurantManager.findRestaurantByLatLng(lat, lng);
+
+            int restaurantPosition = restaurant.getId();
+            Intent intent = SingleRestaurantActivity.makeIntent(MapsActivity.this, restaurantPosition);
+            startActivity(intent);
+        });
+
     }
 
-    // this will be used for peg icon
-    // Guide link: https://www.youtube.com/watch?v=26bl4r3VtGQ
     private BitmapDescriptor bitmapDescriptorFromVector(Context context, int vectorResId) {
         Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
         vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());

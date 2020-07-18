@@ -55,6 +55,15 @@ public class RestaurantManager {
         throw new IndexOutOfBoundsException();
     }
 
+    public Restaurant findRestaurantByLatLng(double latitude, double longitude) {
+        for (Restaurant res: restaurants) {
+            if (res.getLatitude() == latitude && res.getLongitude() == longitude) {
+                return res;
+            }
+        }
+        return null;
+    }
+
     //THIS IS FOR RETRIEVING RESTAURANTS USING ARRAYLIST INDEXING
     public Restaurant getRestaurantByID(int ID) throws IndexOutOfBoundsException{
 
