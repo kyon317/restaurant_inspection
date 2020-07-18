@@ -6,6 +6,10 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,6 +20,7 @@ import java.net.URL;
 
 public class WebScraper extends AsyncTask<String,String,String>{
     private ProgressDialog pd;
+    private final static String reportCsvName = "Fraser Health Restaurant Inspection Reports";
     public void setPd(Context context){
         pd = new ProgressDialog(context);
     }
@@ -45,7 +50,7 @@ public class WebScraper extends AsyncTask<String,String,String>{
             String line = "";
             while ((line = reader.readLine())!=null){
                 buffer.append(line+"\n");
-                Log.d("Response: ",">"+line); //Whole response
+                //Log.d("Response: ",">"+line); //Whole response
             }
             return buffer.toString();
         } catch (MalformedURLException e) {
@@ -73,6 +78,28 @@ public class WebScraper extends AsyncTask<String,String,String>{
         if (pd.isShowing()){
             pd.dismiss();
         }
-        System.out.println("json: "+result);
+        try {
+            JSONObject rawJsonObj = returnJSONObject(result).getJSONObject("result");
+            JSONArray resources = rawJsonObj.getJSONArray("resources");
+            returnCsvUrl(resources,reportCsvName);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+    public String returnCsvUrl(JSONArray jsonArray,String urlNameToFind) throws JSONException {
+        String csvUrl = "";
+        for (int i = 0;i<jsonArray.length();i++){
+            if (urlNameToFind.equals(jsonArray.getJSONObject(i).getString("name")) && jsonArray.getJSONObject(i).getString("format").equals("CSV")){
+                csvUrl = jsonArray.getJSONObject(i).getString("url");
+            }
+
+        }
+        csvUrl.replaceAll("/","");//clear format
+        System.out.println("csvURL: "+csvUrl);
+        return csvUrl;
+    }
+    public JSONObject returnJSONObject(String result) throws JSONException {
+        JSONObject jsonObject = new JSONObject(result);
+        return jsonObject;
     }
 }
