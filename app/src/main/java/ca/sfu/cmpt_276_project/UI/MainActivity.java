@@ -47,12 +47,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.activity_main);
-
-        Intent intent = new Intent(this,TestingActivity.class);
-        startActivity(intent);
-
-/*       getSupportActionBar().setTitle("Surrey Restaurant Inspections");
+        setContentView(R.layout.activity_main);
+        getSupportActionBar().setTitle("Surrey Restaurant Inspections");
 
         // Define ColorDrawable object and parse color
         // using parseColor method
@@ -68,11 +64,15 @@ public class MainActivity extends AppCompatActivity {
 
         populateRestaurantIcons();
         populateListView();
-        registerClickCallback();*/
+        registerClickCallback();
+        //new TestingActivity();
     }
-}
 
-/*
+
+    public void TestActivity(){
+        Intent intent = new Intent(this,TestingActivity.class);
+        startActivity(intent);
+    }
     private void populateRestaurantIcons() {
         restaurantIcons = new int[8];
         restaurantIcons[0] = R.drawable.icon_sushi;
@@ -258,4 +258,4 @@ public class MainActivity extends AppCompatActivity {
             return restaurantView;
         }
     }
-}*/
+}

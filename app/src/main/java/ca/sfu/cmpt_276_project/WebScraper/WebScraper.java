@@ -92,7 +92,6 @@ public class WebScraper extends AsyncTask<String,String,String>{
             if (urlNameToFind.equals(jsonArray.getJSONObject(i).getString("name")) && jsonArray.getJSONObject(i).getString("format").equals("CSV")){
                 csvUrl = jsonArray.getJSONObject(i).getString("url");
             }
-
         }
         csvUrl.replaceAll("/","");//clear format
         System.out.println("csvURL: "+csvUrl);
