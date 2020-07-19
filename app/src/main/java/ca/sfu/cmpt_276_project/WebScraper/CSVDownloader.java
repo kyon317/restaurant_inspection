@@ -1,7 +1,6 @@
 package ca.sfu.cmpt_276_project.WebScraper;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Environment;
@@ -9,15 +8,11 @@ import android.os.StrictMode;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 
 import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Arrays;
@@ -27,18 +22,23 @@ import ca.sfu.cmpt_276_project.R;
 
 public class CSVDownloader extends AsyncTask<String, String, String> {
     public static final int progress_bar_type = 0;
-    WebScraper webScraper = new WebScraper();
     private ProgressBar progressBar;
     private String filename = "";
-    private String file_url = "https://data.surrey.ca/dataset/3c8cb648-0e80-4659-9078-ef4917b90ffb/resource/0e5d04a2-be9b-40fe-8de2-e88362ea916b/download/restaurants.csv";
+
+    public CSVDownloader(String filename, Context context) {
+        this.filename = filename;
+        setPdialog(context);
+    }
 
     public void setFilename(String filename) {
         this.filename = filename;
     }
-    public void setPdialog(Context context){
+
+    public void setPdialog(Context context) {
         progressBar = ((Activity) context).findViewById(R.id.progressBar1);
     }
     //TODO:initialize pDialog and make modifications on progress bar
+
     /**
      * Before starting background thread Show Progress Bar Dialog
      */
@@ -68,24 +68,25 @@ public class CSVDownloader extends AsyncTask<String, String, String> {
             URLConnection connection = url.openConnection();
             connection.connect();
 
+            System.out.println("fetched url: " + url.toString());
             // this will be useful so that you can show a typical 0-100%
             // progress bar
-            long lengthOfFile = getActualSize(f_url);
+            long lengthOfFile = getActualSize(connection);
             System.out.println("length: " + lengthOfFile);
 
             // download the file
             InputStream input = new BufferedInputStream(url.openStream(),
-                    8139);
+                    8121);
             //System.out.println("input: " + input);
             System.out.println(Environment.getExternalStorageDirectory().getAbsolutePath());
             System.out.println(Arrays.toString(Environment.getExternalStorageDirectory().listFiles()));
 
             // Output stream
-            OutputStream output = new FileOutputStream(Environment.getExternalStorageDirectory().getPath() + "/Download"
-                    + "/" + filename);
+            OutputStream output = new FileOutputStream(Environment.getExternalStorageDirectory().getPath() + "/Download/"
+                    + filename);
 
             //System.out.println("Actual Length: "+getActualSize(f_url));
-            byte[] data = new byte[1024];
+            byte[] data = new byte[1024];  //Decide bytes read per time
 
             long total = 0;
 
@@ -129,19 +130,15 @@ public class CSVDownloader extends AsyncTask<String, String, String> {
     @Override
     protected void onPostExecute(String file_url) {
         System.out.println("DONE");
-
         // dismiss the dialog after the file was downloaded
         progressBar.setVisibility(View.GONE);
     }
-    
-    public long getActualSize(String... f_url) throws IOException {
-        URL url = new URL(f_url[0]);
-        InputStream dummyInput = new BufferedInputStream(url.openStream(),
-                8139);
+
+    public long getActualSize(URLConnection connection) {
+        String range = connection.getHeaderField("Content-Range");
+        String[] dummy_string = range.split("\\/");
         long actualLength = 0;
-        while (dummyInput.read()!=-1){
-            actualLength++;
-        }
+        actualLength = Long.parseLong(dummy_string[1]);
         return actualLength;
     }
 }

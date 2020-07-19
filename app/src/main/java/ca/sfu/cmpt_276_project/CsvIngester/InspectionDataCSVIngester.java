@@ -68,12 +68,14 @@ public class InspectionDataCSVIngester {
         return inspectionData;
     }
 
-    public void readInspectionData(Context context) throws IOException, ParseException {
+    public void readInspectionData(Context context, InputStream inputStream,int updateCode) throws IOException, ParseException {
         //initializing violationList
         violationTXTIngester.readViolationData(context);
         InputStream InspectionCSV = context.getResources().openRawResource
                 (R.raw.inspectionreports_itr1);
-
+        if (updateCode == 1) {
+            InspectionCSV = inputStream;
+        }
         List<String> fileContents = getText(InspectionCSV);
         boolean firstLineUnread = true;
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
@@ -105,12 +107,21 @@ public class InspectionDataCSVIngester {
 
             temp.setCriticalViolations(Integer.parseInt(fields.get(3)));
             temp.setNonCriticalViolations(Integer.parseInt(fields.get(4)));
+            int VIOLUMP = 6;
+            int HAZARD_FIELD = 5;
+            //TODO: fix read csv file
+            if (updateCode == 1){
+                VIOLUMP = 5;
+                HAZARD_FIELD = 6;
+                System.out.println("update on");
+                System.out.println("field 5: "+fields.get(5));
+
+            }
 
             //conditions for Hazard ENUM
-
-            if(fields.get(5).equals("Low"))
+            if(fields.get(HAZARD_FIELD).equals("Low"))
                 temp.setHazard(Hazard.LOW);
-            else if(fields.get(5).equals("Moderate"))
+            else if(fields.get(HAZARD_FIELD).equals("Moderate"))
                 temp.setHazard(Hazard.MEDIUM);
             else
                 temp.setHazard(Hazard.HIGH);
@@ -121,8 +132,8 @@ public class InspectionDataCSVIngester {
             if (fields.size()==6){                          //skip if there's no violation
                 dummy_violations.add(dummy_violation);
                 temp.setViolation(dummy_violations);
-            }else if (fields.get(6)!=null){
-                String[] violationLump = fields.get(6).split("\\|");
+            }else if (fields.get(VIOLUMP)!=null){
+                String[] violationLump = fields.get(VIOLUMP).split("\\|");
                 for (String singleViolation:violationLump
                      ) {
                     String[] dataCache = singleViolation.split(",");
@@ -133,6 +144,7 @@ public class InspectionDataCSVIngester {
                 }
                 temp.setViolation(dummy_violations);
             }
+
             IngestionList.add(temp);
         }//end of scan loop
         //Debugging purpose

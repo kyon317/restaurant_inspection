@@ -28,22 +28,34 @@ public class RestaurantCSVIngester {
 
     private List<Restaurant> restaurantList = new ArrayList<>();
 
-    public void readRestaurantList(Context context) throws IOException {
 
+    public void readRestaurantList(Context context, InputStream inputStream, int updateCode) throws IOException {
         InputStream restaurantDataInput = context.getResources().openRawResource
-                                            (R.raw.restaurants_itr1);
+                (R.raw.restaurants_itr1);
+        if (updateCode == 1) {
+            restaurantDataInput = inputStream;
+        }
+
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(restaurantDataInput,
                 StandardCharsets.UTF_8));
         String inputLine = "";
 
         //reading and storing CSV data
-        try{
+        try {
             reader.readLine();
-            while((inputLine = reader.readLine())!=null){
+            while ((inputLine = reader.readLine()) != null) {
+                if (inputLine.contains(", ")) {
+                    inputLine = inputLine.replaceAll(", ", "000");
+                    System.out.println(inputLine);
+                    System.out.println("found false regex");
+                }
                 String[] tokens = inputLine.split(",");
                 Restaurant dummy_restaurant = new Restaurant();
                 dummy_restaurant.setTrackNumber(tokens[0]);
+                if (tokens[1].contains("000")) {
+                    tokens[1] = tokens[1].replace("000", ", ");
+                }
                 dummy_restaurant.setRestaurantName(tokens[1]);
                 dummy_restaurant.setPhysicalAddress(tokens[2]);
                 dummy_restaurant.setPhysicalCity(tokens[3]);
@@ -58,12 +70,12 @@ public class RestaurantCSVIngester {
             e.printStackTrace();
         }
 
-        //Display restaurant list
-/*        for (Restaurant res:restaurantList
+/*        //Display restaurant list
+        for (Restaurant res:restaurantList
              ) {
             res.Display();
-        }*/
-        //System.out.println(this.restaurantList.size()); //Debugging purposes
+        }
+        System.out.println(this.restaurantList.size()); //Debugging purposes*/
 
     }//end of function
 

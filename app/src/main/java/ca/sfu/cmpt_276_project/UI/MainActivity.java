@@ -6,12 +6,6 @@
  * */
 package ca.sfu.cmpt_276_project.UI;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -27,6 +21,12 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -37,8 +37,8 @@ import java.util.List;
 import ca.sfu.cmpt_276_project.CsvIngester.InspectionDataCSVIngester;
 import ca.sfu.cmpt_276_project.CsvIngester.RestaurantCSVIngester;
 import ca.sfu.cmpt_276_project.Model.Hazard;
-import ca.sfu.cmpt_276_project.Model.RestaurantManager;
 import ca.sfu.cmpt_276_project.Model.Restaurant;
+import ca.sfu.cmpt_276_project.Model.RestaurantManager;
 import ca.sfu.cmpt_276_project.R;
 import ca.sfu.cmpt_276_project.TestingActivity;
 
@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
         List<Restaurant> restaurantList = new ArrayList<>();
 
         try {
-            restaurantImport.readRestaurantList(this);
+            restaurantImport.readRestaurantList(this, null, 0);//TODO:Connect with DataManager
             restaurantList = restaurantImport.getRestaurantList();
         } catch (IOException e) {
             e.printStackTrace();
@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
         //get Inspection Data of Restaurants from CSV
         InspectionDataCSVIngester inspectionDataImport = new InspectionDataCSVIngester();
         try {
-            inspectionDataImport.readInspectionData(this);
+            inspectionDataImport.readInspectionData(this, null,0);//TODO:Connect with DataManager
             //Sort inspection data into proper Restaurant objects
             if (!restaurantList.isEmpty()) {
                 for (Restaurant restaurant : restaurantList) {
