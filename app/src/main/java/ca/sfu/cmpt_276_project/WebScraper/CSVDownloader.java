@@ -12,9 +12,12 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Arrays;
@@ -48,7 +51,7 @@ public class CSVDownloader extends AsyncTask<String, String, String> {
         progressBar.setProgress(0);
         progressBar.setScrollBarStyle(ProgressBar.SCROLLBARS_OUTSIDE_INSET);
         progressBar.setMax(100);
-        progressBar.setVisibility(progressBar.VISIBLE);
+        progressBar.setVisibility(View.VISIBLE);
     }
 
     /**
@@ -67,18 +70,21 @@ public class CSVDownloader extends AsyncTask<String, String, String> {
 
             // this will be useful so that you can show a typical 0-100%
             // progress bar
-            int lengthOfFile = connection.getContentLength();
+            long lengthOfFile = getActualSize(f_url);
             System.out.println("length: " + lengthOfFile);
+
             // download the file
             InputStream input = new BufferedInputStream(url.openStream(),
                     8139);
-            System.out.println("input: " + input);
+            //System.out.println("input: " + input);
             System.out.println(Environment.getExternalStorageDirectory().getAbsolutePath());
             System.out.println(Arrays.toString(Environment.getExternalStorageDirectory().listFiles()));
+
             // Output stream
             OutputStream output = new FileOutputStream(Environment.getExternalStorageDirectory().getPath() + "/Download"
                     + "/" + filename);
-            System.out.println("000");
+
+            //System.out.println("Actual Length: "+getActualSize(f_url));
             byte[] data = new byte[1024];
 
             long total = 0;
@@ -87,7 +93,8 @@ public class CSVDownloader extends AsyncTask<String, String, String> {
                 total += count;
                 // publishing the progress....
                 // After this onProgressUpdate will be called
-                publishProgress("" + (int) ((total * 100) / lengthOfFile));
+                System.out.println("lengthofFile:"+lengthOfFile);
+                publishProgress("" + (int) ((total * 100) /lengthOfFile ));
 
                 // writing data to file
                 output.write(data, 0, count);
@@ -125,6 +132,17 @@ public class CSVDownloader extends AsyncTask<String, String, String> {
 
         // dismiss the dialog after the file was downloaded
         progressBar.setVisibility(View.GONE);
+    }
+    
+    public long getActualSize(String... f_url) throws IOException {
+        URL url = new URL(f_url[0]);
+        InputStream dummyInput = new BufferedInputStream(url.openStream(),
+                8139);
+        long actualLength = 0;
+        while (dummyInput.read()!=-1){
+            actualLength++;
+        }
+        return actualLength;
     }
 }
 
