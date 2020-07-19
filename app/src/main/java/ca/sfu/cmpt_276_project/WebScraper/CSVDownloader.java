@@ -1,10 +1,15 @@
 package ca.sfu.cmpt_276_project.WebScraper;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.os.StrictMode;
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 
 import java.io.BufferedInputStream;
 import java.io.FileOutputStream;
@@ -15,15 +20,20 @@ import java.net.URLConnection;
 import java.util.Arrays;
 import java.util.Objects;
 
+import ca.sfu.cmpt_276_project.R;
+
 public class CSVDownloader extends AsyncTask<String, String, String> {
     public static final int progress_bar_type = 0;
     WebScraper webScraper = new WebScraper();
-    private ProgressDialog pDialog;
+    private ProgressBar progressBar;
     private String filename = "";
     private String file_url = "https://data.surrey.ca/dataset/3c8cb648-0e80-4659-9078-ef4917b90ffb/resource/0e5d04a2-be9b-40fe-8de2-e88362ea916b/download/restaurants.csv";
 
     public void setFilename(String filename) {
         this.filename = filename;
+    }
+    public void setPdialog(Context context){
+        progressBar = ((Activity) context).findViewById(R.id.progressBar1);
     }
     //TODO:initialize pDialog and make modifications on progress bar
     /**
@@ -32,7 +42,13 @@ public class CSVDownloader extends AsyncTask<String, String, String> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        //this.showDialog(progress_bar_type);
+
+        //Set up progressBar visibility and details
+        progressBar.setIndeterminate(false);
+        progressBar.setProgress(0);
+        progressBar.setScrollBarStyle(ProgressBar.SCROLLBARS_OUTSIDE_INSET);
+        progressBar.setMax(100);
+        progressBar.setVisibility(progressBar.VISIBLE);
     }
 
     /**
@@ -49,10 +65,10 @@ public class CSVDownloader extends AsyncTask<String, String, String> {
             URLConnection connection = url.openConnection();
             connection.connect();
 
-            // this will be useful so that you can show a tipical 0-100%
+            // this will be useful so that you can show a typical 0-100%
             // progress bar
-            int lenghtOfFile = connection.getContentLength();
-            System.out.println("length: " + lenghtOfFile);
+            int lengthOfFile = connection.getContentLength();
+            System.out.println("length: " + lengthOfFile);
             // download the file
             InputStream input = new BufferedInputStream(url.openStream(),
                     8139);
@@ -71,7 +87,7 @@ public class CSVDownloader extends AsyncTask<String, String, String> {
                 total += count;
                 // publishing the progress....
                 // After this onProgressUpdate will be called
-                publishProgress("" + (int) ((total * 100) / lenghtOfFile));
+                publishProgress("" + (int) ((total * 100) / lengthOfFile));
 
                 // writing data to file
                 output.write(data, 0, count);
@@ -96,7 +112,8 @@ public class CSVDownloader extends AsyncTask<String, String, String> {
     protected void onProgressUpdate(String... progress) {
         // setting progress percentage
         System.out.println("Progress: "+Integer.parseInt(progress[0]));
-        //pDialog.setProgress(Integer.parseInt(progress[0]));
+        //progressBar.setProgress(Integer.parseInt(progress[0])); this is where I'd update my progress bar
+        //                                                          if I had the numbers for it
     }
 
     /**
@@ -105,8 +122,9 @@ public class CSVDownloader extends AsyncTask<String, String, String> {
     @Override
     protected void onPostExecute(String file_url) {
         System.out.println("DONE");
+
         // dismiss the dialog after the file was downloaded
-        //dismissDialog(progress_bar_type);
+        progressBar.setVisibility(View.GONE);
     }
 }
 
