@@ -4,7 +4,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -12,7 +11,6 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -105,6 +103,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         init();
 
+    }
+    @Override
+    public void onBackPressed(){
+        finish();
+        super.onBackPressed();
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        android.os.Process.killProcess(android.os.Process.myPid());
+        super.onDestroy();
     }
 
     public void initializeRestaurantList(){

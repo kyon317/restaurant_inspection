@@ -6,10 +6,6 @@
  * */
 package ca.sfu.cmpt_276_project.UI;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -25,20 +21,18 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import java.io.IOException;
-import java.text.ParseException;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import ca.sfu.cmpt_276_project.CsvIngester.InspectionDataCSVIngester;
-import ca.sfu.cmpt_276_project.CsvIngester.RestaurantCSVIngester;
 import ca.sfu.cmpt_276_project.Model.Hazard;
-import ca.sfu.cmpt_276_project.Model.RestaurantManager;
 import ca.sfu.cmpt_276_project.Model.Restaurant;
+import ca.sfu.cmpt_276_project.Model.RestaurantManager;
 import ca.sfu.cmpt_276_project.R;
-import ca.sfu.cmpt_276_project.TestingActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -70,6 +64,19 @@ public class MainActivity extends AppCompatActivity {
         registerClickCallback();
 
         init();
+    }
+
+    @Override
+    public void onBackPressed(){
+        finish();
+        super.onBackPressed();
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        android.os.Process.killProcess(android.os.Process.myPid());
+        super.onDestroy();
     }
 
     private void populateRestaurantIcons() {

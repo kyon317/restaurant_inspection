@@ -53,7 +53,8 @@
         <activity
             android:name=".UI.Inspection_Details_Activity"
             android:parentActivityName=".UI.SingleRestaurantActivity" />
-        <activity android:name=".UI.MainActivity">
+        <activity android:name=".UI.MainActivity"
+            android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
