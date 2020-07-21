@@ -20,15 +20,12 @@
 package ca.sfu.cmpt_276_project.Model;
 
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class InspectionData implements Comparable<InspectionData>{
+public class InspectionData implements Comparable<InspectionData> {
     private String trackingNumber;
     private Date inspectionDate;
     private Type inspectionType;
@@ -38,56 +35,10 @@ public class InspectionData implements Comparable<InspectionData>{
     private List<Violation> violations;
 
 
-    //Getters
-    public String getTrackingNumber() {
-        return trackingNumber;
-    }
-    public Date getInspectionDate() {
-        return inspectionDate;
-    }
-    public Type getInspectionType() {
-        return inspectionType;
-    }
-    public int getCriticalViolations() {
-        return criticalViolations;
-    }
-    public int getNonCriticalViolations() {
-        return nonCriticalViolations;
-    }
-    public Hazard getHazard() {
-        return hazard;
-    }
-    public List<Violation> getViolation() {
-        return violations;
-    }
-
-    //Setters
-    public void setTrackingNumber(String trackingNumber) {
-        this.trackingNumber = trackingNumber;
-    }
-    public void setInspectionDate(Date inspectionDate) {
-        this.inspectionDate = inspectionDate;
-    }
-    public void setInspectionType(Type inspectionType) {
-        this.inspectionType = inspectionType;
-    }
-    public void setCriticalViolations(int criticalViolations) {
-        this.criticalViolations = criticalViolations;
-    }
-    public void setNonCriticalViolations(int nonCriticalViolations) {
-        this.nonCriticalViolations = nonCriticalViolations;
-    }
-    public void setHazard(Hazard hazard) {
-        this.hazard = hazard;
-    }
-    public void setViolation(List<Violation> violations) {
-        this.violations = violations;
-    }
-
     //Default Constructor
     public InspectionData() {
         this.trackingNumber = null;
-        Date dummy_date = new Date(1970-01-01);
+        Date dummy_date = new Date(1970 - 01 - 01);
         this.inspectionDate = dummy_date;
         this.inspectionType = Type.ROUTINE;
         this.criticalViolations = 0;
@@ -107,25 +58,83 @@ public class InspectionData implements Comparable<InspectionData>{
         this.violations = violations;
     }
 
-    public long timeSinceInspection(){
+    //Getters
+    public String getTrackingNumber() {
+        return trackingNumber;
+    }
+
+    //Setters
+    public void setTrackingNumber(String trackingNumber) {
+        this.trackingNumber = trackingNumber;
+    }
+
+    public Date getInspectionDate() {
+        return inspectionDate;
+    }
+
+    public void setInspectionDate(Date inspectionDate) {
+        this.inspectionDate = inspectionDate;
+    }
+
+    public Type getInspectionType() {
+        return inspectionType;
+    }
+
+    public void setInspectionType(Type inspectionType) {
+        this.inspectionType = inspectionType;
+    }
+
+    public int getCriticalViolations() {
+        return criticalViolations;
+    }
+
+    public void setCriticalViolations(int criticalViolations) {
+        this.criticalViolations = criticalViolations;
+    }
+
+    public int getNonCriticalViolations() {
+        return nonCriticalViolations;
+    }
+
+    public void setNonCriticalViolations(int nonCriticalViolations) {
+        this.nonCriticalViolations = nonCriticalViolations;
+    }
+
+    public Hazard getHazard() {
+        return hazard;
+    }
+
+    public void setHazard(Hazard hazard) {
+        this.hazard = hazard;
+    }
+
+    public List<Violation> getViolation() {
+        return violations;
+    }
+
+    public void setViolation(List<Violation> violations) {
+        this.violations = violations;
+    }
+
+    public long timeSinceInspection() {
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         Date currentDate = new Date();
         formatter.format(currentDate);
         long diffInMillies = Math.abs(this.inspectionDate.getTime() - currentDate.getTime());
-        long diffInDays = TimeUnit.DAYS.convert(diffInMillies,TimeUnit.MILLISECONDS);
+        long diffInDays = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
         return diffInDays;
     }
 
-    public void Display(){
-        System.out.println("Inspection Tracking Number: "+this.getTrackingNumber()
-                +"\nInspection Date: "+this.getInspectionDate()
-                +"\nInspection Type: "+this.getInspectionType()
-                +"\nCritical Violation: "+this.getCriticalViolations()
-                +"\nNon Critical Violation: "+this.getNonCriticalViolations()
-                +"\nHazard: "+this.getHazard()
-                +"\nViolation details: \n*****************************************\n");
-        for (Violation violation:violations
-             ) {
+    public void Display() {
+        System.out.println("Inspection Tracking Number: " + this.getTrackingNumber()
+                + "\nInspection Date: " + this.getInspectionDate()
+                + "\nInspection Type: " + this.getInspectionType()
+                + "\nCritical Violation: " + this.getCriticalViolations()
+                + "\nNon Critical Violation: " + this.getNonCriticalViolations()
+                + "\nHazard: " + this.getHazard()
+                + "\nViolation details: \n*****************************************\n");
+        for (Violation violation : violations
+        ) {
             violation.Display();
         }
     }

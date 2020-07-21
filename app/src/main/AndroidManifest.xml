@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+
+
     package="ca.sfu.cmpt_276_project">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -8,14 +15,16 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.Light">
-        <activity android:name=".TestingActivity"></activity>
+        android:theme="@style/Theme.AppCompat.Light"
+        android:usesCleartextTraffic="true">
+        <activity android:name=".TestingActivity" />
         <activity
             android:name=".UI.SingleRestaurantActivity"
             android:label="@string/title_activity_single_restaurant"
             android:parentActivityName=".UI.MainActivity" />
-        <activity android:name=".UI.Inspection_Details_Activity"
-            android:parentActivityName=".UI.SingleRestaurantActivity"></activity>
+        <activity
+            android:name=".UI.Inspection_Details_Activity"
+            android:parentActivityName=".UI.SingleRestaurantActivity" />
         <activity android:name=".UI.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

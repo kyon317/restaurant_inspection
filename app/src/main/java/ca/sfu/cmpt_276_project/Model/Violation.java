@@ -42,37 +42,43 @@ public class Violation {
     public String getViolationNumber() {
         return violationNumber;
     }
+
+    public void setViolationNumber(String violationNumber) {
+        this.violationNumber = violationNumber;
+    }
+
     public boolean isCritical() {
         return isCritical;
-    }
-    public String getDescription() {
-        return description;
-    }
-    public boolean isRepeat() {
-        return isRepeat;
     }
 
     //Setters
     public void setCritical(boolean critical) {
         isCritical = critical;
     }
-    public void setViolationNumber(String violationNumber) {
-        this.violationNumber = violationNumber;
+
+    public String getDescription() {
+        return description;
     }
+
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public boolean isRepeat() {
+        return isRepeat;
+    }
+
     public void setRepeat(boolean repeat) {
         isRepeat = repeat;
     }
 
     //Display
     //This is just for the use of test
-    public void Display(){
-        System.out.println("Violation number: "+ this.getViolationNumber()
-                            +"\nDescription: "+this.getDescription()
-                            +"\nCritical: "+this.isCritical()
-                            +"\nRepeat: "+this.isRepeat()
-                            +"\n.........................................");
+    public void Display() {
+        System.out.println("Violation number: " + this.getViolationNumber()
+                + "\nDescription: " + this.getDescription()
+                + "\nCritical: " + this.isCritical()
+                + "\nRepeat: " + this.isRepeat()
+                + "\n.........................................");
     }
 }

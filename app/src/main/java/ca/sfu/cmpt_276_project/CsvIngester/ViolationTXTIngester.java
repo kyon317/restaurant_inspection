@@ -38,23 +38,23 @@ public class ViolationTXTIngester {
         String inputLine = "";
 
         //reading and storing CSV data
-        try{
+        try {
             //skipping head lines
             reader.readLine();
             reader.readLine();
 
-            while((inputLine = reader.readLine())!=null){
+            while ((inputLine = reader.readLine()) != null) {
                 String[] tokens = inputLine.split(",");
                 Violation tempData = new Violation();
                 tempData.setViolationNumber(tokens[0]);
-                if (tokens[1].equals("Critical")){
+                if (tokens[1].equals("Critical")) {
                     tempData.setCritical(true);
                 }
                 tempData.setDescription(tokens[2]);
                 violationList.add(tempData);
             }
-        }catch (IOException e){
-            Log.wtf("Reading Activity","Fatal Error when reading file on line" +inputLine,e);
+        } catch (IOException e) {
+            Log.wtf("Reading Activity", "Fatal Error when reading file on line" + inputLine, e);
             e.printStackTrace();
         }
         //for debugging purpose
@@ -65,9 +65,9 @@ public class ViolationTXTIngester {
     }//end of function
 
     //return a violation by tracking number
-    public Violation returnViolationByID(String id){
+    public Violation returnViolationByID(String id) {
         Violation violation_to_return = new Violation();
-        for (Violation violation:violationList
+        for (Violation violation : violationList
         ) {
             if (violation.getViolationNumber().equals(id))
                 violation_to_return = violation;
