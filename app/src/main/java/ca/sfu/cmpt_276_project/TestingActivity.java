@@ -13,9 +13,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.Volley;
-
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
@@ -55,16 +52,16 @@ public class TestingActivity extends AppCompatActivity {
         } catch (InterruptedException | ExecutionException | IOException e) {
             e.printStackTrace();
         }*/
-/*        try {
+        try {
             GeneralAccessTest();
         } catch (IOException | ParseException e) {
             e.printStackTrace();
-        }*/
-        try {
+        }
+/*        try {
             GeneralCheckForUpdateTest();
         } catch (ExecutionException | InterruptedException | ParseException | IOException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
     public void SingletonTest() {
@@ -103,7 +100,10 @@ public class TestingActivity extends AppCompatActivity {
 
     public void GeneralAccessTest() throws IOException, ParseException {
         DataManager dataManager = new DataManager();
-        dataManager.updateDataBase(this);
+        String restaurant_file_name = dataManager.getRestaurant_filename();
+        String inspection_file_name = dataManager.getInspection_filename();
+        System.out.println("restaurant: " + restaurant_file_name);
+        System.out.println("inspection: " + inspection_file_name);
     }
 
     public void GeneralDownloadTest() throws InterruptedException, ExecutionException, IOException {

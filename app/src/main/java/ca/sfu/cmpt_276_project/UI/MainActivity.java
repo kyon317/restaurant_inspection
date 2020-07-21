@@ -33,6 +33,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import ca.sfu.cmpt_276_project.CsvIngester.InspectionDataCSVIngester;
 import ca.sfu.cmpt_276_project.CsvIngester.RestaurantCSVIngester;
@@ -41,12 +42,15 @@ import ca.sfu.cmpt_276_project.Model.Restaurant;
 import ca.sfu.cmpt_276_project.Model.RestaurantManager;
 import ca.sfu.cmpt_276_project.R;
 import ca.sfu.cmpt_276_project.TestingActivity;
+import ca.sfu.cmpt_276_project.WebScraper.DataManager;
 
 public class MainActivity extends AppCompatActivity {
-    private final static boolean DEBUG = true; // Access for debugging mode
+    private final static boolean DEBUG = false; // Access for debugging mode
+    private boolean UPDATE = false;
     private RestaurantManager restaurantManager;
     private int[] restaurantIcons;
     private List<Restaurant> restaurants;
+    private DataManager dataManager = new DataManager();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +64,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         getSupportActionBar().setTitle("Surrey Restaurant Inspections");
 
+        try {
+            UPDATE = dataManager.checkForUpdates(this);
+        } catch (ExecutionException | InterruptedException | ParseException | IOException e) {
+            e.printStackTrace();
+        }
         // Define ColorDrawable object and parse color
         // using parseColor method
         // with color hash code as its parameter
@@ -68,9 +77,10 @@ public class MainActivity extends AppCompatActivity {
 
         // Set BackgroundDrawable
         getSupportActionBar().setBackgroundDrawable(colorDrawable);
-        restaurantManager = RestaurantManager.getInstance();
-        initializeRestaurantList();//method necessary to initialize instance
 
+        restaurantManager = RestaurantManager.getInstance();
+
+        initializeRestaurantList();//method necessary to initialize instance
         populateRestaurantIcons();
         populateListView();
         registerClickCallback();
@@ -80,6 +90,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Debug Mode
+     */
     private void RunDebugMode() {
         Intent intent = new Intent(this, TestingActivity.class);
         startActivity(intent);
@@ -102,9 +115,17 @@ public class MainActivity extends AppCompatActivity {
         RestaurantCSVIngester restaurantImport = new RestaurantCSVIngester();
         List<Restaurant> restaurantList = new ArrayList<>();
 
+        // TODO: 1. refresh on the first run 2. Switch between default mode and import mode
         try {
-            restaurantImport.readRestaurantList(this, null, 0);//TODO:Connect with DataManager
-            restaurantList = restaurantImport.getRestaurantList();
+            if (UPDATE) {
+                System.out.println("UPDATE MODE ON");
+                restaurantImport.readRestaurantList(this, dataManager.getRestaurant_filename(), 1);
+                restaurantList = restaurantImport.getRestaurantList();
+            } else {
+                restaurantImport.readRestaurantList(this, dataManager.getRestaurant_filename(), 1);
+                restaurantList = restaurantImport.getRestaurantList();
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -112,7 +133,12 @@ public class MainActivity extends AppCompatActivity {
         //get Inspection Data of Restaurants from CSV
         InspectionDataCSVIngester inspectionDataImport = new InspectionDataCSVIngester();
         try {
-            inspectionDataImport.readInspectionData(this, null, 0);//TODO:Connect with DataManager
+            if (UPDATE) {
+                System.out.println("UPDATE MODE ON");
+                inspectionDataImport.readInspectionData(this, dataManager.getInspection_filename(), 1);
+            } else {
+                inspectionDataImport.readInspectionData(this, dataManager.getInspection_filename(), 1);
+            }
             //Sort inspection data into proper Restaurant objects
             if (!restaurantList.isEmpty()) {
                 for (Restaurant restaurant : restaurantList) {

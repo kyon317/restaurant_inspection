@@ -15,6 +15,7 @@ import android.content.Context;
 import android.util.Log;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -68,13 +69,14 @@ public class InspectionDataCSVIngester {
         return inspectionData;
     }
 
-    public void readInspectionData(Context context, InputStream inputStream, int updateCode) throws IOException, ParseException {
+    public void readInspectionData(Context context, String inputFilename, int updateCode) throws IOException, ParseException {
         //initializing violationList
         violationTXTIngester.readViolationData(context);
         InputStream InspectionCSV = context.getResources().openRawResource
                 (R.raw.inspectionreports_itr1);
         if (updateCode == 1) {
-            InspectionCSV = inputStream;
+            InspectionCSV.close();
+            InspectionCSV = new FileInputStream(inputFilename);
         }
         List<String> fileContents = getText(InspectionCSV);
         boolean firstLineUnread = true;
@@ -94,6 +96,7 @@ public class InspectionDataCSVIngester {
                     .map(s -> s.replace("\"", ""))  // Remove double quotes
                     .collect(Collectors.toList());  // Cool functional stuff.
 
+            if (fields.size() == 0) continue;  // Skip gibberish info
             InspectionData temp = new InspectionData();
 
             temp.setTrackingNumber(fields.get(0));
@@ -107,42 +110,69 @@ public class InspectionDataCSVIngester {
 
             temp.setCriticalViolations(Integer.parseInt(fields.get(3)));
             temp.setNonCriticalViolations(Integer.parseInt(fields.get(4)));
-            int VIOLUMP = 6;
-            int HAZARD_FIELD = 5;
-            //TODO: fix read csv file
+
             if (updateCode == 1) {
-                VIOLUMP = 5;
-                HAZARD_FIELD = 6;
-                System.out.println("update on");
-                System.out.println("field 5: " + fields.get(5));
-
-            }
-
-            //conditions for Hazard ENUM
-            if (fields.get(HAZARD_FIELD).equals("Low"))
-                temp.setHazard(Hazard.LOW);
-            else if (fields.get(HAZARD_FIELD).equals("Moderate"))
-                temp.setHazard(Hazard.MEDIUM);
-            else
-                temp.setHazard(Hazard.HIGH);
-
-            //Violation parser
-            List<Violation> dummy_violations = new ArrayList<>();
-            Violation dummy_violation = new Violation();
-            if (fields.size() == 6) {                          //skip if there's no violation
-                dummy_violations.add(dummy_violation);
-                temp.setViolation(dummy_violations);
-            } else if (fields.get(VIOLUMP) != null) {
-                String[] violationLump = fields.get(VIOLUMP).split("\\|");
-                for (String singleViolation : violationLump
-                ) {
-                    String[] dataCache = singleViolation.split(",");
-                    //System.out.println("ID: "+dataCache[0]);
-                    dummy_violation = violationTXTIngester.returnViolationByID(dataCache[0]);
-                    //dummyViolation.Display();
-                    dummy_violations.add(dummy_violation);
+                System.out.println("fuck this csv file");//TODO:Remove this line
+                System.out.println(fields);
+                List<Violation> dummy_violations = new ArrayList<>();
+                Violation dummy_violation = new Violation();
+                if (fields.size() == 5) {
+                    temp.setHazard(Hazard.LOW);
+                    temp.setViolation(dummy_violations);
+                } else if (fields.size() > 5) {
+                    String[] violationLump = fields.get(5).split("\\|");
+                    for (String singleViolation : violationLump
+                    ) {
+                        String[] dataCache = singleViolation.split(",");
+                        //System.out.println("ID: "+dataCache[0]);
+                        dummy_violation = violationTXTIngester.returnViolationByID(dataCache[0]);
+                        //dummyViolation.Display();
+                        dummy_violations.add(dummy_violation);
+                    }
+                    temp.setViolation(dummy_violations);
+                    if (fields.size() == 7) {
+                        //conditions for Hazard ENUM
+                        if (fields.get(6).equals("Low"))
+                            temp.setHazard(Hazard.LOW);
+                        else if (fields.get(6).equals("Moderate"))
+                            temp.setHazard(Hazard.MEDIUM);
+                        else
+                            temp.setHazard(Hazard.HIGH);
+                    } else {
+                        if (temp.getCriticalViolations() >= 2) temp.setHazard(Hazard.HIGH);
+                        else if (temp.getCriticalViolations() + temp.getNonCriticalViolations() >= 4)
+                            temp.setHazard(Hazard.MEDIUM);
+                        else temp.setHazard(Hazard.LOW);
+                    }
                 }
-                temp.setViolation(dummy_violations);
+            } else {
+                //conditions for Hazard ENUM
+                if (fields.get(5).equals("Low"))
+                    temp.setHazard(Hazard.LOW);
+                else if (fields.get(5).equals("Moderate"))
+                    temp.setHazard(Hazard.MEDIUM);
+                else
+                    temp.setHazard(Hazard.HIGH);
+
+                //Violation parser
+                List<Violation> dummy_violations = new ArrayList<>();
+                Violation dummy_violation = new Violation();
+                if (fields.size() == 6) {                          //skip if there's no violation
+                    dummy_violations.add(dummy_violation);
+                    temp.setViolation(dummy_violations);
+
+                } else if (fields.get(6) != null) {
+                    String[] violationLump = fields.get(6).split("\\|");
+                    for (String singleViolation : violationLump
+                    ) {
+                        String[] dataCache = singleViolation.split(",");
+                        //System.out.println("ID: "+dataCache[0]);
+                        dummy_violation = violationTXTIngester.returnViolationByID(dataCache[0]);
+                        //dummyViolation.Display();
+                        dummy_violations.add(dummy_violation);
+                    }
+                    temp.setViolation(dummy_violations);
+                }
             }
 
             IngestionList.add(temp);

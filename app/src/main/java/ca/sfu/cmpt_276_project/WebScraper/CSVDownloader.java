@@ -1,27 +1,21 @@
 package ca.sfu.cmpt_276_project.WebScraper;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.os.StrictMode;
 import android.util.Log;
-import android.view.View;
 import android.widget.ProgressBar;
 
 import java.io.BufferedInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Arrays;
 import java.util.Objects;
-import java.util.concurrent.ExecutionException;
 
 import ca.sfu.cmpt_276_project.R;
 
@@ -49,13 +43,12 @@ public class CSVDownloader extends AsyncTask<String, String, String> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-
         //Set up progressBar visibility and details
-        progressBar.setIndeterminate(false);
+/*        progressBar.setIndeterminate(false);
         progressBar.setProgress(0);
         progressBar.setScrollBarStyle(ProgressBar.SCROLLBARS_OUTSIDE_INSET);
         progressBar.setMax(100);
-        progressBar.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.VISIBLE);*/
     }
 
     /**
@@ -124,7 +117,7 @@ public class CSVDownloader extends AsyncTask<String, String, String> {
     protected void onProgressUpdate(String... progress) {
         // setting progress percentage
         System.out.println("Progress: " + Integer.parseInt(progress[0]));
-        progressBar.setProgress(Integer.parseInt(progress[0]));
+//        progressBar.setProgress(Integer.parseInt(progress[0]));
         //progressBar.setProgress(Integer.parseInt(progress[0])); this is where I'd update my progress bar
         //                                                          if I had the numbers for it
     }
@@ -136,7 +129,7 @@ public class CSVDownloader extends AsyncTask<String, String, String> {
     protected void onPostExecute(String file_url) {
         System.out.println("DONE");
         // dismiss the dialog after the file was downloaded
-        progressBar.setVisibility(View.GONE);
+//        progressBar.setVisibility(View.GONE);
     }
 
     public long getActualSize(URLConnection connection) {

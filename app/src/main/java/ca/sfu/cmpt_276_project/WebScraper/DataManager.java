@@ -2,32 +2,19 @@ package ca.sfu.cmpt_276_project.WebScraper;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.util.Log;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
-
-import ca.sfu.cmpt_276_project.CsvIngester.InspectionDataCSVIngester;
-import ca.sfu.cmpt_276_project.CsvIngester.RestaurantCSVIngester;
-import ca.sfu.cmpt_276_project.Model.Restaurant;
 
 public class DataManager extends Activity {
     private final static String restaurant_url = "http://data.surrey.ca/api/3/action/package_show?id=restaurants";
@@ -35,17 +22,18 @@ public class DataManager extends Activity {
     private final static String restaurant_filename = "restaurants_itr1.csv";
     private final static String restaurant_update_date_local = "restaurants_date_local.txt";
     private final static String inspection_filename = "inspectionreports_itr2.csv";
-    private final static String inspection_update_date_local  = "inspectionreports_date_local.txt";
-    private final static String directory_path = android.os.Environment.getExternalStorageDirectory()+"/Download/";
+    private final static String inspection_update_date_local = "inspectionreports_date_local.txt";
+    private final static String directory_path = android.os.Environment.getExternalStorageDirectory() + "/Download/";
     private String restaurant_csv_url = "";
     private String inspection_csv_url = "";
     private Date restaurant_latest_update = null;
     private Date inspection_latest_update = null;
 
-    public void checkForUpdates(Context context) throws ExecutionException, InterruptedException, ParseException, IOException {
-        if (!(checkFileExistence(restaurant_filename)&&checkFileExistence(inspection_filename))){
-            createDialog(context,"No local data found","Data");
-        }else{
+    public boolean checkForUpdates(Context context) throws ExecutionException, InterruptedException, ParseException, IOException {
+        boolean isUpdate = false;
+        if (!(checkFileExistence(restaurant_filename) && checkFileExistence(inspection_filename))) {
+            isUpdate = createDialog(context, "No local data found", "Data");
+        } else {
             restaurant_latest_update = readLocalDate(restaurant_update_date_local);
             inspection_latest_update = readLocalDate(inspection_update_date_local);
             WebScraper restaurantData = new WebScraper();
@@ -62,27 +50,29 @@ public class DataManager extends Activity {
 
             //To test it with older data on server, change before to after
             if (restaurant_latest_update.before(restaurant_date_on_server)&&inspection_latest_update.before(inspection_date_on_server)){
-                createDialog(context,"A new update found","Data");
-            }else{
-                if (restaurant_latest_update.before(restaurant_date_on_server)){
-                    createDialog(context,"A new update found","Restaurant List");
+                isUpdate = createDialog(context, "A new update found", "Data");
+            }else {
+                if (restaurant_latest_update.before(restaurant_date_on_server)) {
+                    isUpdate = createDialog(context, "A new update found", "Restaurant List");
                 }
-                if (inspection_latest_update.after(inspection_date_on_server)){
-                    createDialog(context,"A new update found","Inspection Data");
+                if (inspection_latest_update.before(inspection_date_on_server)) {
+                    isUpdate = createDialog(context, "A new update found", "Inspection Data");
                 }
             }
         }
+        return isUpdate;
     }
 
-    public void createDialog(Context context,String title,String msg){
+    public boolean createDialog(Context context, String title, String msg) {
+        final boolean[] isUpdate = {true};
         new AlertDialog.Builder(context)
                 .setTitle(title)
-                .setMessage("Download "+msg+"?")
+                .setMessage("Download " + msg + "?")
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        if (msg.equals("Restaurant List")){
+                        if (msg.equals("Restaurant List")) {
                             try {
-                                downloadList(context,restaurant_url,restaurant_filename,restaurant_csv_url);
+                                downloadList(context, restaurant_url, restaurant_filename, restaurant_csv_url);
                             } catch (ExecutionException | InterruptedException | IOException e) {
                                 e.printStackTrace();
                             }
@@ -104,15 +94,13 @@ public class DataManager extends Activity {
                 .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        if (msg.equals("Download from server?)")){
-
-                        }
+                        isUpdate[0] = false;
                     }
                 })
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
+        return isUpdate[0];
     }
-
 
     public boolean checkFileExistence(String filename){
         File dummyFile = new File(directory_path+filename);
@@ -141,7 +129,6 @@ public class DataManager extends Activity {
         }
     }
 
-
     public void updateLocalDate(String filename,String data) throws IOException {
         BufferedWriter writer = new BufferedWriter(new FileWriter(directory_path+filename));
         writer.write(data);
@@ -157,7 +144,7 @@ public class DataManager extends Activity {
     }
 
     public Date readLocalDate(String filename) throws IOException, ParseException {
-        BufferedReader reader = new BufferedReader(new FileReader(directory_path+filename));
+        BufferedReader reader = new BufferedReader(new FileReader(directory_path + filename));
         String input = reader.readLine();
         Date date = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy").parse(input);
         System.out.println(input);
@@ -165,52 +152,28 @@ public class DataManager extends Activity {
         reader.close();
         return date;
     }
+
     /**
-     * Use ACCESS_CODE to access different files
-     * 0: restaurant_list
-     * 1: inspection_list
+     * Getters
      */
-    public InputStream returnStream(Context context, int ACCESS_CODE) throws FileNotFoundException {
-        InputStream inputStream = null;
-        File inputFile = null;
-        if (ACCESS_CODE == 0) {
-            inputFile = new File(android.os.Environment.getExternalStorageDirectory() + "/Download/" + restaurant_filename);
-        }
-        if (ACCESS_CODE == 1) {
-            inputFile = new File(android.os.Environment.getExternalStorageDirectory() + "/Download/" + inspection_filename);
-        }
-        if (inputFile != null) {
-            inputStream = new FileInputStream(inputFile);
-        } else {
-            Log.wtf("Reading from External Storage", "Fatal Error: File Doesn't exist!");
-        }
-        return inputStream;
+
+    public String getRestaurant_filename() {
+        return directory_path + restaurant_filename;
     }
 
-    public void updateDataBase(Context context) throws IOException, ParseException {
-        InputStream restaurantInputStream = returnStream(context, 0);
-        InputStream inspectionInputStream = returnStream(context, 1);
-        List<Restaurant> restaurantList;
+    public String getInspection_filename() {
+        return directory_path + inspection_filename;
+    }
 
-        RestaurantCSVIngester restaurantCSVIngester = new RestaurantCSVIngester();
-        restaurantCSVIngester.readRestaurantList(context, restaurantInputStream, 1);
+    public Date getRestaurant_latest_update() {
+        return restaurant_latest_update;
+    }
 
-        restaurantList = restaurantCSVIngester.getRestaurantList();
+    public Date getInspection_latest_update() {
+        return inspection_latest_update;
+    }
 
-        System.out.println("size of list: " + restaurantList.size());
-        System.out.println("print last restaurant: ");
-        restaurantList.get(restaurantList.size() - 1).Display();
-
-        InspectionDataCSVIngester inspectionDataCSVIngester = new InspectionDataCSVIngester();
-//        inspectionDataCSVIngester.readInspectionData(context, inspectionInputStream, 1);
-        for (Restaurant res : restaurantList
-        ) {
-            //TODO: get data from inspectionDataCSVIngester, the InputStream is provided above.
-            //res.setInspectionDataList(inspectionDataCSVIngester.returnInspectionByID(res.getTrackNumber()));
-        }
-//        List<InspectionData>inspectionDataList =  inspectionDataCSVIngester.returnInspectionByID("SWOD-APSP3X");
-//        inspectionDataList.get(0).Display();
-//        System.out.println("print last restaurant with inspections: ");
-//        restaurantList.get(restaurantList.size()-1).Display();
+    public String getDirectory_path() {
+        return directory_path;
     }
 }

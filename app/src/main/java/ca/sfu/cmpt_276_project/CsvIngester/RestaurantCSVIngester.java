@@ -14,6 +14,7 @@ import android.content.Context;
 import android.util.Log;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -29,11 +30,12 @@ public class RestaurantCSVIngester {
     private List<Restaurant> restaurantList = new ArrayList<>();
 
 
-    public void readRestaurantList(Context context, InputStream inputStream, int updateCode) throws IOException {
+    public void readRestaurantList(Context context, String inputFileName, int updateCode) throws IOException {
         InputStream restaurantDataInput = context.getResources().openRawResource
                 (R.raw.restaurants_itr1);
         if (updateCode == 1) {
-            restaurantDataInput = inputStream;
+            restaurantDataInput.close();
+            restaurantDataInput = new FileInputStream(inputFileName);
         }
 
 
