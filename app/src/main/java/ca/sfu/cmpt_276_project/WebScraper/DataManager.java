@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Looper;
+import android.provider.ContactsContract;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -33,11 +34,11 @@ public class DataManager extends Activity {
     private Date inspection_latest_update = null;
 
     //TODO: Move it to Main Activity
-    public boolean checkForUpdates(Context context) throws ExecutionException, InterruptedException, ParseException, IOException {
-        Boolean isUpdate = false;
+    public DataStatus checkForUpdates() throws ExecutionException, InterruptedException, ParseException, IOException {
         if (!(checkFileExistence(restaurant_filename) && checkFileExistence(inspection_filename))) {
-            isUpdate = createDialog(context, "No local data found", "Data");
-        } else {
+            return DataStatus.NOT_EXIST;
+        }
+        else {
             restaurant_latest_update = readLocalDate(restaurant_update_date_local);
             inspection_latest_update = readLocalDate(inspection_update_date_local);
             WebScraper restaurantData = new WebScraper();
@@ -59,68 +60,25 @@ public class DataManager extends Activity {
             long hour_diff_ins = TimeUnit.HOURS.convert(timeDiff_ins, TimeUnit.MILLISECONDS);
             if (hour_diff_res >=20 && hour_diff_ins>=20){
                 System.out.println("time diff: "+hour_diff_ins);
-                isUpdate = createDialog(context, "A new update found", "Data");
+                return DataStatus.OUT_OF_DATE;
             }else if (hour_diff_res>=20){
-                isUpdate = createDialog(context, "A new update found", "Restaurant List");
+                return DataStatus.OUT_OF_DATE;
             }else if(hour_diff_ins>=20){
-                isUpdate = createDialog(context, "A new update found", "Inspection Data");
+                return DataStatus.OUT_OF_DATE;
             }
             //To test it with older data on server, change before to after
             else if (restaurant_latest_update.before(restaurant_date_on_server)&&inspection_latest_update.before(inspection_date_on_server)){
-                isUpdate = createDialog(context, "A new update found", "Data");
+                return DataStatus.OUT_OF_DATE;
             }else {
                 if (restaurant_latest_update.before(restaurant_date_on_server)) {
-                    isUpdate = createDialog(context, "A new update found", "Restaurant List");
+                    return DataStatus.OUT_OF_DATE;
                 }
                 if (inspection_latest_update.before(inspection_date_on_server)) {
-                    isUpdate = createDialog(context, "A new update found", "Inspection Data");
+                    return DataStatus.OUT_OF_DATE;
                 }
             }
         }
-        System.out.println("IS UPDATE: "+isUpdate);
-        return isUpdate;
-    }
-
-    //TODO: Move it to Main Activity
-    public boolean createDialog(Context context, String title, String msg) {
-        final Boolean[] isUpdate = {false};
-        new AlertDialog.Builder(context)
-                .setTitle(title)
-                .setMessage("Download " + msg + "?")
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (msg.equals("Restaurant List")) {
-                            try {
-                                downloadList(context, restaurant_url, restaurant_filename, restaurant_csv_url);
-                            } catch (ExecutionException | InterruptedException | IOException e) {
-                                e.printStackTrace();
-                            }
-                        }else if (msg.equals("Inspection Data")){
-                            try {
-                                downloadList(context,inspection_url,inspection_filename,inspection_csv_url);
-                            } catch (ExecutionException | InterruptedException | IOException e) {
-                                e.printStackTrace();
-                            }
-                        }else{
-                            try {
-                                downloadAll(context);
-                            } catch (ExecutionException | InterruptedException | IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                })
-                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        System.out.println("CANCEL");
-                        isUpdate[0] = true;
-                        System.out.println("After Clicked: "+ isUpdate[0]);
-                    }
-                })
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
-        return isUpdate[0];
+        return DataStatus.UP_TO_DATE;
     }
 
     public boolean checkFileExistence(String filename){
@@ -179,11 +137,11 @@ public class DataManager extends Activity {
      */
 
     public String getRestaurant_filename() {
-        return directory_path + restaurant_filename;
+        return restaurant_filename;
     }
 
     public String getInspection_filename() {
-        return directory_path + inspection_filename;
+        return inspection_filename;
     }
 
     public Date getRestaurant_latest_update() {
@@ -198,6 +156,19 @@ public class DataManager extends Activity {
         return directory_path;
     }
 
+    public String getRestaurant_url() {
+        return restaurant_url;
+    }
 
+    public String getInspection_url() {
+        return inspection_url;
+    }
 
+    public String getRestaurant_csv_url() {
+        return restaurant_csv_url;
+    }
+
+    public String getInspection_csv_url() {
+        return inspection_csv_url;
+    }
 }

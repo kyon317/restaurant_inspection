@@ -7,6 +7,9 @@
 package ca.sfu.cmpt_276_project.UI;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -43,15 +46,17 @@ import ca.sfu.cmpt_276_project.Model.RestaurantManager;
 import ca.sfu.cmpt_276_project.R;
 import ca.sfu.cmpt_276_project.TestingActivity;
 import ca.sfu.cmpt_276_project.WebScraper.DataManager;
+import ca.sfu.cmpt_276_project.WebScraper.DataStatus;
+import ca.sfu.cmpt_276_project.WebScraper.RunMode;
 
 public class MainActivity extends AppCompatActivity {
     private final static boolean DEBUG = false; // Access for debugging mode
-    private boolean UPDATE = false;
     private RestaurantManager restaurantManager;
     private int[] restaurantIcons;
     private List<Restaurant> restaurants;
     private DataManager dataManager = new DataManager();
-
+    private DataStatus dataStatus;
+    private RunMode runMode = RunMode.DEFAULT;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,10 +67,13 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Surrey Restaurant Inspections");
 
         try {
-            UPDATE = dataManager.checkForUpdates(this);
+            dataStatus = dataManager.checkForUpdates();
+            System.out.println("returned update info: "+dataStatus);
         } catch (ExecutionException | InterruptedException | IOException | ParseException e) {
             e.printStackTrace();
         }
+        checkRunmode();
+
         // Define ColorDrawable object and parse color
         // using parseColor method
         // with color hash code as its parameter
@@ -85,6 +93,40 @@ public class MainActivity extends AppCompatActivity {
         if (DEBUG) {
             RunDebugMode();
         }
+    }
+
+    public void checkRunmode(){
+        if (dataStatus!=DataStatus.UP_TO_DATE)
+            createDownloadDialog("New Updates Found","updates",dataStatus);
+        else runMode = RunMode.LOCAL;
+    }
+    public RunMode getRunMode() {
+        return runMode;
+    }
+
+    public void setRunMode(RunMode runMode) {
+        this.runMode = runMode;
+    }
+
+    public void createDownloadDialog(String title, String msg, DataStatus status){
+        new AlertDialog.Builder(this)
+                .setTitle(title)
+                .setMessage("Download " + msg + "?")
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        setRunMode(RunMode.UPDATE);
+                    }
+                })
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        System.out.println("CANCEL");
+                        if (status==DataStatus.NOT_EXIST) setRunMode(RunMode.DEFAULT);
+                        else setRunMode(RunMode.LOCAL);
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
     }
 
     /**
@@ -112,36 +154,42 @@ public class MainActivity extends AppCompatActivity {
         RestaurantCSVIngester restaurantImport = new RestaurantCSVIngester();
         List<Restaurant> restaurantList = new ArrayList<>();
 
-        // TODO: 1. refresh on the first run 2. Switch between default mode and import mode
+        // TODO:  refresh after download complete
         try {
-            if (UPDATE) {
-                System.out.println("UPDATE MODE ON");
-                restaurantImport.readRestaurantList(this, dataManager.getRestaurant_filename(), 1);
-                restaurantList = restaurantImport.getRestaurantList();
-            } else {
+            if (runMode == RunMode.LOCAL) {
                 System.out.println("LOADING LOCAL DATA");
-                if (dataManager.checkFileExistence(dataManager.getRestaurant_filename()))
-                restaurantImport.readRestaurantList(this, dataManager.getRestaurant_filename(), 1);
-                else restaurantImport.readRestaurantList(this,null, 0);
-
+                restaurantImport.readRestaurantList(this, dataManager.getDirectory_path()+dataManager.getRestaurant_filename(), 1);
+                restaurantList = restaurantImport.getRestaurantList();
+            } else if (runMode == RunMode.DEFAULT){
+                System.out.println("LOADING DEFAULT DATA");
+                restaurantImport.readRestaurantList(this,null, 0);
+                restaurantList = restaurantImport.getRestaurantList();
+            }else {
+                System.out.println("DOWNLOADING DATA");
+                dataManager.downloadList(this,dataManager.getRestaurant_url(),dataManager.getRestaurant_filename(),dataManager.getRestaurant_csv_url());
+                recreate();
+                restaurantImport.readRestaurantList(this, dataManager.getDirectory_path()+dataManager.getRestaurant_filename(), 1);
                 restaurantList = restaurantImport.getRestaurantList();
             }
 
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
 
         //get Inspection Data of Restaurants from CSV
         InspectionDataCSVIngester inspectionDataImport = new InspectionDataCSVIngester();
         try {
-            if (UPDATE) {
-                System.out.println("UPDATE MODE ON");
-                inspectionDataImport.readInspectionData(this, dataManager.getInspection_filename(), 1);
-            } else {
+            if (runMode== RunMode.LOCAL) {
                 System.out.println("LOADING LOCAL DATA");
-                if (dataManager.checkFileExistence(dataManager.getInspection_filename()))
-                inspectionDataImport.readInspectionData(this, dataManager.getInspection_filename(), 1);
-                else inspectionDataImport.readInspectionData(this, null, 0);
+                inspectionDataImport.readInspectionData(this, dataManager.getDirectory_path()+dataManager.getInspection_filename(), 1);
+            } else if (runMode == RunMode.DEFAULT){
+                System.out.println("LOADING DEFAULT DATA");
+                inspectionDataImport.readInspectionData(this, null, 0);
+            }else{
+                System.out.println("DOWNLOADING DATA");
+                dataManager.downloadList(this,dataManager.getInspection_url(),dataManager.getInspection_filename(),dataManager.getInspection_csv_url());
+                recreate();
+                inspectionDataImport.readInspectionData(this, dataManager.getDirectory_path()+dataManager.getInspection_filename(), 1);
             }
             //Sort inspection data into proper Restaurant objects
             if (!restaurantList.isEmpty()) {
@@ -150,9 +198,7 @@ public class MainActivity extends AppCompatActivity {
                             (restaurant.getTrackNumber()));
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
+        } catch (IOException | ParseException | InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
 

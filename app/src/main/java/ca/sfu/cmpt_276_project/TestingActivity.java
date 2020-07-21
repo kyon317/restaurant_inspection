@@ -113,6 +113,6 @@ public class TestingActivity extends AppCompatActivity {
     }
     public void GeneralCheckForUpdateTest() throws ExecutionException, InterruptedException, ParseException, IOException {
         DataManager dataManager = new DataManager();
-        dataManager.checkForUpdates(this);
+        dataManager.checkForUpdates();
     }
 }
