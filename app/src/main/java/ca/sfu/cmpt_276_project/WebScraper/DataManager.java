@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.AsyncTask;
+import android.os.Looper;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -15,6 +17,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 public class DataManager extends Activity {
     private final static String restaurant_url = "http://data.surrey.ca/api/3/action/package_show?id=restaurants";
@@ -29,8 +32,9 @@ public class DataManager extends Activity {
     private Date restaurant_latest_update = null;
     private Date inspection_latest_update = null;
 
+    //TODO: Move it to Main Activity
     public boolean checkForUpdates(Context context) throws ExecutionException, InterruptedException, ParseException, IOException {
-        boolean isUpdate = false;
+        Boolean isUpdate = false;
         if (!(checkFileExistence(restaurant_filename) && checkFileExistence(inspection_filename))) {
             isUpdate = createDialog(context, "No local data found", "Data");
         } else {
@@ -40,16 +44,29 @@ public class DataManager extends Activity {
             String fetched_res_date = restaurantData.execute(restaurant_url).get()[1];
             Date restaurant_date_on_server;
             restaurant_date_on_server = dateParser(fetched_res_date);
-            System.out.println("restaurant_date_on_server:" + restaurant_date_on_server);
+            //System.out.println("restaurant_date_on_server:" + restaurant_date_on_server);
 
             WebScraper inspectionData = new WebScraper();
             String fetched_ins_date = inspectionData.execute(inspection_url).get()[1];
             Date inspection_date_on_server;
             inspection_date_on_server = dateParser(fetched_ins_date);
-            System.out.println("inspection_latest_update:" + inspection_date_on_server);
+            //System.out.println("inspection_latest_update:" + inspection_date_on_server);
 
+            Date currentTime = new Date();
+            long time_diff_res = currentTime.getTime()-restaurant_latest_update.getTime();
+            long hour_diff_res = TimeUnit.HOURS.convert(time_diff_res, TimeUnit.MILLISECONDS);
+            long timeDiff_ins = currentTime.getTime()-inspection_latest_update.getTime();
+            long hour_diff_ins = TimeUnit.HOURS.convert(timeDiff_ins, TimeUnit.MILLISECONDS);
+            if (hour_diff_res >=20 && hour_diff_ins>=20){
+                System.out.println("time diff: "+hour_diff_ins);
+                isUpdate = createDialog(context, "A new update found", "Data");
+            }else if (hour_diff_res>=20){
+                isUpdate = createDialog(context, "A new update found", "Restaurant List");
+            }else if(hour_diff_ins>=20){
+                isUpdate = createDialog(context, "A new update found", "Inspection Data");
+            }
             //To test it with older data on server, change before to after
-            if (restaurant_latest_update.before(restaurant_date_on_server)&&inspection_latest_update.before(inspection_date_on_server)){
+            else if (restaurant_latest_update.before(restaurant_date_on_server)&&inspection_latest_update.before(inspection_date_on_server)){
                 isUpdate = createDialog(context, "A new update found", "Data");
             }else {
                 if (restaurant_latest_update.before(restaurant_date_on_server)) {
@@ -60,11 +77,13 @@ public class DataManager extends Activity {
                 }
             }
         }
+        System.out.println("IS UPDATE: "+isUpdate);
         return isUpdate;
     }
 
+    //TODO: Move it to Main Activity
     public boolean createDialog(Context context, String title, String msg) {
-        final boolean[] isUpdate = {true};
+        final Boolean[] isUpdate = {false};
         new AlertDialog.Builder(context)
                 .setTitle(title)
                 .setMessage("Download " + msg + "?")
@@ -94,7 +113,9 @@ public class DataManager extends Activity {
                 .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        isUpdate[0] = false;
+                        System.out.println("CANCEL");
+                        isUpdate[0] = true;
+                        System.out.println("After Clicked: "+ isUpdate[0]);
                     }
                 })
                 .setIcon(android.R.drawable.ic_dialog_alert)
@@ -176,4 +197,7 @@ public class DataManager extends Activity {
     public String getDirectory_path() {
         return directory_path;
     }
+
+
+
 }

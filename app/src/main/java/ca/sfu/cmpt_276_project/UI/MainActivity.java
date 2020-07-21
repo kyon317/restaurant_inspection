@@ -56,9 +56,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            // Permission is not granted
-            //System.out.println("not permitted");
-            //System.out.println(PackageManager.PERMISSION_GRANTED);
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
         }
         setContentView(R.layout.activity_main);
@@ -66,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             UPDATE = dataManager.checkForUpdates(this);
-        } catch (ExecutionException | InterruptedException | ParseException | IOException e) {
+        } catch (ExecutionException | InterruptedException | IOException | ParseException e) {
             e.printStackTrace();
         }
         // Define ColorDrawable object and parse color
@@ -122,7 +119,11 @@ public class MainActivity extends AppCompatActivity {
                 restaurantImport.readRestaurantList(this, dataManager.getRestaurant_filename(), 1);
                 restaurantList = restaurantImport.getRestaurantList();
             } else {
+                System.out.println("LOADING LOCAL DATA");
+                if (dataManager.checkFileExistence(dataManager.getRestaurant_filename()))
                 restaurantImport.readRestaurantList(this, dataManager.getRestaurant_filename(), 1);
+                else restaurantImport.readRestaurantList(this,null, 0);
+
                 restaurantList = restaurantImport.getRestaurantList();
             }
 
@@ -137,7 +138,10 @@ public class MainActivity extends AppCompatActivity {
                 System.out.println("UPDATE MODE ON");
                 inspectionDataImport.readInspectionData(this, dataManager.getInspection_filename(), 1);
             } else {
+                System.out.println("LOADING LOCAL DATA");
+                if (dataManager.checkFileExistence(dataManager.getInspection_filename()))
                 inspectionDataImport.readInspectionData(this, dataManager.getInspection_filename(), 1);
+                else inspectionDataImport.readInspectionData(this, null, 0);
             }
             //Sort inspection data into proper Restaurant objects
             if (!restaurantList.isEmpty()) {

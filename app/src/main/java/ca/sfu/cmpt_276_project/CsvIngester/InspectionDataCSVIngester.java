@@ -112,8 +112,6 @@ public class InspectionDataCSVIngester {
             temp.setNonCriticalViolations(Integer.parseInt(fields.get(4)));
 
             if (updateCode == 1) {
-                System.out.println("fuck this csv file");//TODO:Remove this line
-                System.out.println(fields);
                 List<Violation> dummy_violations = new ArrayList<>();
                 Violation dummy_violation = new Violation();
                 if (fields.size() == 5) {
