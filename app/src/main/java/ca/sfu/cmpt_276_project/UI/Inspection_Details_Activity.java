@@ -17,7 +17,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -27,13 +30,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.Toast;
 
 import ca.sfu.cmpt_276_project.Model.Hazard;
 import ca.sfu.cmpt_276_project.Model.InspectionData;
-import ca.sfu.cmpt_276_project.Model.Restaurant;
 import ca.sfu.cmpt_276_project.Model.RestaurantManager;
 import ca.sfu.cmpt_276_project.Model.Violation;
 import ca.sfu.cmpt_276_project.R;
@@ -214,8 +213,8 @@ public class Inspection_Details_Activity extends AppCompatActivity {
                 case 205:
                 case 206:
                 case 207:
-                case 208:
                 case 209:
+                case 208:
                 case 210:
                 case 211:
                 case 212:

@@ -55,6 +55,22 @@ import ca.sfu.cmpt_276_project.R;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
+    public static Intent makeIntent(Context context, Double latitude, double longitude,
+                                    Boolean fromRestaurant) {
+        Intent intent= new Intent(context, MapsActivity.class);
+        intent.putExtra(EXTRA_LAT, latitude);
+        intent.putExtra(EXTRA_LNG, longitude);
+        intent.putExtra(EXTRA_BOOL, fromRestaurant);
+        return intent;
+    }
+
+    private double restaurantLat;
+    private double restaurantLng;
+    private Boolean fromRestaurant;
+
+    private static final String EXTRA_LAT = "ca.sfu.cmpt_276_project.UI.extraLat";
+    private static final String EXTRA_LNG = "ca.sfu.cmpt_276_project.UI.extraLng";
+    private static final String EXTRA_BOOL = "ca.sfu.cmpt_276_project.UI.extraBool";
     private GoogleMap mMap;
     private Marker mMarker;
     private UiSettings mUiSettings;
@@ -103,7 +119,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         init();
 
+        Intent intent = getIntent();
+        restaurantLat = intent.getDoubleExtra(EXTRA_LAT, 49.1915);
+        restaurantLng = intent.getDoubleExtra(EXTRA_LNG, 122.8456);
+        fromRestaurant = intent.getBooleanExtra(EXTRA_BOOL, false);
+        if(fromRestaurant == true){
+            //TODO: have camera move to given location
+           // moveCamera(new LatLng(restaurantLat, restaurantLng), DEFAULT_ZOOM);
+        }
     }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+    }
+
     @Override
     public void onBackPressed(){
         finish();
@@ -223,6 +253,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         }
     }
+
 
     private class CustomInfoAdapter implements GoogleMap.InfoWindowAdapter {
         private Activity context;

@@ -11,10 +11,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-
-
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -23,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -33,6 +30,7 @@ import ca.sfu.cmpt_276_project.Model.InspectionData;
 import ca.sfu.cmpt_276_project.Model.Restaurant;
 import ca.sfu.cmpt_276_project.Model.RestaurantManager;
 import ca.sfu.cmpt_276_project.R;
+
 
 public class SingleRestaurantActivity extends AppCompatActivity {
 
@@ -61,6 +59,8 @@ public class SingleRestaurantActivity extends AppCompatActivity {
         getSupportActionBar().setBackgroundDrawable(colorDrawable);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        //Todo: fix actionbar back btn so it returns to last activity.
+
 
         Intent intent = getIntent();
         restaurantPosition = intent.getIntExtra(EXTRA_RES_NUM, 0);
@@ -84,6 +84,17 @@ public class SingleRestaurantActivity extends AppCompatActivity {
                 +" " + restaurant.getPhysicalCity());
         TextView coords_textView = findViewById(R.id.coordinatesText);
         coords_textView.setText(restaurant.getLatitude() + ", " + restaurant.getLongitude());
+        coords_textView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent intent = MapsActivity.makeIntent(SingleRestaurantActivity.this,
+                       restaurant.getLatitude(),
+                        restaurant.getLongitude(),
+                        true);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override
