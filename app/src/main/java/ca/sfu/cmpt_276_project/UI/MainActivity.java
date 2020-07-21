@@ -8,13 +8,13 @@ package ca.sfu.cmpt_276_project.UI;
 
 import android.Manifest;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
     private List<Restaurant> restaurants;
     private DataManager dataManager = new DataManager();
     private DataStatus dataStatus;
-    private RunMode runMode = RunMode.DEFAULT;
+    private RunMode runMode = RunMode.DEFAULT;  //TODO: FIX BUG ON FIRST RUN
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,11 +68,15 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             dataStatus = dataManager.checkForUpdates();
-            System.out.println("returned update info: "+dataStatus);
+            System.out.println("returned update info: " + dataStatus);
         } catch (ExecutionException | InterruptedException | IOException | ParseException e) {
             e.printStackTrace();
         }
-        checkRunmode();
+
+        if (dataStatus != DataStatus.UP_TO_DATE)
+            runMode = createDownloadDialog("New Updates Found", "updates", dataStatus);
+        else runMode = RunMode.LOCAL;
+        outputRunmode();
 
         // Define ColorDrawable object and parse color
         // using parseColor method
@@ -95,38 +99,33 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void checkRunmode(){
-        if (dataStatus!=DataStatus.UP_TO_DATE)
-            createDownloadDialog("New Updates Found","updates",dataStatus);
-        else runMode = RunMode.LOCAL;
-    }
-    public RunMode getRunMode() {
-        return runMode;
+    public void outputRunmode(){
+        System.out.println("Selected: "+runMode);
     }
 
-    public void setRunMode(RunMode runMode) {
-        this.runMode = runMode;
-    }
-
-    public void createDownloadDialog(String title, String msg, DataStatus status){
+    public RunMode createDownloadDialog(String title, String msg, DataStatus status){
+        RunMode[] result = new RunMode[1];
         new AlertDialog.Builder(this)
                 .setTitle(title)
                 .setMessage("Download " + msg + "?")
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        setRunMode(RunMode.UPDATE);
+                        result[0] = RunMode.UPDATE;
+                        dialog.dismiss();
                     }
                 })
                 .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         System.out.println("CANCEL");
-                        if (status==DataStatus.NOT_EXIST) setRunMode(RunMode.DEFAULT);
-                        else setRunMode(RunMode.LOCAL);
+                        if (status==DataStatus.NOT_EXIST) result[0] = RunMode.DEFAULT;
+                        else result[0]=RunMode.LOCAL;
+                        dialogInterface.dismiss();
                     }
                 })
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
+        return result[0];
     }
 
     /**
