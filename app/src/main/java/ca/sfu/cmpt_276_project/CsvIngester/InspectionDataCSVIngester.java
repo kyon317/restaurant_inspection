@@ -37,7 +37,7 @@ public class InspectionDataCSVIngester {
     private List<InspectionData> IngestionList = new ArrayList<>();
     private ViolationTXTIngester violationTXTIngester = new ViolationTXTIngester();
 
-    public static List<String> getText(InputStream inputStream) throws IOException{
+    public static List<String> getText(InputStream inputStream) throws IOException {
 
         List<String> lines = new ArrayList<>();
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream,
@@ -49,7 +49,7 @@ public class InspectionDataCSVIngester {
                 lines.add(line);
             }
         } catch (IOException e) {
-            Log.wtf("Reading Activity","Fatal Error when reading file on line");
+            Log.wtf("Reading Activity", "Fatal Error when reading file on line");
             e.printStackTrace();
         }
 
@@ -57,18 +57,18 @@ public class InspectionDataCSVIngester {
     }
 
     //return a list of inspection by tracking number
-    public List<InspectionData> returnInspectionByID(String id){
+    public List<InspectionData> returnInspectionByID(String id) {
         List<InspectionData> inspectionData = new ArrayList<>();
-        for (InspectionData inspection:IngestionList
-             ) {
-            if (inspection.getTrackingNumber().equals(id)){
+        for (InspectionData inspection : IngestionList
+        ) {
+            if (inspection.getTrackingNumber().equals(id)) {
                 inspectionData.add(inspection);
             }
         }
         return inspectionData;
     }
 
-    public void readInspectionData(Context context, InputStream inputStream,int updateCode) throws IOException, ParseException {
+    public void readInspectionData(Context context, InputStream inputStream, int updateCode) throws IOException, ParseException {
         //initializing violationList
         violationTXTIngester.readViolationData(context);
         InputStream InspectionCSV = context.getResources().openRawResource
@@ -100,7 +100,7 @@ public class InspectionDataCSVIngester {
             temp.setInspectionDate(format.parse(fields.get(1)));
 
             //conditions for Inspection Type ENUM
-            if(fields.get(2).equals("Routine"))
+            if (fields.get(2).equals("Routine"))
                 temp.setInspectionType(Type.ROUTINE);
             else
                 temp.setInspectionType(Type.FOLLOW_UP);
@@ -110,18 +110,18 @@ public class InspectionDataCSVIngester {
             int VIOLUMP = 6;
             int HAZARD_FIELD = 5;
             //TODO: fix read csv file
-            if (updateCode == 1){
+            if (updateCode == 1) {
                 VIOLUMP = 5;
                 HAZARD_FIELD = 6;
                 System.out.println("update on");
-                System.out.println("field 5: "+fields.get(5));
+                System.out.println("field 5: " + fields.get(5));
 
             }
 
             //conditions for Hazard ENUM
-            if(fields.get(HAZARD_FIELD).equals("Low"))
+            if (fields.get(HAZARD_FIELD).equals("Low"))
                 temp.setHazard(Hazard.LOW);
-            else if(fields.get(HAZARD_FIELD).equals("Moderate"))
+            else if (fields.get(HAZARD_FIELD).equals("Moderate"))
                 temp.setHazard(Hazard.MEDIUM);
             else
                 temp.setHazard(Hazard.HIGH);
@@ -129,13 +129,13 @@ public class InspectionDataCSVIngester {
             //Violation parser
             List<Violation> dummy_violations = new ArrayList<>();
             Violation dummy_violation = new Violation();
-            if (fields.size()==6){                          //skip if there's no violation
+            if (fields.size() == 6) {                          //skip if there's no violation
                 dummy_violations.add(dummy_violation);
                 temp.setViolation(dummy_violations);
-            }else if (fields.get(VIOLUMP)!=null){
+            } else if (fields.get(VIOLUMP) != null) {
                 String[] violationLump = fields.get(VIOLUMP).split("\\|");
-                for (String singleViolation:violationLump
-                     ) {
+                for (String singleViolation : violationLump
+                ) {
                     String[] dataCache = singleViolation.split(",");
                     //System.out.println("ID: "+dataCache[0]);
                     dummy_violation = violationTXTIngester.returnViolationByID(dataCache[0]);

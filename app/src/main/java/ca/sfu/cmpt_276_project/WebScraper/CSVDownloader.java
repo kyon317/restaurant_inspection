@@ -1,7 +1,10 @@
 package ca.sfu.cmpt_276_project.WebScraper;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.os.StrictMode;
@@ -11,17 +14,18 @@ import android.widget.ProgressBar;
 
 import java.io.BufferedInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 
 import ca.sfu.cmpt_276_project.R;
 
 public class CSVDownloader extends AsyncTask<String, String, String> {
-    public static final int progress_bar_type = 0;
     private ProgressBar progressBar;
     private String filename = "";
 
@@ -94,8 +98,8 @@ public class CSVDownloader extends AsyncTask<String, String, String> {
                 total += count;
                 // publishing the progress....
                 // After this onProgressUpdate will be called
-                System.out.println("lengthofFile:"+lengthOfFile);
-                publishProgress("" + (int) ((total * 100) /lengthOfFile ));
+                //System.out.println("lengthofFile:" + lengthOfFile);
+                publishProgress("" + (int) ((total * 100) / lengthOfFile));
 
                 // writing data to file
                 output.write(data, 0, count);
@@ -119,7 +123,8 @@ public class CSVDownloader extends AsyncTask<String, String, String> {
      */
     protected void onProgressUpdate(String... progress) {
         // setting progress percentage
-        System.out.println("Progress: "+Integer.parseInt(progress[0]));
+        System.out.println("Progress: " + Integer.parseInt(progress[0]));
+        progressBar.setProgress(Integer.parseInt(progress[0]));
         //progressBar.setProgress(Integer.parseInt(progress[0])); this is where I'd update my progress bar
         //                                                          if I had the numbers for it
     }

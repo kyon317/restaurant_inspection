@@ -1,12 +1,12 @@
 /*
-* Class: RestaurantCSVIngester
-*
-* Class Description: The csvImporter Class contains a csv reader that fetches data from the provided restaurants_itr1.csv file.
-*
-* Function:
-* 1. readRestaurantList(Context context): Given the context, the function fetches data from restaurants_itr1.csv and interprets it into a List of Restaurants.[Done]
-*
-* */
+ * Class: RestaurantCSVIngester
+ *
+ * Class Description: The csvImporter Class contains a csv reader that fetches data from the provided restaurants_itr1.csv file.
+ *
+ * Function:
+ * 1. readRestaurantList(Context context): Given the context, the function fetches data from restaurants_itr1.csv and interprets it into a List of Restaurants.[Done]
+ *
+ * */
 
 package ca.sfu.cmpt_276_project.CsvIngester;
 
@@ -65,8 +65,8 @@ public class RestaurantCSVIngester {
 
                 restaurantList.add(dummy_restaurant);
             }
-        }catch (IOException e){
-            Log.wtf("Reading Activity","Fatal Error when reading file on line" +inputLine,e);
+        } catch (IOException e) {
+            Log.wtf("Reading Activity", "Fatal Error when reading file on line" + inputLine, e);
             e.printStackTrace();
         }
 

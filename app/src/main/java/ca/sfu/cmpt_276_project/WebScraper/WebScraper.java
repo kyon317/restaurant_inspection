@@ -17,15 +17,15 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class WebScraper extends AsyncTask<String, String, String> {
+public class WebScraper extends AsyncTask<String, String, String[]> {
     private final static String INSPECTION_LIST_NAME = "Fraser Health Restaurant Inspection Reports";
     private final static String RESTAURANT_LIST_NAME = "Restaurants";
     private static String CSV_url = "";
 
     //Background data fetching
     @Override
-    protected String doInBackground(String... params) {
-
+    protected String[] doInBackground(String... params) {
+        String[] result = new String[2];
         HttpURLConnection connection = null;
         BufferedReader reader = null;
         try {
@@ -43,7 +43,10 @@ public class WebScraper extends AsyncTask<String, String, String> {
             JSONObject rawJsonObj = returnJSONObject(buffer.toString()).getJSONObject("result");
             JSONArray resources = rawJsonObj.getJSONArray("resources");
             setCSV_url(returnCsvUrl(resources));
-            return CSV_url;
+            String date = returnLastModifiedDate(resources);
+            result[0] = CSV_url;
+            result[1] = date;
+            return result;
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -62,11 +65,11 @@ public class WebScraper extends AsyncTask<String, String, String> {
                 }
             }
         }
-        return null;
+        return result;
     }
 
     @Override
-    protected void onPostExecute(String result) {
+    protected void onPostExecute(String[] result) {
         super.onPostExecute(result);
         //System.out.println("Result: "+result);
     }
@@ -87,6 +90,19 @@ public class WebScraper extends AsyncTask<String, String, String> {
         return csvUrl;
     }
 
+    public String returnLastModifiedDate(JSONArray jsonArray) throws JSONException {
+        String date = "";
+        for (int i = 0; i < jsonArray.length(); i++) {
+            if (RESTAURANT_LIST_NAME.equals(jsonArray.getJSONObject(i).getString("name")) || INSPECTION_LIST_NAME.equals(jsonArray.getJSONObject(i).getString("name"))) {
+                if (jsonArray.getJSONObject(i).getString("format").equals("CSV")) {
+                    date = jsonArray.getJSONObject(i).getString("last_modified");
+                }
+            }
+        }
+
+        //System.out.println("date: "+date);  // For testing
+        return date;
+    }
     public JSONObject returnJSONObject(String result) throws JSONException {
         JSONObject jsonObject = new JSONObject(result);
         return jsonObject;
