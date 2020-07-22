@@ -115,7 +115,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         getLocationPermission();
 
         restaurantManager = RestaurantManager.getInstance();
-        initializeRestaurantList();
 
         init();
 
@@ -150,7 +149,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onDestroy();
     }
 
-    public void initializeRestaurantList(){
+/*    public void initializeRestaurantList(){
         //get Restaurants from CSV
         RestaurantCSVIngester restaurantImport = new RestaurantCSVIngester();
         List<Restaurant> restaurantList = new ArrayList<>();
@@ -182,7 +181,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //Update existing Restaurant Manager obj instance
         restaurantManager.setRestaurants(restaurantList);
 
-    }
+    }*/
 
 
     private void getDeviceLocation() {

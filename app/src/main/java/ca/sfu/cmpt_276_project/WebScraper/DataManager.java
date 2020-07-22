@@ -43,6 +43,7 @@ public class DataManager extends Activity {
             inspection_latest_update = readLocalDate(inspection_update_date_local);
             WebScraper restaurantData = new WebScraper();
             String fetched_res_date = restaurantData.execute(restaurant_url).get()[1];
+            System.out.println("fetched_date: "+fetched_res_date);
             Date restaurant_date_on_server;
             restaurant_date_on_server = dateParser(fetched_res_date);
             //System.out.println("restaurant_date_on_server:" + restaurant_date_on_server);
