@@ -109,9 +109,11 @@ public class SingleRestaurantActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                Intent intent = MapsActivity.makeLaunchIntent(SingleRestaurantActivity.this,
-                        restaurant.getTrackNumber(), true);
-
+                Intent intent = MapsActivity.makeIntent(SingleRestaurantActivity.this,
+                       restaurant.getTrackNumber(), restaurant.getRestaurantName(),
+                       restaurant.getLatitude(),
+                        restaurant.getLongitude(),
+                        true);
                 startActivity(intent);
             }
         });

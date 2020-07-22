@@ -10,6 +10,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.location.LocationProvider;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
@@ -21,6 +22,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
@@ -55,20 +59,29 @@ import ca.sfu.cmpt_276_project.R;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
-    public static Intent makeLaunchIntent(Context context, String trackNum,
-                                          Boolean fromRestaurant) {
-        Intent intent= new Intent(context, MapsActivity.class);
-        intent.putExtra(EXTRA_TRACKNUM, trackNum);
+    public static Intent makeIntent(Context context,
+                                    String trackNum, String name,
+                                    Double latitude, double longitude,
+                                    Boolean fromRestaurant) {
+        Intent intent = new Intent(context, MapsActivity.class);
+        intent.putExtra(EXTRA_NUM, trackNum);
+        intent.putExtra(EXTRA_NAME, name);
+        intent.putExtra(EXTRA_LAT, latitude);
+        intent.putExtra(EXTRA_LNG, longitude);
         intent.putExtra(EXTRA_BOOL, fromRestaurant);
         return intent;
     }
 
-
-    private String restaurantTrackNum;
+    private String restaurantName;
+    private String restaurantNum;
+    private double restaurantLat;
+    private double restaurantLng;
     private Boolean fromRestaurant;
 
-
-    private static final String EXTRA_TRACKNUM = "ca.sfu.cmpt_276_project.UI.extraTrackNum";
+    private static final String EXTRA_NUM = "ca.sfu.cmpt_276_project.UI.extraNum";
+    private static final String EXTRA_NAME = "ca.sfu.cmpt_276_project.UI.extraName";
+    private static final String EXTRA_LAT = "ca.sfu.cmpt_276_project.UI.extraLat";
+    private static final String EXTRA_LNG = "ca.sfu.cmpt_276_project.UI.extraLng";
     private static final String EXTRA_BOOL = "ca.sfu.cmpt_276_project.UI.extraBool";
     private GoogleMap mMap;
     private Marker mMarker;
@@ -84,6 +97,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private RestaurantManager restaurantManager;
     private int[] restaurantIcons;
     private List<Restaurant> restaurants;
+
+    private Location currentLocation;
+    private LocationManager locationManager;
+    private static final long MIN_TIME = 400;
+    private static final float MIN_DISTANCE = 1000;
 
     private ClusterManager<PegItem> mClusterManager;
 
@@ -113,6 +131,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         getLocationPermission();
 
+
         restaurantManager = RestaurantManager.getInstance();
         initializeRestaurantList();
 
@@ -120,9 +139,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
+    private final LocationListener mLocationListener = new LocationListener() {
+        @Override
+        public void onLocationChanged(final Location location) {
+            getDeviceLocation();
+        }
+    };
+
     @Override
-    protected void onResume(){
+    protected void onResume() {
         super.onResume();
+        /*
+        try {
+            if(mLocationPermissionGranted){
+                locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,MIN_TIME,MIN_DISTANCE,mLocationListener);
+
+            }
+        }
+        catch (SecurityException e) {
+
+        }
+
+         */
     }
 
     @Override
@@ -186,10 +225,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     @Override
                     public void onComplete(@NonNull Task task) {
                         if (task.isSuccessful()) {
-                            Location currentLocation = (Location) task.getResult();
+                            if(location != null){
+                                currentLocation = (Location) task.getResult();
 
-                            moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()),
-                                    DEFAULT_ZOOM);
+                                moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()),
+                                        DEFAULT_ZOOM);
+                            }
                         } else {
                             Toast.makeText(MapsActivity.this,
                                     "Unable to get current location", Toast.LENGTH_SHORT).show();
@@ -218,73 +259,50 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mUiSettings = mMap.getUiSettings();
-        mClusterManager = new ClusterManager<>(this, mMap);
-        setUpCluster();
 
+        mClusterManager = new ClusterManager<>(this, mMap);
+
+        mMap.getUiSettings().setZoomGesturesEnabled(true);
+
+        setUpCluster();
         //Set Custom InfoWindow Adapter
         CustomInfoAdapter adapter = new CustomInfoAdapter(MapsActivity.this);
         mMap.setInfoWindowAdapter(adapter);
 
         registerClickCallback();
 
-        // Receive intent from Restaurant Activity
         Intent intent = getIntent();
-        restaurantTrackNum = intent.getStringExtra(EXTRA_TRACKNUM);
+        restaurantName = intent.getStringExtra(EXTRA_NAME);
+        restaurantNum = intent.getStringExtra(EXTRA_NUM);
+        restaurantLat = intent.getDoubleExtra(EXTRA_LAT, 49.1915);
+        restaurantLng = intent.getDoubleExtra(EXTRA_LNG, 122.8456);
         fromRestaurant = intent.getBooleanExtra(EXTRA_BOOL, false);
+        if(fromRestaurant == true){
+            mClusterManager.clearItems();
 
-        Restaurant goToRes = null;
-        boolean found = false;
-        if (fromRestaurant) {
-            int i = 0;
-            // search restaurant
-            for (Restaurant temp : restaurantManager.getRestaurants()) {
-                if (restaurantTrackNum.equals(temp.getTrackNumber())) {
-                    goToRes = temp;
-                    found = true;
-                    break;
-                }
-                i++;
-            }
-            if(found){
-                mClusterManager.clearItems();
+            MarkerOptions options = new MarkerOptions().title(restaurantName).
+                    position(new LatLng(restaurantLat,restaurantLng));
 
-                String temp = goToRes.getRestaurantName();
-
-                MarkerOptions options = new MarkerOptions().
-                        position(new LatLng(goToRes.getLatitude(),
-                                goToRes.getLongitude())).
-                        title(temp);
-
-                mMarker = mMap.addMarker(options);
-                mMarker.showInfoWindow();
-                moveCamera(new LatLng(goToRes.getLatitude(),
-                        goToRes.getLongitude()), DEFAULT_ZOOM);
-            }
+            mMarker = mMap.addMarker(options);
+            mMarker.showInfoWindow();
+            moveCamera(new LatLng(restaurantLat,restaurantLng), DEFAULT_ZOOM);
         }
 
-        // show device location
-        else {
-            if (mLocationPermissionGranted) {
-                getDeviceLocation();
+        else if (mLocationPermissionGranted) {
+            getDeviceLocation();
 
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                        != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
-                        Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
+                    Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-                    return;
-                }
-                mMap.setMyLocationEnabled(true);
-                mMap.getUiSettings().setMyLocationButtonEnabled(false);
+                return;
             }
         }
 
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
         mMap.getUiSettings().setZoomControlsEnabled(true);
-
-        mMap.getUiSettings().setZoomGesturesEnabled(true);
     }
-
 
 
     private class CustomInfoAdapter implements GoogleMap.InfoWindowAdapter {
@@ -345,6 +363,52 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void showRestaurants() {
+        /*
+        //takes each restaurant in the manager and places it on the map.
+        MarkerOptions options;
+
+        for(int i = 0; i < restaurantManager.getRestaurants().size();i++){
+
+            Restaurant currentRestaurant = restaurantManager.getRestaurantByID(i);
+
+            // remember restaurant position in list view
+            currentRestaurant.setId(i);
+
+            String snippet = "Address:          " + currentRestaurant.getPhysicalAddress() + "\n"
+                            + "Recent Inspection Level:            ";
+
+            options = new MarkerOptions();
+            options.position(new LatLng(currentRestaurant.getLatitude(),
+                    currentRestaurant.getLongitude()));
+            options.title(currentRestaurant.getRestaurantName());
+
+            if(currentRestaurant.getInspectionDataList().isEmpty() == false) {
+
+                Hazard hazard = currentRestaurant.getInspectionDataList().get(0).getHazard();
+                if(hazard == Hazard.HIGH) {
+                    options.icon(bitmapDescriptorFromVector(getApplicationContext(),
+                            R.drawable.icon_map_high));
+                    snippet = snippet + "High";
+                }
+                else if(hazard == Hazard.MEDIUM){
+                    options.icon(bitmapDescriptorFromVector(getApplicationContext(),
+                            R.drawable.icon_map_medium));
+                    snippet = snippet + "Medium";
+                }
+                else {
+                    options.icon(bitmapDescriptorFromVector(getApplicationContext(),
+                            R.drawable.icon_map_low));
+                    snippet = snippet + "Low";
+                }
+            }
+
+            options.snippet(snippet);
+
+            mMarker = mMap.addMarker(options);
+
+        }
+
+         */
 
         for(int i = 0; i < restaurantManager.getRestaurants().size();i++){
 
@@ -379,23 +443,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mClusterManager.addItem(newItem);
         }
 
-        //testCluster();
     }
-/*
-    public void testCluster (){
-        double lat = 49.19166309;
-        double lng = -122.8136499;
 
-        // Add ten cluster items in close proximity, for purposes of this example.
-        for (int i = 0; i < 10; i++) {
-            double offset = i / 60d;
-            lat = lat + offset;
-            lng = lng + offset;
-            PegItem offsetItem = new PegItem(lat, lng);
-            mClusterManager.addItem(offsetItem);
-        }
-    }
- */
     private void registerClickCallback() {
 
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
