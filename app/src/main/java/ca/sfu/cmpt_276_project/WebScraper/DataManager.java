@@ -20,7 +20,7 @@ import java.util.Date;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-public class DataManager extends Activity {
+public class DataManager extends Activity{
     private final static String restaurant_url = "http://data.surrey.ca/api/3/action/package_show?id=restaurants";
     private final static String inspection_url = "http://data.surrey.ca/api/3/action/package_show?id=fraser-health-restaurant-inspection-reports";
     private final static String restaurant_filename = "restaurants_itr1.csv";
@@ -172,4 +172,6 @@ public class DataManager extends Activity {
     public String getInspection_csv_url() {
         return inspection_csv_url;
     }
+
+
 }

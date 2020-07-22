@@ -3,13 +3,21 @@ package ca.sfu.cmpt_276_project.UI;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
 
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -26,7 +34,7 @@ public class LoadingActivity extends AppCompatActivity {
 
     private DataManager dataManager;
     private DataStatus dataStatus;
-    private RunMode runMode = RunMode.LOCAL;  //TODO: FIX BUG ON FIRST RUN
+    private RunMode runMode = RunMode.UPDATE;  //TODO: FIX BUG ON FIRST RUN
     private AlertDialog alertDialog;
     private RestaurantManager restaurantManager;
 
@@ -35,22 +43,72 @@ public class LoadingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loading);
         dataManager = new DataManager();
-/*        try {
-            dataStatus = dataManager.checkForUpdates();
-            System.out.println("returned update info: " + dataStatus);
-        } catch (ExecutionException | InterruptedException | IOException | ParseException e) {
-            e.printStackTrace();
-        }*/
+        System.out.println("NETWORK"+checkNetwork());
 
-/*        if (dataStatus != DataStatus.UP_TO_DATE)
-            runMode = createDownloadDialog("New Updates Found", "updates", dataStatus);
-        else runMode = RunMode.LOCAL;*/
-        setRestaurantManager();
-        start();
+        //selectRunMode();
+        //setRestaurantManager();
+        Handler handler = new Handler();
+        handler.post(this::test);
     }
 
 
-    public void setRestaurantManager(){
+    public void test(){
+        Log.d("test","local time");
+    }
+    public RunMode selectRunMode(){
+        if (!checkNetwork()){
+            if (networkDialog()){
+                if (dataManager.checkFileExistence(dataManager.getRestaurant_filename())&&dataManager.checkFileExistence(dataManager.getInspection_filename()))
+                    runMode = RunMode.LOCAL;
+                else
+                    runMode = RunMode.DEFAULT;
+            }
+        }else{
+            try {
+                dataStatus = dataManager.checkForUpdates();
+                System.out.println("returned update info: " + dataStatus);
+            } catch (ExecutionException | InterruptedException | IOException | ParseException e) {
+                e.printStackTrace();
+            }
+
+            if (dataStatus != DataStatus.UP_TO_DATE)
+                runMode = createDownloadDialog("New Updates Found", "updates", dataStatus);
+            else runMode = RunMode.LOCAL;
+        }
+        return runMode;
+    }
+
+    public boolean networkDialog(){
+        final boolean[] result = {false};
+        new AlertDialog.Builder(this)
+                .setTitle("No network connection")
+                .setMessage("Load local data?")
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        result[0]=true;
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
+        return result[0];
+    }
+
+    public boolean checkNetwork(){
+        boolean isConnected = false;
+        ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        if(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
+                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED) {
+            //we are connected to a network
+            isConnected = true;
+        }
+        else
+            isConnected = false;
+        return isConnected;
+    }
+    public boolean setRestaurantManager(){
+        boolean result = true;
         List<Restaurant> restaurantList = new ArrayList<>();
         RestaurantCSVIngester restaurantImport = new RestaurantCSVIngester();
         try {
@@ -72,6 +130,7 @@ public class LoadingActivity extends AppCompatActivity {
 
         } catch (IOException | InterruptedException | ExecutionException e) {
             e.printStackTrace();
+            result = false;
         }
 
         //get Inspection Data of Restaurants from CSV
@@ -97,13 +156,15 @@ public class LoadingActivity extends AppCompatActivity {
             }
         } catch (IOException | ParseException | InterruptedException | ExecutionException e) {
             e.printStackTrace();
+            result = false;
         }
 
         //Update existing Restaurant Manager obj instance
         restaurantManager = RestaurantManager.getInstance();
         restaurantManager.setRestaurants(restaurantList);
-        System.out.println("current selected mode: "+runMode);
 
+        System.out.println("current selected mode: "+runMode);
+        return true;
     }
 
     public void start(){
@@ -134,4 +195,27 @@ public class LoadingActivity extends AppCompatActivity {
                 .show();
         return result[0];
     }
+
+    public static class backgroundTask extends AsyncTask<Runnable,Integer,Integer>{
+
+        @Override
+        protected Integer doInBackground(Runnable... runnables) {
+            int count = 0;
+            System.out.println(runnables.length);
+            for (Runnable runnable : runnables) {
+                System.out.println("current: "+runnable);
+//                runnable.run();
+//                count++;
+//                publishProgress(count);
+            }
+            return count;
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values);
+            System.out.println("Progress: "+values);
+        }
+    }
+
 }

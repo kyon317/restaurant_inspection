@@ -59,7 +59,6 @@ public class CSVDownloader extends AsyncTask<String, String, String> {
         int count;
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
-
         try {
             URL url = new URL(f_url[0]);
             URLConnection connection = url.openConnection();
@@ -127,7 +126,7 @@ public class CSVDownloader extends AsyncTask<String, String, String> {
      **/
     @Override
     protected void onPostExecute(String file_url) {
-        System.out.println("DONE");
+        System.out.println("DONE Downloading");
         // dismiss the dialog after the file was downloaded
 //        progressBar.setVisibility(View.GONE);
     }

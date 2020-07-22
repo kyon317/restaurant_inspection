@@ -4,6 +4,7 @@
 package ca.sfu.cmpt_276_project.WebScraper;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -44,6 +45,7 @@ public class WebScraper extends AsyncTask<String, String, String[]> {
             JSONArray resources = rawJsonObj.getJSONArray("resources");
             setCSV_url(returnCsvUrl(resources));
             String date = returnLastModifiedDate(resources);
+            Log.d("WebScraper","result_csv:"+CSV_url);
             result[0] = CSV_url;
             result[1] = date;
             return result;
