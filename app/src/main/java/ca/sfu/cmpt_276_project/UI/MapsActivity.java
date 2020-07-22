@@ -55,20 +55,29 @@ import ca.sfu.cmpt_276_project.R;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
-    public static Intent makeLaunchIntent(Context context, String trackNum,
-                                          Boolean fromRestaurant) {
+    public static Intent makeIntent(Context context,
+                                    String trackNum, String name,
+                                    Double latitude, double longitude,
+                                    Boolean fromRestaurant) {
         Intent intent= new Intent(context, MapsActivity.class);
-        intent.putExtra(EXTRA_TRACKNUM, trackNum);
+        intent.putExtra(EXTRA_NUM, trackNum);
+        intent.putExtra(EXTRA_NAME, name);
+        intent.putExtra(EXTRA_LAT, latitude);
+        intent.putExtra(EXTRA_LNG, longitude);
         intent.putExtra(EXTRA_BOOL, fromRestaurant);
         return intent;
     }
 
-    private String restaurantTrackNum;
+    private String restaurantName;
+    private String restaurantNum;
     private double restaurantLat;
     private double restaurantLng;
     private Boolean fromRestaurant;
 
-    private static final String EXTRA_TRACKNUM = "ca.sfu.cmpt_276_project.UI.extraTrackNum";
+    private static final String EXTRA_NUM = "ca.sfu.cmpt_276_project.UI.extraNum";
+    private static final String EXTRA_NAME = "ca.sfu.cmpt_276_project.UI.extraName";
+    private static final String EXTRA_LAT = "ca.sfu.cmpt_276_project.UI.extraLat";
+    private static final String EXTRA_LNG = "ca.sfu.cmpt_276_project.UI.extraLng";
     private static final String EXTRA_BOOL = "ca.sfu.cmpt_276_project.UI.extraBool";
     private GoogleMap mMap;
     private Marker mMarker;
@@ -201,7 +210,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     // move the camera
     private void moveCamera(LatLng latLng, float zoom) {
-
+        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,zoom));
         CameraUpdate location = CameraUpdateFactory.newLatLngZoom(latLng, zoom);
         mMap.animateCamera(location);
 
@@ -215,71 +224,49 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mUiSettings = mMap.getUiSettings();
-        mClusterManager = new ClusterManager<>(this, mMap);
-        setUpCluster();
 
+        mClusterManager = new ClusterManager<>(this, mMap);
+
+        mMap.getUiSettings().setZoomGesturesEnabled(true);
+
+        setUpCluster();
         //Set Custom InfoWindow Adapter
         CustomInfoAdapter adapter = new CustomInfoAdapter(MapsActivity.this);
         mMap.setInfoWindowAdapter(adapter);
 
         registerClickCallback();
 
-        // Receive intent from Restaurant Activity
         Intent intent = getIntent();
-        restaurantTrackNum = intent.getStringExtra(EXTRA_TRACKNUM);
+        restaurantName = intent.getStringExtra(EXTRA_NAME);
+        restaurantNum = intent.getStringExtra(EXTRA_NUM);
+        restaurantLat = intent.getDoubleExtra(EXTRA_LAT, 49.1915);
+        restaurantLng = intent.getDoubleExtra(EXTRA_LNG, 122.8456);
         fromRestaurant = intent.getBooleanExtra(EXTRA_BOOL, false);
+        if(fromRestaurant == true){
+            mClusterManager.clearItems();
 
-        Restaurant goToRes = null;
-        boolean found = false;
-        if (fromRestaurant) {
-            int i = 0;
-            // search restaurant
-            for (Restaurant temp : restaurantManager.getRestaurants()) {
-                if (restaurantTrackNum.equals(temp.getTrackNumber())) {
-                    goToRes = temp;
-                    found = true;
-                    break;
-                }
-                i++;
-            }
-            if(found){
-                mClusterManager.clearItems();
+            MarkerOptions options = new MarkerOptions().title(restaurantName).
+                    position(new LatLng(restaurantLat,restaurantLng));
 
-                String temp = goToRes.getRestaurantName();
-
-                MarkerOptions options = new MarkerOptions().
-                        position(new LatLng(goToRes.getLatitude(),
-                                goToRes.getLongitude())).
-                        title(temp);
-
-                mMarker = mMap.addMarker(options);
-                mMarker.showInfoWindow();
-                moveCamera(new LatLng(goToRes.getLatitude(),
-                        goToRes.getLongitude()), DEFAULT_ZOOM);
-            }
+            mMarker = mMap.addMarker(options);
+            mMarker.showInfoWindow();
+            moveCamera(new LatLng(restaurantLat,restaurantLng), DEFAULT_ZOOM);
         }
 
-        // show device location
-        else {
-            if (mLocationPermissionGranted) {
-                getDeviceLocation();
+        else if (mLocationPermissionGranted) {
+            getDeviceLocation();
 
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                        != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
-                        Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
+                    Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-                    return;
-                }
-                mMap.setMyLocationEnabled(true);
-                mMap.getUiSettings().setMyLocationButtonEnabled(false);
+                return;
             }
         }
 
         mMap.setMyLocationEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
         mMap.getUiSettings().setZoomControlsEnabled(true);
-
-        mMap.getUiSettings().setZoomGesturesEnabled(true);
     }
 
 
@@ -374,6 +361,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             mClusterManager.addItem(newItem);
         }
+
     }
 
     private void registerClickCallback() {
@@ -486,7 +474,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         }
     }
-
 
     private class MarkerClusterRenderer extends DefaultClusterRenderer<PegItem> {
 
