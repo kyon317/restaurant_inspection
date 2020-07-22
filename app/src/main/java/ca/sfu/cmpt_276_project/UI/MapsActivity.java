@@ -10,6 +10,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.location.LocationProvider;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
@@ -21,6 +22,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
@@ -59,7 +63,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     String trackNum, String name,
                                     Double latitude, double longitude,
                                     Boolean fromRestaurant) {
-        Intent intent= new Intent(context, MapsActivity.class);
+        Intent intent = new Intent(context, MapsActivity.class);
         intent.putExtra(EXTRA_NUM, trackNum);
         intent.putExtra(EXTRA_NAME, name);
         intent.putExtra(EXTRA_LAT, latitude);
@@ -94,6 +98,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private int[] restaurantIcons;
     private List<Restaurant> restaurants;
 
+    private Location currentLocation;
+    private LocationManager locationManager;
+    private static final long MIN_TIME = 400;
+    private static final float MIN_DISTANCE = 1000;
+
     private ClusterManager<PegItem> mClusterManager;
 
     // allows MapsActivity to be accessed
@@ -122,6 +131,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         getLocationPermission();
 
+
         restaurantManager = RestaurantManager.getInstance();
         initializeRestaurantList();
 
@@ -129,9 +139,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
+    private final LocationListener mLocationListener = new LocationListener() {
+        @Override
+        public void onLocationChanged(final Location location) {
+            getDeviceLocation();
+        }
+    };
+
     @Override
-    protected void onResume(){
+    protected void onResume() {
         super.onResume();
+        /*
+        try {
+            if(mLocationPermissionGranted){
+                locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,MIN_TIME,MIN_DISTANCE,mLocationListener);
+
+            }
+        }
+        catch (SecurityException e) {
+
+        }
+        
+         */
     }
 
     @Override
@@ -192,10 +222,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     @Override
                     public void onComplete(@NonNull Task task) {
                         if (task.isSuccessful()) {
-                            Location currentLocation = (Location) task.getResult();
+                            if(location != null){
+                                currentLocation = (Location) task.getResult();
 
-                            moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()),
-                                    DEFAULT_ZOOM);
+                                moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()),
+                                        DEFAULT_ZOOM);
+                            }
                         } else {
                             Toast.makeText(MapsActivity.this,
                                     "Unable to get current location", Toast.LENGTH_SHORT).show();
