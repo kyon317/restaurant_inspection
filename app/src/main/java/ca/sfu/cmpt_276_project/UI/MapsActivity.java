@@ -125,7 +125,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         fromRestaurant = intent.getBooleanExtra(EXTRA_BOOL, false);
         if(fromRestaurant == true){
             //TODO: have camera move to given location
-           // moveCamera(new LatLng(restaurantLat, restaurantLng), DEFAULT_ZOOM);
+            moveCamera(new LatLng(restaurantLat, restaurantLng), DEFAULT_ZOOM);
+
+            mMap.setInfoWindowAdapter(new CustomInfoAdapter(MapsActivity.this));
+
         }
     }
 
