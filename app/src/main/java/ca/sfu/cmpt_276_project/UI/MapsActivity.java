@@ -42,13 +42,8 @@ import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 
-import java.io.IOException;
-import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.List;
 
-import ca.sfu.cmpt_276_project.CsvIngester.InspectionDataCSVIngester;
-import ca.sfu.cmpt_276_project.CsvIngester.RestaurantCSVIngester;
 import ca.sfu.cmpt_276_project.Model.Hazard;
 import ca.sfu.cmpt_276_project.Model.PegItem;
 import ca.sfu.cmpt_276_project.Model.Restaurant;

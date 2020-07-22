@@ -49,11 +49,7 @@ public class WebScraper extends AsyncTask<String, String, String[]> {
             result[0] = CSV_url;
             result[1] = date;
             return result;
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
+        } catch (JSONException | IOException e) {
             e.printStackTrace();
         } finally {
             if (connection != null) {

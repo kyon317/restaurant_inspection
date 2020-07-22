@@ -4,14 +4,7 @@
 package ca.sfu.cmpt_276_project.UI;
 
 
-import androidx.annotation.MainThread;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
-
 import android.annotation.SuppressLint;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -20,13 +13,13 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
-import android.provider.ContactsContract;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,8 +28,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import ca.sfu.cmpt_276_project.CsvIngester.InspectionDataCSVIngester;
 import ca.sfu.cmpt_276_project.CsvIngester.RestaurantCSVIngester;
@@ -238,7 +229,7 @@ public class LoadingActivity extends AppCompatActivity {
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        CSVDownloader Downloader_1 = new CSVDownloader(dataManager.getRestaurant_filename(),LoadingActivity.this);
+                        /*CSVDownloader Downloader_1 = new CSVDownloader(dataManager.getRestaurant_filename(),LoadingActivity.this);
                         CSVDownloader Downloader_2 = new CSVDownloader(dataManager.getInspection_filename(),LoadingActivity.this);
                         WebScraper restaurantData = new WebScraper();
                         String fetched_res = null;
@@ -263,8 +254,12 @@ public class LoadingActivity extends AppCompatActivity {
 
                         } catch (IOException e) {
                             e.printStackTrace();
-                        }
+                        }*/
+                        //TODO: Try if you can find a way to schedule setRestaurantManager(RunMode.UPDATE)&startMapActivity(),
+                        // they have to run in a serial
+                        setRestaurantManager(RunMode.UPDATE);
                         while (true){
+
                             File DummyFile = new File(dataManager.getDirectory_path()+dataManager.getInspection_filename());
                             if (DummyFile.length()>=2289280){
                                 break;
@@ -285,14 +280,5 @@ public class LoadingActivity extends AppCompatActivity {
         alertDialog.show();
         alertVisible = false;
     }
-    Thread timer = new Thread() {
-        public void run(){
-            try {
-                sleep(3000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
 
-        }
-    };
 }

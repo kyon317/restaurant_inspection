@@ -2,17 +2,13 @@
 * */
 package ca.sfu.cmpt_276_project.WebScraper;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.os.StrictMode;
 import android.util.Log;
-import android.view.View;
-import android.widget.ProgressBar;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -23,10 +19,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.Arrays;
 import java.util.Objects;
-
-import ca.sfu.cmpt_276_project.R;
-import ca.sfu.cmpt_276_project.UI.LoadingActivity;
-import ca.sfu.cmpt_276_project.UI.MapsActivity;
 
 public class CSVDownloader extends AsyncTask<String, String, String> {
     private ProgressDialog progreassDiag;
