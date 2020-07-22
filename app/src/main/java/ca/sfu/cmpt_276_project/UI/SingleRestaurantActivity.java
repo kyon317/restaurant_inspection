@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -39,8 +40,10 @@ public class SingleRestaurantActivity extends AppCompatActivity {
 
     private int restaurantPosition;
     private Restaurant restaurant;
+    private Boolean fromMap;
 
     private static final String EXTRA_RES_NUM = "ca.sfu.cmpt_276_project.UI.extraResNum";
+    private static final String EXTRA_BOOL_FROM = "ca.sfu.cmpt_276_project.UI.exraBoolFrom";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +66,8 @@ public class SingleRestaurantActivity extends AppCompatActivity {
 
 
         Intent intent = getIntent();
+        intent.getBooleanExtra(EXTRA_BOOL_FROM, false);
+
         restaurantPosition = intent.getIntExtra(EXTRA_RES_NUM, 0);
 
         //give the view the restaurant info
@@ -74,6 +79,22 @@ public class SingleRestaurantActivity extends AppCompatActivity {
         populateInspectionsList();
         registerOnClick();
 
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        if(fromMap == false){
+            Intent intent = MainActivity.makeIntent(SingleRestaurantActivity.this);
+            startActivity(intent);
+        }
+        else if(fromMap == true){
+            Intent intent = MapsActivity.makeIntent(SingleRestaurantActivity.this);
+            startActivity(intent);
+        }
+        else {
+            finish(); // close this activity and return to preview activity (if there is any)
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void populatateView() {
@@ -88,10 +109,9 @@ public class SingleRestaurantActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                Intent intent = MapsActivity.makeIntent(SingleRestaurantActivity.this,
-                       restaurant.getLatitude(),
-                        restaurant.getLongitude(),
-                        true);
+                Intent intent = MapsActivity.makeLaunchIntent(SingleRestaurantActivity.this,
+                        restaurant.getTrackNumber(), true);
+
                 startActivity(intent);
             }
         });
@@ -128,9 +148,10 @@ public class SingleRestaurantActivity extends AppCompatActivity {
     }
 
     //allows SingleRestaurantActivity to be accessed.
-    public static Intent makeIntent(Context context, int restaurantPosition) {
+    public static Intent makeIntent(Context context, int restaurantPosition, boolean fromMap) {
         Intent intent =  new Intent(context, SingleRestaurantActivity.class);
         intent.putExtra(EXTRA_RES_NUM, restaurantPosition);
+        intent.putExtra(EXTRA_BOOL_FROM, fromMap);
         return intent;
     }
 

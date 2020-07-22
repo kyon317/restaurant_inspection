@@ -11,7 +11,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -25,10 +24,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import ca.sfu.cmpt_276_project.CsvIngester.InspectionDataCSVIngester;
+import ca.sfu.cmpt_276_project.CsvIngester.RestaurantCSVIngester;
 import ca.sfu.cmpt_276_project.Model.Hazard;
 import ca.sfu.cmpt_276_project.Model.Restaurant;
 import ca.sfu.cmpt_276_project.Model.RestaurantManager;
@@ -57,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         restaurantManager = RestaurantManager.getInstance();
-        //initializeRestaurantList();//method necessary to initialize instance
+        //initializeRestaurantList();
 
         populateRestaurantIcons();
         populateListView();
@@ -68,6 +72,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed(){
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_HOME);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         finish();
         super.onBackPressed();
     }
@@ -79,25 +86,13 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    private void populateRestaurantIcons() {
-        restaurantIcons = new int[8];
-        restaurantIcons[0] = R.drawable.icon_sushi;
-        restaurantIcons[1] = R.drawable.icon_dimsum;
-        restaurantIcons[2] = R.drawable.icon_dimsum;
-        restaurantIcons[3] = R.drawable.icon_aw;
-        restaurantIcons[4] = R.drawable.icon_beer;
-        restaurantIcons[5] = R.drawable.icon_pizza;
-        restaurantIcons[6] = R.drawable.icon_pizza;
-        restaurantIcons[7] = R.drawable.icon_chicken;
-    }
-
-    /*public void initializeRestaurantList(){
+    public void initializeRestaurantList(){
         //get Restaurants from CSV
         RestaurantCSVIngester restaurantImport = new RestaurantCSVIngester();
         List<Restaurant> restaurantList = new ArrayList<>();
 
         try {
-            restaurantImport.readRestaurantList(this);
+            restaurantImport.readRestaurantList(this, null, 0 );
             restaurantList = restaurantImport.getRestaurantList();
         } catch (IOException e) {
             e.printStackTrace();
@@ -106,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
         //get Inspection Data of Restaurants from CSV
         InspectionDataCSVIngester inspectionDataImport = new InspectionDataCSVIngester();
         try {
-            inspectionDataImport.readInspectionData(this);
+            inspectionDataImport.readInspectionData(this, null, 0 );
             //Sort inspection data into proper Restaurant objects
             if (!restaurantList.isEmpty()) {
                 for (Restaurant restaurant : restaurantList) {
@@ -123,7 +118,20 @@ public class MainActivity extends AppCompatActivity {
         //Update existing Restaurant Manager obj instance
         restaurantManager.setRestaurants(restaurantList);
 
-    }*/
+    }
+
+
+    private void populateRestaurantIcons() {
+        restaurantIcons = new int[8];
+        restaurantIcons[0] = R.drawable.icon_sushi;
+        restaurantIcons[1] = R.drawable.icon_dimsum;
+        restaurantIcons[2] = R.drawable.icon_dimsum;
+        restaurantIcons[3] = R.drawable.icon_aw;
+        restaurantIcons[4] = R.drawable.icon_beer;
+        restaurantIcons[5] = R.drawable.icon_pizza;
+        restaurantIcons[6] = R.drawable.icon_pizza;
+        restaurantIcons[7] = R.drawable.icon_chicken;
+    }
 
     // start Maps activity
     private void init(){
@@ -143,13 +151,6 @@ public class MainActivity extends AppCompatActivity {
         return intent;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            finish();
-        }
-        return super.onOptionsItemSelected(item);
-    }
 
     @Override
     protected void onResume(){
@@ -175,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
                 Restaurant clickedRestaurant = restaurantManager.getRestaurantByID(position);
 
                 // pass clicked restaurant's position to SingleRestaurantActivity
-                Intent intent = SingleRestaurantActivity.makeIntent(MainActivity.this, position);
+                Intent intent = SingleRestaurantActivity.makeIntent(MainActivity.this, position, false);
                 startActivity(intent);
             }
         });
