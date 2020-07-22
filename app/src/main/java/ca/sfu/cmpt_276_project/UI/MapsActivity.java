@@ -2,6 +2,7 @@ package ca.sfu.cmpt_276_project.UI;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -14,6 +15,7 @@ import android.location.LocationProvider;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,10 +24,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -43,6 +43,12 @@ import com.google.android.gms.tasks.Task;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionDeniedResponse;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.single.PermissionListener;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -99,9 +105,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private List<Restaurant> restaurants;
 
     private Location currentLocation;
-    private LocationManager locationManager;
-    private static final long MIN_TIME = 400;
-    private static final float MIN_DISTANCE = 1000;
+    static MapsActivity instance;
+    LocationRequest locationRequest;
+
+    public static MapsActivity getInstance() {
+        return instance;
+    }
 
     private ClusterManager<PegItem> mClusterManager;
 
@@ -131,37 +140,70 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         getLocationPermission();
 
+        instance = this;
 
         restaurantManager = RestaurantManager.getInstance();
         initializeRestaurantList();
 
         init();
 
+        Dexter.withActivity(this).withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+                .withListener(new PermissionListener() {
+                    @Override
+                    public void onPermissionGranted(PermissionGrantedResponse response) {
+                        updateLocation();
+                    }
+
+                    @Override
+                    public void onPermissionDenied(PermissionDeniedResponse response) {
+
+                    }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
+
+                    }
+                }).check();
+
     }
 
-    private final LocationListener mLocationListener = new LocationListener() {
-        @Override
-        public void onLocationChanged(final Location location) {
-            getDeviceLocation();
+    private void updateLocation() {
+        buildLocationRequest();
+
+        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
         }
-    };
+        mFusedLocationProviderClient.requestLocationUpdates(locationRequest, getPendingIntent());
+
+    }
+
+    private PendingIntent getPendingIntent() {
+        Intent intent =new Intent(this, MyService.class);
+        intent.setAction(MyService.ACTION_PROCESS_UPDATE);
+        return PendingIntent.getBroadcast(this,0,intent,PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
+    private void buildLocationRequest() {
+        locationRequest = new LocationRequest();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(5000);
+        locationRequest.setFastestInterval(3000);
+        locationRequest.setSmallestDisplacement(15f);
+    }
+
+    public void updateLocation(Location newLocation){
+        MapsActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                moveCamera(new LatLng(newLocation.getLatitude(),newLocation.getLongitude()),DEFAULT_ZOOM);
+            }
+        });
+    }
 
     @Override
     protected void onResume() {
         super.onResume();
-        /*
-        try {
-            if(mLocationPermissionGranted){
-                locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,MIN_TIME,MIN_DISTANCE,mLocationListener);
-
-            }
-        }
-        catch (SecurityException e) {
-
-        }
-        
-         */
     }
 
     @Override
