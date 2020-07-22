@@ -156,7 +156,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         List<Restaurant> restaurantList = new ArrayList<>();
 
         try {
-            restaurantImport.readRestaurantList(this);
+            restaurantImport.readRestaurantList(this, null, 0 );
             restaurantList = restaurantImport.getRestaurantList();
         } catch (IOException e) {
             e.printStackTrace();
@@ -165,7 +165,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //get Inspection Data of Restaurants from CSV
         InspectionDataCSVIngester inspectionDataImport = new InspectionDataCSVIngester();
         try {
-            inspectionDataImport.readInspectionData(this);
+            inspectionDataImport.readInspectionData(this, null, 0 );
             //Sort inspection data into proper Restaurant objects
             if (!restaurantList.isEmpty()) {
                 for (Restaurant restaurant : restaurantList) {
