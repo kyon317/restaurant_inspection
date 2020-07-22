@@ -1,8 +1,12 @@
 package ca.sfu.cmpt_276_project.UI;
 
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.AlertDialog;
+
+import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,14 +14,12 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -34,65 +36,50 @@ public class LoadingActivity extends AppCompatActivity {
 
     private DataManager dataManager;
     private DataStatus dataStatus;
-    private RunMode runMode = RunMode.UPDATE;  //TODO: FIX BUG ON FIRST RUN
-    private AlertDialog alertDialog;
+    private RunMode runMode;
     private RestaurantManager restaurantManager;
-
+    private boolean alertVisible = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loading);
+        getSupportActionBar().setTitle("Surrey Restaurant Inspections");
         dataManager = new DataManager();
-        System.out.println("NETWORK"+checkNetwork());
+        try {
+            dataStatus = dataManager.checkForUpdates();
+        } catch (ExecutionException | InterruptedException | ParseException | IOException e) {
+            e.printStackTrace();
+        }
+        backgroundTask task = new backgroundTask();
+        try {
+            task.execute("selectRunMode").get();
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("selectedRun_mode: "+runMode);
+        System.out.println("alertVisible: "+alertVisible);
 
-        //selectRunMode();
-        //setRestaurantManager();
-        Handler handler = new Handler();
-        handler.post(this::test);
+        if (alertVisible){
+            showDialog();
+        }else{
+            startMapActivity();
+        }
     }
 
-
-    public void test(){
-        Log.d("test","local time");
-    }
-    public RunMode selectRunMode(){
+    public void selectRunMode() throws InterruptedException {
+        System.out.println("network: "+checkNetwork());
         if (!checkNetwork()){
-            if (networkDialog()){
+            Toast.makeText(this,"No Network Connection, loading from local directory",Toast.LENGTH_LONG).show();
                 if (dataManager.checkFileExistence(dataManager.getRestaurant_filename())&&dataManager.checkFileExistence(dataManager.getInspection_filename()))
                     runMode = RunMode.LOCAL;
                 else
                     runMode = RunMode.DEFAULT;
-            }
         }else{
-            try {
-                dataStatus = dataManager.checkForUpdates();
-                System.out.println("returned update info: " + dataStatus);
-            } catch (ExecutionException | InterruptedException | IOException | ParseException e) {
-                e.printStackTrace();
+            if (dataStatus != DataStatus.UP_TO_DATE){
+                alertVisible = true;
             }
-
-            if (dataStatus != DataStatus.UP_TO_DATE)
-                runMode = createDownloadDialog("New Updates Found", "updates", dataStatus);
             else runMode = RunMode.LOCAL;
         }
-        return runMode;
-    }
-
-    public boolean networkDialog(){
-        final boolean[] result = {false};
-        new AlertDialog.Builder(this)
-                .setTitle("No network connection")
-                .setMessage("Load local data?")
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        result[0]=true;
-                    }
-                })
-                .setNegativeButton(android.R.string.cancel, null)
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
-        return result[0];
     }
 
     public boolean checkNetwork(){
@@ -107,21 +94,19 @@ public class LoadingActivity extends AppCompatActivity {
             isConnected = false;
         return isConnected;
     }
-    public boolean setRestaurantManager(){
-        boolean result = true;
+    public void setRestaurantManager(RunMode selectedRunmMode){
         List<Restaurant> restaurantList = new ArrayList<>();
         RestaurantCSVIngester restaurantImport = new RestaurantCSVIngester();
         try {
-
-            if (runMode == RunMode.LOCAL) {
+            if (selectedRunmMode == RunMode.LOCAL) {
                 System.out.println("LOADING LOCAL DATA");
                 restaurantImport.readRestaurantList(this, dataManager.getDirectory_path()+dataManager.getRestaurant_filename(), 1);
                 restaurantList = restaurantImport.getRestaurantList();
-            } else if (runMode == RunMode.DEFAULT){
+            } else if (selectedRunmMode == RunMode.DEFAULT){
                 System.out.println("LOADING DEFAULT DATA");
                 restaurantImport.readRestaurantList(this,null, 0);
                 restaurantList = restaurantImport.getRestaurantList();
-            }else {
+            }else if (selectedRunmMode == RunMode.UPDATE){
                 System.out.println("DOWNLOADING DATA");
                 dataManager.downloadList(this,dataManager.getRestaurant_url(),dataManager.getRestaurant_filename(),dataManager.getRestaurant_csv_url());
                 restaurantImport.readRestaurantList(this, dataManager.getDirectory_path()+dataManager.getRestaurant_filename(), 1);
@@ -130,19 +115,19 @@ public class LoadingActivity extends AppCompatActivity {
 
         } catch (IOException | InterruptedException | ExecutionException e) {
             e.printStackTrace();
-            result = false;
+
         }
 
         //get Inspection Data of Restaurants from CSV
         InspectionDataCSVIngester inspectionDataImport = new InspectionDataCSVIngester();
         try {
-            if (runMode== RunMode.LOCAL) {
+            if (selectedRunmMode== RunMode.LOCAL) {
                 System.out.println("LOADING LOCAL DATA");
                 inspectionDataImport.readInspectionData(this, dataManager.getDirectory_path()+dataManager.getInspection_filename(), 1);
-            } else if (runMode == RunMode.DEFAULT){
+            } else if (selectedRunmMode == RunMode.DEFAULT){
                 System.out.println("LOADING DEFAULT DATA");
                 inspectionDataImport.readInspectionData(this, null, 0);
-            }else{
+            }else if (selectedRunmMode == RunMode.UPDATE){
                 System.out.println("DOWNLOADING DATA");
                 dataManager.downloadList(this,dataManager.getInspection_url(),dataManager.getInspection_filename(),dataManager.getInspection_csv_url());
                 inspectionDataImport.readInspectionData(this, dataManager.getDirectory_path()+dataManager.getInspection_filename(), 1);
@@ -156,66 +141,96 @@ public class LoadingActivity extends AppCompatActivity {
             }
         } catch (IOException | ParseException | InterruptedException | ExecutionException e) {
             e.printStackTrace();
-            result = false;
         }
 
         //Update existing Restaurant Manager obj instance
         restaurantManager = RestaurantManager.getInstance();
         restaurantManager.setRestaurants(restaurantList);
-
-        System.out.println("current selected mode: "+runMode);
-        return true;
+//        if (selectedRunmMode == RunMode.UPDATE){
+//            recreate();
+//        }
     }
 
-    public void start(){
+    public void startMapActivity(){
         Intent intent = new Intent(this,MapsActivity.class);
         startActivity(intent);
     }
 
-    public RunMode createDownloadDialog(String title, String msg, DataStatus status){
-        RunMode[] result = new RunMode[1];
 
-        alertDialog = new AlertDialog.Builder(this)
-                .setTitle(title)
-                .setMessage("Download " + msg + "?")
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        result[0] = RunMode.UPDATE;
-                    }
-                })
-                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        System.out.println("CANCEL");
-                        if (status==DataStatus.NOT_EXIST) result[0] = RunMode.DEFAULT;
-                        else result[0]=RunMode.LOCAL;
-                    }
-                })
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
-        return result[0];
-    }
-
-    public static class backgroundTask extends AsyncTask<Runnable,Integer,Integer>{
+    public class backgroundTask extends AsyncTask<String,Integer,Integer>{
 
         @Override
-        protected Integer doInBackground(Runnable... runnables) {
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Integer doInBackground(String... params) {
             int count = 0;
-            System.out.println(runnables.length);
-            for (Runnable runnable : runnables) {
-                System.out.println("current: "+runnable);
-//                runnable.run();
-//                count++;
-//                publishProgress(count);
+            for (int i =0; i<params.length;i++){
+                System.out.println("instructions: "+params[i]);
+
+                switch (params[i]){
+                    case "selectRunMode":
+                        try {
+                            LoadingActivity.this.selectRunMode();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        count = 0;
+                        break;
+                    case "startMapActivity":
+                        LoadingActivity.this.startMapActivity();
+                        count = 1;
+                        break;
+                    case "setRestaurantManager":
+                        setRestaurantManager(runMode);
+                        count = 2;
+                        break;
+                    default:
+                        Log.wtf("Loading Activity","Invalid instruction name");
+                        break;
+                }
+                publishProgress(count);
             }
+            System.out.println("current runmode: "+runMode);
             return count;
         }
 
         @Override
         protected void onProgressUpdate(Integer... values) {
             super.onProgressUpdate(values);
-            System.out.println("Progress: "+values);
+            System.out.println("Progress: "+values[0].toString());
+            if (values[0]==0&&runMode!=RunMode.UPDATE) setRestaurantManager(runMode);
+            //if (values[0]==2) startMapActivity();
+        }
+
+        @Override
+        protected void onPostExecute(Integer integer) {
+            super.onPostExecute(integer);
         }
     }
-
+    public void showDialog(){
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle("A NEW UPDATE FOUND")
+                .setCancelable(false)
+                .setMessage("Download Update?")
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        setRestaurantManager(RunMode.UPDATE);
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        if (dataStatus==DataStatus.NOT_EXIST)setRestaurantManager(RunMode.DEFAULT);
+                        else setRestaurantManager(RunMode.LOCAL);
+                        startMapActivity();
+                    }
+                });
+        alertDialog.show();
+        alertVisible = false;
+    }
 }

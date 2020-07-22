@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 public class DataManager extends Activity{
     private final static String restaurant_url = "http://data.surrey.ca/api/3/action/package_show?id=restaurants";
     private final static String inspection_url = "http://data.surrey.ca/api/3/action/package_show?id=fraser-health-restaurant-inspection-reports";
-    private final static String restaurant_filename = "restaurants_itr1.csv";
+    private final static String restaurant_filename = "restaurants_itr2.csv";
     private final static String restaurant_update_date_local = "restaurants_date_local.txt";
     private final static String inspection_filename = "inspectionreports_itr2.csv";
     private final static String inspection_update_date_local = "inspectionreports_date_local.txt";
@@ -33,7 +33,7 @@ public class DataManager extends Activity{
     private Date restaurant_latest_update = null;
     private Date inspection_latest_update = null;
 
-    //TODO: Move it to Main Activity
+
     public DataStatus checkForUpdates() throws ExecutionException, InterruptedException, ParseException, IOException {
         if (!(checkFileExistence(restaurant_filename) && checkFileExistence(inspection_filename))) {
             return DataStatus.NOT_EXIST;
@@ -43,7 +43,6 @@ public class DataManager extends Activity{
             inspection_latest_update = readLocalDate(inspection_update_date_local);
             WebScraper restaurantData = new WebScraper();
             String fetched_res_date = restaurantData.execute(restaurant_url).get()[1];
-            System.out.println("fetched_date: "+fetched_res_date);
             Date restaurant_date_on_server;
             restaurant_date_on_server = dateParser(fetched_res_date);
             //System.out.println("restaurant_date_on_server:" + restaurant_date_on_server);
@@ -60,7 +59,6 @@ public class DataManager extends Activity{
             long timeDiff_ins = currentTime.getTime()-inspection_latest_update.getTime();
             long hour_diff_ins = TimeUnit.HOURS.convert(timeDiff_ins, TimeUnit.MILLISECONDS);
             if (hour_diff_res >=20 && hour_diff_ins>=20){
-                System.out.println("time diff: "+hour_diff_ins);
                 return DataStatus.OUT_OF_DATE;
             }else if (hour_diff_res>=20){
                 return DataStatus.OUT_OF_DATE;
@@ -79,6 +77,7 @@ public class DataManager extends Activity{
                 }
             }
         }
+        System.out.println("datastatus return");
         return DataStatus.UP_TO_DATE;
     }
 

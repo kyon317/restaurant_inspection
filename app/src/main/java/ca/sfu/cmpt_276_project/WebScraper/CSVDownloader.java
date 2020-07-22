@@ -1,14 +1,19 @@
 package ca.sfu.cmpt_276_project.WebScraper;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.os.StrictMode;
 import android.util.Log;
+import android.view.View;
 import android.widget.ProgressBar;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -18,9 +23,11 @@ import java.util.Arrays;
 import java.util.Objects;
 
 import ca.sfu.cmpt_276_project.R;
+import ca.sfu.cmpt_276_project.UI.LoadingActivity;
+import ca.sfu.cmpt_276_project.UI.MapsActivity;
 
 public class CSVDownloader extends AsyncTask<String, String, String> {
-    private ProgressBar progressBar;
+    private ProgressDialog progreassDiag;
     private String filename = "";
 
     public CSVDownloader(String filename, Context context) {
@@ -33,10 +40,30 @@ public class CSVDownloader extends AsyncTask<String, String, String> {
     }
 
     public void setPdialog(Context context) {
-        progressBar = ((Activity) context).findViewById(R.id.progressBar1);
-    }
-    //TODO:initialize pDialog and make modifications on progress bar
+        progreassDiag = new ProgressDialog(context);
 
+    }
+    public boolean checkFileExistence(String filename){
+        File dummyFile = new File(Environment.getExternalStorageDirectory().getPath() + "/Download/"+filename);
+        return dummyFile.exists();
+    }
+
+    public void backupFile(String filename){
+        File dummyFile = new File(Environment.getExternalStorageDirectory().getPath() + "/Download/"+filename);
+        dummyFile.renameTo(new File(Environment.getExternalStorageDirectory().getPath() + "/Download/" + filename + "(1)"));
+    }
+    public void restoreFile(String backupFilename){
+        if (checkFileExistence(backupFilename)){
+            File dummyFile = new File(Environment.getExternalStorageDirectory().getPath() + "/Download/"+backupFilename);
+            dummyFile.renameTo(new File(Environment.getExternalStorageDirectory().getPath() + "/Download/" + filename));
+        }
+    }
+    public void deleteFile(String filename){
+        if (checkFileExistence(filename)){
+            File dummyFile = new File(Environment.getExternalStorageDirectory().getPath() + "/Download/"+filename);
+            dummyFile.delete();
+        }
+    }
     /**
      * Before starting background thread Show Progress Bar Dialog
      */
@@ -44,11 +71,34 @@ public class CSVDownloader extends AsyncTask<String, String, String> {
     protected void onPreExecute() {
         super.onPreExecute();
         //Set up progressBar visibility and details
-/*        progressBar.setIndeterminate(false);
-        progressBar.setProgress(0);
-        progressBar.setScrollBarStyle(ProgressBar.SCROLLBARS_OUTSIDE_INSET);
-        progressBar.setMax(100);
-        progressBar.setVisibility(View.VISIBLE);*/
+        System.out.println(filename);
+        if (checkFileExistence(filename)){
+            backupFile(filename);
+        }
+        progreassDiag.setTitle("Hold on, we are loading the data");
+        progreassDiag.setIndeterminate(false);
+        progreassDiag.setProgress(0);
+        progreassDiag.setCancelable(false);
+        progreassDiag.setMax(100);
+        progreassDiag.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        CSVDownloader.this.cancel(true);
+                        deleteFile(filename);
+                        restoreFile(filename+"(1)");
+                        progreassDiag.cancel();
+                        progreassDiag.dismiss();
+                    }
+                });
+        progreassDiag.setCanceledOnTouchOutside(false);
+        progreassDiag.setButton(DialogInterface.BUTTON_POSITIVE, "Done", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                System.out.println(this.getClass());
+                progreassDiag.dismiss();
+            }
+        });
+        progreassDiag.show();
     }
 
     /**
@@ -56,6 +106,7 @@ public class CSVDownloader extends AsyncTask<String, String, String> {
      */
     @Override
     protected String doInBackground(String... f_url) {
+        progreassDiag.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(false);
         int count;
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
@@ -86,11 +137,9 @@ public class CSVDownloader extends AsyncTask<String, String, String> {
 
             long total = 0;
 
-            while ((count = input.read(data)) != -1) {
+            while ((count = input.read(data)) != -1&&!CSVDownloader.this.isCancelled()) {
                 total += count;
                 // publishing the progress....
-                // After this onProgressUpdate will be called
-                //System.out.println("lengthofFile:" + lengthOfFile);
                 publishProgress("" + (int) ((total * 100) / lengthOfFile));
 
                 // writing data to file
@@ -116,9 +165,7 @@ public class CSVDownloader extends AsyncTask<String, String, String> {
     protected void onProgressUpdate(String... progress) {
         // setting progress percentage
         System.out.println("Progress: " + Integer.parseInt(progress[0]));
-//        progressBar.setProgress(Integer.parseInt(progress[0]));
-        //progressBar.setProgress(Integer.parseInt(progress[0])); this is where I'd update my progress bar
-        //                                                          if I had the numbers for it
+        progreassDiag.setProgress(Integer.parseInt(progress[0]));
     }
 
     /**
@@ -126,9 +173,11 @@ public class CSVDownloader extends AsyncTask<String, String, String> {
      **/
     @Override
     protected void onPostExecute(String file_url) {
+        progreassDiag.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(true);
+        progreassDiag.getButton(DialogInterface.BUTTON_NEGATIVE).setEnabled(false);
         System.out.println("DONE Downloading");
         // dismiss the dialog after the file was downloaded
-//        progressBar.setVisibility(View.GONE);
+        //progressBar.setVisibility(View.GONE);
     }
 
     public long getActualSize(URLConnection connection) {
