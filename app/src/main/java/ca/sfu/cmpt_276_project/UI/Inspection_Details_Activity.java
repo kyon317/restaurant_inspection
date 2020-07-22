@@ -209,8 +209,8 @@ public class Inspection_Details_Activity extends AppCompatActivity {
                 case 205:
                 case 206:
                 case 207:
-                case 208:
                 case 209:
+                case 208:
                 case 210:
                 case 211:
                 case 212:

@@ -11,7 +11,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -32,20 +31,16 @@ import ca.sfu.cmpt_276_project.Model.Restaurant;
 import ca.sfu.cmpt_276_project.Model.RestaurantManager;
 import ca.sfu.cmpt_276_project.R;
 
+
 public class SingleRestaurantActivity extends AppCompatActivity {
 
-    private static final String EXTRA_RES_NUM = "ca.sfu.cmpt_276_project.UI.extraResNum";
     private List<InspectionData> inspections = new ArrayList<>();
     private RestaurantManager restaurantManager;
+
     private int restaurantPosition;
     private Restaurant restaurant;
 
-    //allows SingleRestaurantActivity to be accessed.
-    public static Intent makeIntent(Context context, int restaurantPosition) {
-        Intent intent = new Intent(context, SingleRestaurantActivity.class);
-        intent.putExtra(EXTRA_RES_NUM, restaurantPosition);
-        return intent;
-    }
+    private static final String EXTRA_RES_NUM = "ca.sfu.cmpt_276_project.UI.extraResNum";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +59,8 @@ public class SingleRestaurantActivity extends AppCompatActivity {
         getSupportActionBar().setBackgroundDrawable(colorDrawable);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        //Todo: fix actionbar back btn so it returns to last activity.
+
 
         Intent intent = getIntent();
         restaurantPosition = intent.getIntExtra(EXTRA_RES_NUM, 0);
@@ -79,34 +76,35 @@ public class SingleRestaurantActivity extends AppCompatActivity {
 
     }
 
-    //Customize toolbar item operations
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                break;
-        }
-        return true;
-    }
-
     private void populatateView() {
         TextView restaurantName_textview = findViewById(R.id.Restaurant_name);
         restaurantName_textview.setText(restaurant.getRestaurantName());
         TextView addressText_textview = findViewById(R.id.addressText);
         addressText_textview.setText(restaurant.getPhysicalAddress()
-                + " " + restaurant.getPhysicalCity());
+                +" " + restaurant.getPhysicalCity());
         TextView coords_textView = findViewById(R.id.coordinatesText);
         coords_textView.setText(restaurant.getLatitude() + ", " + restaurant.getLongitude());
+        coords_textView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent intent = MapsActivity.makeIntent(SingleRestaurantActivity.this,
+                       restaurant.getLatitude(),
+                        restaurant.getLongitude(),
+                        true);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override
-    protected void onResume() {
+    protected void onResume(){
         super.onResume();
         populatateView();
         populateInspectionsList();
         registerOnClick();
     }
+
 
     private void registerOnClick() {
         ListView list = findViewById(R.id.inspectionsListView);
@@ -122,7 +120,6 @@ public class SingleRestaurantActivity extends AppCompatActivity {
             }
         });
     }
-
     //creates a ListView and an ArrayAdapter to fill inspectionsListView
     private void populateInspectionsList() {
         ArrayAdapter<InspectionData> adapter = new MyListAdapter();
@@ -130,18 +127,25 @@ public class SingleRestaurantActivity extends AppCompatActivity {
         list.setAdapter(adapter);
     }
 
+    //allows SingleRestaurantActivity to be accessed.
+    public static Intent makeIntent(Context context, int restaurantPosition) {
+        Intent intent =  new Intent(context, SingleRestaurantActivity.class);
+        intent.putExtra(EXTRA_RES_NUM, restaurantPosition);
+        return intent;
+    }
+
     //fills inspectionListView with data of each of the restaurants inspections.
     private class MyListAdapter extends ArrayAdapter<InspectionData> {
-        public MyListAdapter() {
+        public MyListAdapter(){
             super(SingleRestaurantActivity.this,
                     R.layout.inspection_listview,
                     inspections);
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
+        public View getView(int position, View convertView, ViewGroup parent){
             View itemView = convertView;
-            if (itemView == null) {
+            if(itemView == null){
                 itemView = getLayoutInflater().inflate(R.layout.inspection_listview,
                         parent,
                         false);
@@ -151,13 +155,15 @@ public class SingleRestaurantActivity extends AppCompatActivity {
 
             ImageView imageView = itemView.findViewById(R.id.hazardicon);
             Hazard hazard = inspections.get(position).getHazard();
-            if (hazard == Hazard.LOW) {
+            if(hazard == Hazard.LOW){
                 imageView.setImageResource(R.drawable.low_hazard);
                 itemView.setBackgroundColor(Color.rgb(152, 255, 156));
-            } else if (hazard == Hazard.MEDIUM) {
+            }
+            else if(hazard == Hazard.MEDIUM){
                 imageView.setImageResource(R.drawable.moderate_hazard);
                 itemView.setBackgroundColor(Color.rgb(255, 202, 125));
-            } else {
+            }
+            else {
                 imageView.setImageResource(R.drawable.high_hazard);
                 itemView.setBackgroundColor(Color.rgb(250, 143, 110));
             }
@@ -172,13 +178,15 @@ public class SingleRestaurantActivity extends AppCompatActivity {
             TextView inspectionDateText = itemView.findViewById(R.id.inspectionDateValue);
 
             long date = currentInspection.timeSinceInspection();
-            if (date < 30) {
+            if(date < 30){
                 inspectionDateText.setText(String.valueOf(date));
-            } else if (date < 365) {
+            }
+            else if(date < 365){
                 SimpleDateFormat formatter = new SimpleDateFormat("MMMM dd");
                 String strDate = formatter.format(currentInspection.getInspectionDate());
                 inspectionDateText.setText(strDate);
-            } else {
+            }
+            else{
                 SimpleDateFormat formatter = new SimpleDateFormat("MMMM YYYY");
                 String strDate = formatter.format(currentInspection.getInspectionDate());
                 inspectionDateText.setText(strDate);

@@ -35,6 +35,16 @@ public class Restaurant implements Comparable<Restaurant> {
     private int icon;
     private List<InspectionData> inspectionDataList = new ArrayList<>();
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int id;
+
 
     //Default Constructor
     public Restaurant() {
