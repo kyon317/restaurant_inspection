@@ -15,6 +15,7 @@ import android.content.Context;
 import android.util.Log;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -37,7 +38,7 @@ public class InspectionDataCSVIngester {
     private List<InspectionData> IngestionList = new ArrayList<>();
     private ViolationTXTIngester violationTXTIngester = new ViolationTXTIngester();
 
-    public static List<String> getText(InputStream inputStream) throws IOException{
+    public static List<String> getText(InputStream inputStream) throws IOException {
 
         List<String> lines = new ArrayList<>();
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream,
@@ -49,7 +50,7 @@ public class InspectionDataCSVIngester {
                 lines.add(line);
             }
         } catch (IOException e) {
-            Log.wtf("Reading Activity","Fatal Error when reading file on line");
+            Log.wtf("Reading Activity", "Fatal Error when reading file on line");
             e.printStackTrace();
         }
 
@@ -57,24 +58,26 @@ public class InspectionDataCSVIngester {
     }
 
     //return a list of inspection by tracking number
-    public List<InspectionData> returnInspectionByID(String id){
+    public List<InspectionData> returnInspectionByID(String id) {
         List<InspectionData> inspectionData = new ArrayList<>();
-        for (InspectionData inspection:IngestionList
-             ) {
-            if (inspection.getTrackingNumber().equals(id)){
+        for (InspectionData inspection : IngestionList
+        ) {
+            if (inspection.getTrackingNumber().equals(id)) {
                 inspectionData.add(inspection);
             }
         }
         return inspectionData;
     }
 
-    public void readInspectionData(Context context) throws IOException, ParseException {
+    public void readInspectionData(Context context, String inputFilename, int updateCode) throws IOException, ParseException {
         //initializing violationList
         violationTXTIngester.readViolationData(context);
-
         InputStream InspectionCSV = context.getResources().openRawResource
                 (R.raw.inspectionreports_itr1);
-
+        if (updateCode == 1) {
+            InspectionCSV.close();
+            InspectionCSV = new FileInputStream(inputFilename);
+        }
         List<String> fileContents = getText(InspectionCSV);
         boolean firstLineUnread = true;
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
@@ -93,13 +96,14 @@ public class InspectionDataCSVIngester {
                     .map(s -> s.replace("\"", ""))  // Remove double quotes
                     .collect(Collectors.toList());  // Cool functional stuff.
 
+            if (fields.size() == 0) continue;  // Skip gibberish info
             InspectionData temp = new InspectionData();
 
             temp.setTrackingNumber(fields.get(0));
             temp.setInspectionDate(format.parse(fields.get(1)));
 
             //conditions for Inspection Type ENUM
-            if(fields.get(2).equals("Routine"))
+            if (fields.get(2).equals("Routine"))
                 temp.setInspectionType(Type.ROUTINE);
             else
                 temp.setInspectionType(Type.FOLLOW_UP);
@@ -107,33 +111,68 @@ public class InspectionDataCSVIngester {
             temp.setCriticalViolations(Integer.parseInt(fields.get(3)));
             temp.setNonCriticalViolations(Integer.parseInt(fields.get(4)));
 
-            //conditions for Hazard ENUM
-
-            if(fields.get(5).equals("Low"))
-                temp.setHazard(Hazard.LOW);
-            else if(fields.get(5).equals("Moderate"))
-                temp.setHazard(Hazard.MEDIUM);
-            else
-                temp.setHazard(Hazard.HIGH);
-
-            //Violation parser
-            List<Violation> dummy_violations = new ArrayList<>();
-            Violation dummy_violation = new Violation();
-            if (fields.size()==6){                          //skip if there's no violation
-                dummy_violations.add(dummy_violation);
-                temp.setViolation(dummy_violations);
-            }else if (fields.get(6)!=null){
-                String[] violationLump = fields.get(6).split("\\|");
-                for (String singleViolation:violationLump
-                     ) {
-                    String[] dataCache = singleViolation.split(",");
-                    //System.out.println("ID: "+dataCache[0]);
-                    dummy_violation = violationTXTIngester.returnViolationByID(dataCache[0]);
-                    //dummyViolation.Display();
-                    dummy_violations.add(dummy_violation);
+            if (updateCode == 1) {
+                List<Violation> dummy_violations = new ArrayList<>();
+                Violation dummy_violation = new Violation();
+                if (fields.size() == 5) {
+                    temp.setHazard(Hazard.LOW);
+                    temp.setViolation(dummy_violations);
+                } else if (fields.size() > 5) {
+                    String[] violationLump = fields.get(5).split("\\|");
+                    for (String singleViolation : violationLump
+                    ) {
+                        String[] dataCache = singleViolation.split(",");
+                        //System.out.println("ID: "+dataCache[0]);
+                        dummy_violation = violationTXTIngester.returnViolationByID(dataCache[0]);
+                        //dummyViolation.Display();
+                        dummy_violations.add(dummy_violation);
+                    }
+                    temp.setViolation(dummy_violations);
+                    if (fields.size() == 7) {
+                        //conditions for Hazard ENUM
+                        if (fields.get(6).equals("Low"))
+                            temp.setHazard(Hazard.LOW);
+                        else if (fields.get(6).equals("Moderate"))
+                            temp.setHazard(Hazard.MEDIUM);
+                        else
+                            temp.setHazard(Hazard.HIGH);
+                    } else {
+                        if (temp.getCriticalViolations() >= 2) temp.setHazard(Hazard.HIGH);
+                        else if (temp.getCriticalViolations() + temp.getNonCriticalViolations() >= 4)
+                            temp.setHazard(Hazard.MEDIUM);
+                        else temp.setHazard(Hazard.LOW);
+                    }
                 }
-                temp.setViolation(dummy_violations);
+            } else {
+                //conditions for Hazard ENUM
+                if (fields.get(5).equals("Low"))
+                    temp.setHazard(Hazard.LOW);
+                else if (fields.get(5).equals("Moderate"))
+                    temp.setHazard(Hazard.MEDIUM);
+                else
+                    temp.setHazard(Hazard.HIGH);
+
+                //Violation parser
+                List<Violation> dummy_violations = new ArrayList<>();
+                Violation dummy_violation = new Violation();
+                if (fields.size() == 6) {                          //skip if there's no violation
+                    dummy_violations.add(dummy_violation);
+                    temp.setViolation(dummy_violations);
+
+                } else if (fields.get(6) != null) {
+                    String[] violationLump = fields.get(6).split("\\|");
+                    for (String singleViolation : violationLump
+                    ) {
+                        String[] dataCache = singleViolation.split(",");
+                        //System.out.println("ID: "+dataCache[0]);
+                        dummy_violation = violationTXTIngester.returnViolationByID(dataCache[0]);
+                        //dummyViolation.Display();
+                        dummy_violations.add(dummy_violation);
+                    }
+                    temp.setViolation(dummy_violations);
+                }
             }
+
             IngestionList.add(temp);
         }//end of scan loop
         //Debugging purpose

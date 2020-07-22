@@ -11,45 +11,46 @@ import java.util.List;
 
 public class RestaurantManager {
 
-    private List<Restaurant> restaurants;
-
     /**
      * Singleton code
      */
     private static RestaurantManager instance;
+    private List<Restaurant> restaurants;
 
-    public static RestaurantManager getInstance(){
-        if(instance == null)
+    private RestaurantManager() {
+        this.restaurants = new ArrayList<>();
+    }
+
+    public static RestaurantManager getInstance() {
+        if (instance == null)
             instance = new RestaurantManager();
         return instance;
     }
 
-    private RestaurantManager(){
-        this.restaurants = new ArrayList<>();
+    public List<Restaurant> getRestaurants() {
+        return this.restaurants;
     }
 
     /**
      * Usual model code
      */
 
-    public void setRestaurants(List<Restaurant> restaurantList){
+    public void setRestaurants(List<Restaurant> restaurantList) {
         this.restaurants = restaurantList;
         java.util.Collections.sort(this.restaurants);
-        for (Restaurant restaurant:restaurants
-             ) {
+        for (Restaurant restaurant : restaurants
+        ) {
             List<InspectionData> inspectionDataList = restaurant.getInspectionDataList();
             java.util.Collections.sort(inspectionDataList);
         }
     }
 
-    public List<Restaurant> getRestaurants(){ return this.restaurants; }
-
     //THIS IS TO RETRIEVE RESTAURANTS BY TRACKING NUMBER
     public Restaurant getRestaurantByTrackingNumber(String trackNumber)
-            throws IndexOutOfBoundsException{
+            throws IndexOutOfBoundsException {
 
-        for(Restaurant restaurant: restaurants){
-            if(restaurant.getTrackNumber().equals(trackNumber))
+        for (Restaurant restaurant : restaurants) {
+            if (restaurant.getTrackNumber().equals(trackNumber))
                 return restaurant;
         }
         throw new IndexOutOfBoundsException();
@@ -65,10 +66,10 @@ public class RestaurantManager {
     }
 
     //THIS IS FOR RETRIEVING RESTAURANTS USING ARRAYLIST INDEXING
-    public Restaurant getRestaurantByID(int ID) throws IndexOutOfBoundsException{
+    public Restaurant getRestaurantByID(int ID) throws IndexOutOfBoundsException {
 
-        for(int i = 0; i < this.restaurants.size(); i++){
-            if(i == ID){
+        for (int i = 0; i < this.restaurants.size(); i++) {
+            if (i == ID) {
                 return restaurants.get(i);
             }
         }

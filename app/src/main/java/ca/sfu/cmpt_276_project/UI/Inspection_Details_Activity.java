@@ -1,9 +1,9 @@
 /*
-* Activity: Inspection_Details_Activity
-*
-* Activity description: Give specific inspection details.
-*
-* */
+ * Activity: Inspection_Details_Activity
+ *
+ * Activity description: Give specific inspection details.
+ *
+ * */
 
 package ca.sfu.cmpt_276_project.UI;
 
@@ -39,21 +39,20 @@ import ca.sfu.cmpt_276_project.R;
 
 public class Inspection_Details_Activity extends AppCompatActivity {
 
-    public static Intent makeIntent(Context context, int position, int restaurantPosition) {
-        Intent intent= new Intent(context, Inspection_Details_Activity.class);
-        intent.putExtra(EXTRA_RES_NUM, restaurantPosition);
-        intent.putExtra(EXTRA_INSPECTION_NUM,position);
-        return intent;
-    }
-
     private static final String EXTRA_RES_NUM = "ca.sfu.cmpt_276_project.UI.extraResNum";
     private static final String EXTRA_INSPECTION_NUM = "ca.sfu.cmpt_276_project.UI.extraInspectionNum";
-
-    private RestaurantManager restaurantManager;
-    private List<Violation> violations = new ArrayList<>();
     InspectionData inspection;
     int restaurantNum;
     int inspectionNum;
+    private RestaurantManager restaurantManager;
+    private List<Violation> violations = new ArrayList<>();
+
+    public static Intent makeIntent(Context context, int position, int restaurantPosition) {
+        Intent intent = new Intent(context, Inspection_Details_Activity.class);
+        intent.putExtra(EXTRA_RES_NUM, restaurantPosition);
+        intent.putExtra(EXTRA_INSPECTION_NUM, position);
+        return intent;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,17 +100,15 @@ public class Inspection_Details_Activity extends AppCompatActivity {
         TextView hazard = findViewById(R.id.res_hazard_rating);
         ImageView hazardIcon = findViewById(R.id.hazard_icon);
         Hazard hazardLevel = inspection.getHazard();
-        if(hazardLevel == Hazard.LOW){
+        if (hazardLevel == Hazard.LOW) {
             hazard.setTextColor(Color.rgb(37, 148, 55));
             hazard.setText("Low");
             hazardIcon.setImageResource(R.drawable.hazardlow);
-        }
-        else if(hazardLevel == Hazard.MEDIUM){
+        } else if (hazardLevel == Hazard.MEDIUM) {
             hazard.setTextColor(Color.MAGENTA);
             hazard.setText("Moderate");
             hazardIcon.setImageResource(R.drawable.hazardyellow);
-        }
-        else{
+        } else {
             hazard.setTextColor((Color.RED));
             hazard.setText("High");
             hazardIcon.setImageResource(R.drawable.hazardhigh);
@@ -123,8 +120,8 @@ public class Inspection_Details_Activity extends AppCompatActivity {
 
     //Customize toolbar item operations
     @Override
-    public boolean onOptionsItemSelected(MenuItem item){
-        switch (item.getItemId()){
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
                 break;
@@ -163,36 +160,35 @@ public class Inspection_Details_Activity extends AppCompatActivity {
 
         @NonNull
         @Override
-        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent){
+        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
             View violationsView = convertView;
-            if(violationsView == null){
+            if (violationsView == null) {
                 violationsView = getLayoutInflater().inflate(R.layout.violation_view,
-                        parent,false);
+                        parent, false);
             }
 
-            if(inspection.getNonCriticalViolations() == 0 && inspection.getCriticalViolations() == 0){
+            if (inspection.getNonCriticalViolations() == 0 && inspection.getCriticalViolations() == 0) {
                 return violationsView;
             }
 
             Violation currentViolation = violations.get(position);
 
             // Fill short details and change text color based on critical rating
-            TextView violationTxt = (TextView)violationsView.findViewById((R.id.violation_txt));
-            ImageView violationIcon = (ImageView)violationsView.findViewById(R.id.violation_icon);
-            if(!currentViolation.isCritical()){
+            TextView violationTxt = (TextView) violationsView.findViewById((R.id.violation_txt));
+            ImageView violationIcon = (ImageView) violationsView.findViewById(R.id.violation_icon);
+            if (!currentViolation.isCritical()) {
                 violationTxt.setTextColor(Color.rgb(37, 148, 55));
                 violationIcon.setImageResource(R.drawable.icon_warning);
-            }
-            else{
+            } else {
                 violationTxt.setTextColor(Color.RED);
                 violationIcon.setImageResource(R.drawable.icon_critical);
             }
 
-            ImageView violationLevelImage = (ImageView)violationsView.findViewById((R.id.violation_level));
+            ImageView violationLevelImage = (ImageView) violationsView.findViewById((R.id.violation_level));
 
             // Short description and icon based on the number of violation
             int violationNum = Integer.valueOf(currentViolation.getViolationNumber());
-            switch (violationNum){
+            switch (violationNum) {
                 case 101:
                     violationTxt.setText("Plans not in regulation.");
                     violationLevelImage.setImageResource(R.drawable.icon_plans);

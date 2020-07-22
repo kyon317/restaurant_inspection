@@ -1,12 +1,12 @@
 /*
-* Class: RestaurantCSVIngester
-*
-* Class Description: The csvImporter Class contains a csv reader that fetches data from the provided restaurants_itr1.csv file.
-*
-* Function:
-* 1. readRestaurantList(Context context): Given the context, the function fetches data from restaurants_itr1.csv and interprets it into a List of Restaurants.[Done]
-*
-* */
+ * Class: RestaurantCSVIngester
+ *
+ * Class Description: The csvImporter Class contains a csv reader that fetches data from the provided restaurants_itr1.csv file.
+ *
+ * Function:
+ * 1. readRestaurantList(Context context): Given the context, the function fetches data from restaurants_itr1.csv and interprets it into a List of Restaurants.[Done]
+ *
+ * */
 
 package ca.sfu.cmpt_276_project.CsvIngester;
 
@@ -14,6 +14,7 @@ import android.content.Context;
 import android.util.Log;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -28,21 +29,35 @@ public class RestaurantCSVIngester {
 
     private List<Restaurant> restaurantList = new ArrayList<>();
 
-    public void readRestaurantList(Context context) throws IOException {
+
+    public void readRestaurantList(Context context, String inputFileName, int updateCode) throws IOException {
         InputStream restaurantDataInput = context.getResources().openRawResource
-                                            (R.raw.restaurants_itr1);
+                (R.raw.restaurants_itr1);
+        if (updateCode == 1) {
+            restaurantDataInput.close();
+            restaurantDataInput = new FileInputStream(inputFileName);
+        }
+
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(restaurantDataInput,
                 StandardCharsets.UTF_8));
         String inputLine = "";
 
         //reading and storing CSV data
-        try{
+        try {
             reader.readLine();
-            while((inputLine = reader.readLine())!=null){
+            while ((inputLine = reader.readLine()) != null) {
+                if (inputLine.contains(", ")) {
+                    inputLine = inputLine.replaceAll(", ", "000");
+                    System.out.println(inputLine);
+                    System.out.println("found false regex");
+                }
                 String[] tokens = inputLine.split(",");
                 Restaurant dummy_restaurant = new Restaurant();
                 dummy_restaurant.setTrackNumber(tokens[0]);
+                if (tokens[1].contains("000")) {
+                    tokens[1] = tokens[1].replace("000", ", ");
+                }
                 dummy_restaurant.setRestaurantName(tokens[1]);
                 dummy_restaurant.setPhysicalAddress(tokens[2]);
                 dummy_restaurant.setPhysicalCity(tokens[3]);
@@ -52,17 +67,17 @@ public class RestaurantCSVIngester {
 
                 restaurantList.add(dummy_restaurant);
             }
-        }catch (IOException e){
-            Log.wtf("Reading Activity","Fatal Error when reading file on line" +inputLine,e);
+        } catch (IOException e) {
+            Log.wtf("Reading Activity", "Fatal Error when reading file on line" + inputLine, e);
             e.printStackTrace();
         }
 
-        //Display restaurant list
-/*        for (Restaurant res:restaurantList
+/*        //Display restaurant list
+        for (Restaurant res:restaurantList
              ) {
             res.Display();
-        }*/
-        //System.out.println(this.restaurantList.size()); //Debugging purposes
+        }
+        System.out.println(this.restaurantList.size()); //Debugging purposes*/
 
     }//end of function
 
