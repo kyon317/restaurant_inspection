@@ -1,9 +1,12 @@
+/*Basic Behavior on stored data
+* */
 package ca.sfu.cmpt_276_project.WebScraper;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Looper;
 import android.provider.ContactsContract;

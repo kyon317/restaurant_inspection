@@ -1,3 +1,5 @@
+/*Google Map API Class
+* */
 package ca.sfu.cmpt_276_project.UI;
 
 import android.Manifest;

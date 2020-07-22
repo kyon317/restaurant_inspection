@@ -1,3 +1,5 @@
+/*Data status
+* */
 package ca.sfu.cmpt_276_project.WebScraper;
 
 public enum DataStatus {

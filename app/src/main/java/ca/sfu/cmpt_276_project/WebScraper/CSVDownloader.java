@@ -1,3 +1,5 @@
+/*Download CSV from server
+* */
 package ca.sfu.cmpt_276_project.WebScraper;
 
 import android.app.Activity;
@@ -75,6 +77,7 @@ public class CSVDownloader extends AsyncTask<String, String, String> {
         if (checkFileExistence(filename)){
             backupFile(filename);
         }
+
         progreassDiag.setTitle("Hold on, we are loading the data");
         progreassDiag.setIndeterminate(false);
         progreassDiag.setProgress(0);
@@ -84,7 +87,7 @@ public class CSVDownloader extends AsyncTask<String, String, String> {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         CSVDownloader.this.cancel(true);
-                        deleteFile(filename);
+                        deleteFile(filename);//TODO: correctly delete file
                         restoreFile(filename+"(1)");
                         progreassDiag.cancel();
                         progreassDiag.dismiss();
@@ -94,7 +97,6 @@ public class CSVDownloader extends AsyncTask<String, String, String> {
         progreassDiag.setButton(DialogInterface.BUTTON_POSITIVE, "Done", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                System.out.println(this.getClass());
                 progreassDiag.dismiss();
             }
         });
