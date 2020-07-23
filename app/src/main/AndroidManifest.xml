@@ -23,7 +23,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light">
         <receiver
-            android:name=".UI.MyService"/>
+            android:name=".UI.LocationService"/>
 
         <meta-data
             android:name="com.google.android.gms.version"
@@ -53,11 +53,11 @@
         <activity
             android:name=".UI.SingleRestaurantActivity"
             android:label="@string/title_activity_single_restaurant"
-            android:parentActivityName=".UI.MainActivity" />
+            android:parentActivityName=".UI.RestaurantListActivity" />
         <activity
             android:name=".UI.Inspection_Details_Activity"
             android:parentActivityName=".UI.SingleRestaurantActivity" />
-        <activity android:name=".UI.MainActivity">
+        <activity android:name=".UI.RestaurantListActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
