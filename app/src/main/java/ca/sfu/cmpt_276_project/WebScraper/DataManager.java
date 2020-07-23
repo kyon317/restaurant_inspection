@@ -74,7 +74,6 @@ public class DataManager extends Activity{
                 }
             }
         }
-        System.out.println("datastatus return");
         return DataStatus.UP_TO_DATE;
     }
 

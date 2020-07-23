@@ -91,40 +91,6 @@ public class MainActivity extends AppCompatActivity {
         restaurantIcons[7] = R.drawable.icon_chicken;
     }
 
-    /*public void initializeRestaurantList(){
-        //get Restaurants from CSV
-        RestaurantCSVIngester restaurantImport = new RestaurantCSVIngester();
-        List<Restaurant> restaurantList = new ArrayList<>();
-
-        try {
-            restaurantImport.readRestaurantList(this);
-            restaurantList = restaurantImport.getRestaurantList();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        //get Inspection Data of Restaurants from CSV
-        InspectionDataCSVIngester inspectionDataImport = new InspectionDataCSVIngester();
-        try {
-            inspectionDataImport.readInspectionData(this);
-            //Sort inspection data into proper Restaurant objects
-            if (!restaurantList.isEmpty()) {
-                for (Restaurant restaurant : restaurantList) {
-                    restaurant.setInspectionDataList(inspectionDataImport.returnInspectionByID
-                            (restaurant.getTrackNumber()));
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        //Update existing Restaurant Manager obj instance
-        restaurantManager.setRestaurants(restaurantList);
-
-    }*/
-
     // start Maps activity
     private void init(){
         Button btnMaps = (Button) findViewById(R.id.btnMaps);

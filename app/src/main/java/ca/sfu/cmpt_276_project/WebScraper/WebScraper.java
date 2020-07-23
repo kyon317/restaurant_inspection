@@ -4,7 +4,6 @@
 package ca.sfu.cmpt_276_project.WebScraper;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -15,7 +14,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 public class WebScraper extends AsyncTask<String, String, String[]> {
@@ -45,7 +43,6 @@ public class WebScraper extends AsyncTask<String, String, String[]> {
             JSONArray resources = rawJsonObj.getJSONArray("resources");
             setCSV_url(returnCsvUrl(resources));
             String date = returnLastModifiedDate(resources);
-            Log.d("WebScraper","result_csv:"+CSV_url);
             result[0] = CSV_url;
             result[1] = date;
             return result;
@@ -83,7 +80,6 @@ public class WebScraper extends AsyncTask<String, String, String[]> {
             }
         }
         csvUrl.replaceAll("/", "");//clear format
-        //System.out.println("csvURL: "+csvUrl);  // For testing
         setCSV_url(csvUrl);
         return csvUrl;
     }

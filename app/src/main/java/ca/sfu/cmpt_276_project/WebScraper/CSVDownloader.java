@@ -108,13 +108,9 @@ public class CSVDownloader extends AsyncTask<String, String, String> {
             URL url = new URL(f_url[0]);
             URLConnection connection = url.openConnection();
             connection.connect();
-
             System.out.println("fetched url: " + url.toString());
-            // this will be useful so that you can show a typical 0-100%
             // progress bar
             long lengthOfFile = getActualSize(connection);
-            System.out.println("length: " + lengthOfFile);
-
             // download the file
             InputStream input = new BufferedInputStream(url.openStream(),
                     8121);

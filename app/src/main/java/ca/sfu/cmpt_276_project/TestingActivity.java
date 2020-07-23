@@ -1,5 +1,5 @@
 /*
- * This is a testing activity to test singleton class and data consistency
+ * This is a dummy testing activity to test new implementation
  *
  * */
 
@@ -52,11 +52,11 @@ public class TestingActivity extends AppCompatActivity {
         } catch (InterruptedException | ExecutionException | IOException e) {
             e.printStackTrace();
         }*/
-        try {
+/*        try {
             GeneralAccessTest();
         } catch (IOException | ParseException e) {
             e.printStackTrace();
-        }
+        }*/
 /*        try {
             GeneralCheckForUpdateTest();
         } catch (ExecutionException | InterruptedException | ParseException | IOException e) {
@@ -83,21 +83,18 @@ public class TestingActivity extends AppCompatActivity {
             System.out.println("Inspection Count: " + inspection_count);
         }
     }
-
     public void WebTest() {
         String url = "http://data.surrey.ca/api/3/action/package_show?id=fraser-health-restaurant-inspection-reports";
         //WebScraper webScraper = new WebScraper();
         //webScraper.setPd(this);
         //webScraper.execute(url);
     }
-
     public void DownloadTest() {
         CSVDownloader csvDownloader = new CSVDownloader("iter2.csv", this);
         csvDownloader.setFilename("iter2.csv");
         csvDownloader.setPdialog(this);
         csvDownloader.execute("https://data.surrey.ca/dataset/3c8cb648-0e80-4659-9078-ef4917b90ffb/resource/0e5d04a2-be9b-40fe-8de2-e88362ea916b/download/restaurants.csv");
     }
-
     public void GeneralAccessTest() throws IOException, ParseException {
         DataManager dataManager = new DataManager();
         String restaurant_file_name = dataManager.getRestaurant_filename();
@@ -105,7 +102,6 @@ public class TestingActivity extends AppCompatActivity {
         System.out.println("restaurant: " + restaurant_file_name);
         System.out.println("inspection: " + inspection_file_name);
     }
-
     public void GeneralDownloadTest() throws InterruptedException, ExecutionException, IOException {
         DataManager dataManager = new DataManager();
         dataManager.downloadAll(this);

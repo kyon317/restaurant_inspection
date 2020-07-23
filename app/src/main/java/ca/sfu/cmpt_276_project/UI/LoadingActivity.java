@@ -12,12 +12,9 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -25,7 +22,6 @@ import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -34,11 +30,9 @@ import ca.sfu.cmpt_276_project.CsvIngester.RestaurantCSVIngester;
 import ca.sfu.cmpt_276_project.Model.Restaurant;
 import ca.sfu.cmpt_276_project.Model.RestaurantManager;
 import ca.sfu.cmpt_276_project.R;
-import ca.sfu.cmpt_276_project.WebScraper.CSVDownloader;
 import ca.sfu.cmpt_276_project.WebScraper.DataManager;
 import ca.sfu.cmpt_276_project.WebScraper.DataStatus;
 import ca.sfu.cmpt_276_project.WebScraper.RunMode;
-import ca.sfu.cmpt_276_project.WebScraper.WebScraper;
 
 public class LoadingActivity extends AppCompatActivity {
 
@@ -64,8 +58,6 @@ public class LoadingActivity extends AppCompatActivity {
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
-        System.out.println("selectedRun_mode: "+runMode);
-        System.out.println("alertVisible: "+alertVisible);
 
         if (alertVisible){
             showDialog();
@@ -75,7 +67,6 @@ public class LoadingActivity extends AppCompatActivity {
     }
 
     public void selectRunMode() throws InterruptedException {
-        System.out.println("network: "+checkNetwork());
         if (!checkNetwork()){
             Toast.makeText(this,"No Network Connection, loading from local directory",Toast.LENGTH_LONG).show();
                 if (dataManager.checkFileExistence(dataManager.getRestaurant_filename())&&dataManager.checkFileExistence(dataManager.getInspection_filename()))
@@ -154,9 +145,6 @@ public class LoadingActivity extends AppCompatActivity {
         //Update existing Restaurant Manager obj instance
         restaurantManager = RestaurantManager.getInstance();
         restaurantManager.setRestaurants(restaurantList);
-//        if (selectedRunmMode == RunMode.UPDATE){
-//            recreate();
-//        }
     }
 
     public void startMapActivity(){
@@ -229,32 +217,6 @@ public class LoadingActivity extends AppCompatActivity {
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        /*CSVDownloader Downloader_1 = new CSVDownloader(dataManager.getRestaurant_filename(),LoadingActivity.this);
-                        CSVDownloader Downloader_2 = new CSVDownloader(dataManager.getInspection_filename(),LoadingActivity.this);
-                        WebScraper restaurantData = new WebScraper();
-                        String fetched_res = null;
-                        String fetched_ins = null;
-                        try {
-                            fetched_res = restaurantData.execute(dataManager.getRestaurant_url()).get()[0];
-                        } catch (ExecutionException | InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        WebScraper inspectionData = new WebScraper();
-                        try {
-                            fetched_ins = inspectionData.execute(dataManager.getInspection_url()).get()[0];
-                        } catch (ExecutionException | InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        Downloader_1.execute(fetched_res);
-                        Downloader_2.execute(fetched_ins);
-                        Date date = new Date();
-                        try {
-                            dataManager.updateLocalDate("restaurants_date_local.txt",date.toString());
-                            dataManager.updateLocalDate("inspectionreports_date_local.txt",date.toString());
-
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }*/
                         //TODO: Try if you can find a way to schedule setRestaurantManager(RunMode.UPDATE)&startMapActivity(),
                         // they have to run in a serial
                         setRestaurantManager(RunMode.UPDATE);
