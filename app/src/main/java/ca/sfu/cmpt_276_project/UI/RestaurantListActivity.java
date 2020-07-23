@@ -56,11 +56,6 @@ public class RestaurantListActivity extends AppCompatActivity {
         return intent;
     }
 
-//    @Override
-////    public void onBackPressed() {
-////        finish();
-////    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

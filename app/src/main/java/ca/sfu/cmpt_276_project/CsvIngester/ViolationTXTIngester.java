@@ -57,11 +57,6 @@ public class ViolationTXTIngester {
             Log.wtf("Reading Activity", "Fatal Error when reading file on line" + inputLine, e);
             e.printStackTrace();
         }
-        //for debugging purpose
-/*        for (Violation violation:violationList
-             ) {
-            violation.Display();
-        }*/
     }//end of function
 
     //return a violation by tracking number

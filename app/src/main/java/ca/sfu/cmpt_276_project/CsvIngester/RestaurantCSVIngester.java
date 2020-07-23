@@ -72,13 +72,6 @@ public class RestaurantCSVIngester {
             e.printStackTrace();
         }
 
-/*        //Display restaurant list
-        for (Restaurant res:restaurantList
-             ) {
-            res.Display();
-        }
-        System.out.println(this.restaurantList.size()); //Debugging purposes*/
-
     }//end of function
 
     public List<Restaurant> getRestaurantList() {

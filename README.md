@@ -13,8 +13,10 @@
 * Repo Manager: Kabir
 * Team Member: Jimmy
 
-**Scrum Roles (1st iteration)**
+**Scrum Roles (2nd iteration)**
 * Scrum Master: Kabir
 * Product Owner: Jimmy
 * Repo Manager: Vincent
 * Team Member: Simon
+
+The first run might take a while to download data

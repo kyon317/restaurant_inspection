@@ -217,8 +217,6 @@ public class LoadingActivity extends AppCompatActivity {
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        //TODO: Try if you can find a way to schedule setRestaurantManager(RunMode.UPDATE)&startMapActivity(),
-                        // they have to run in a serial
                         setRestaurantManager(RunMode.UPDATE);
                         while (true){
 

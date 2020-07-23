@@ -175,10 +175,6 @@ public class InspectionDataCSVIngester {
 
             IngestionList.add(temp);
         }//end of scan loop
-        //Debugging purpose
-        /*
-        for(InspectionData inspectionData : IngestionList){
-            inspectionData.Display();
-        }*/
+
     }
 }

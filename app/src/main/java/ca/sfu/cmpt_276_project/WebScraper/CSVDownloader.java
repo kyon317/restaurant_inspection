@@ -79,7 +79,7 @@ public class CSVDownloader extends AsyncTask<String, String, String> {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         CSVDownloader.this.cancel(true);
-                        deleteFile(filename);//TODO: correctly delete file
+                        deleteFile(filename);
                         restoreFile(filename+"(1)");
                         progreassDiag.cancel();
                         progreassDiag.dismiss();

@@ -67,8 +67,6 @@ public class SingleRestaurantActivity extends AppCompatActivity {
         getSupportActionBar().setBackgroundDrawable(colorDrawable);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        //Todo: fix actionbar back btn so it returns to last activity.
-
 
         Intent intent = getIntent();
         fromMap = intent.getBooleanExtra(EXTRA_BOOL_FROM, false);
