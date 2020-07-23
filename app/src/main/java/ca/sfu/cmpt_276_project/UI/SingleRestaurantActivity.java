@@ -71,7 +71,7 @@ public class SingleRestaurantActivity extends AppCompatActivity {
 
 
         Intent intent = getIntent();
-        intent.getBooleanExtra(EXTRA_BOOL_FROM, false);
+        fromMap = intent.getBooleanExtra(EXTRA_BOOL_FROM, false);
 
         restaurantPosition = intent.getIntExtra(EXTRA_RES_NUM, 0);
 
