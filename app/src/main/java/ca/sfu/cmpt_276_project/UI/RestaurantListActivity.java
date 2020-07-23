@@ -41,6 +41,7 @@ import ca.sfu.cmpt_276_project.Model.Hazard;
 import ca.sfu.cmpt_276_project.Model.Restaurant;
 import ca.sfu.cmpt_276_project.Model.RestaurantManager;
 import ca.sfu.cmpt_276_project.R;
+import ca.sfu.cmpt_276_project.WebScraper.DataManager;
 
 public class RestaurantListActivity extends AppCompatActivity {
 
@@ -76,7 +77,7 @@ public class RestaurantListActivity extends AppCompatActivity {
 
 
         restaurantManager = RestaurantManager.getInstance();
-        //initializeRestaurantList();//method necessary to initialize instance
+        initializeRestaurantList();//method necessary to initialize instance
 
         populateRestaurantIcons();
         populateListView();
@@ -85,39 +86,44 @@ public class RestaurantListActivity extends AppCompatActivity {
         init();
     }
 
-//    public void initializeRestaurantList() {
-//        //get Restaurants from CSV
-//        RestaurantCSVIngester restaurantImport = new RestaurantCSVIngester();
-//        List<Restaurant> restaurantList = new ArrayList<>();
-//
-//        try {
-//            restaurantImport.readRestaurantList(this, null, 0);
-//            restaurantList = restaurantImport.getRestaurantList();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//
-//        //get Inspection Data of Restaurants from CSV
-//        InspectionDataCSVIngester inspectionDataImport = new InspectionDataCSVIngester();
-//        try {
-//            inspectionDataImport.readInspectionData(this, null, 0);
-//            //Sort inspection data into proper Restaurant objects
-//            if (!restaurantList.isEmpty()) {
-//                for (Restaurant restaurant : restaurantList) {
-//                    restaurant.setInspectionDataList(inspectionDataImport.returnInspectionByID
-//                            (restaurant.getTrackNumber()));
-//                }
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } catch (ParseException e) {
-//            e.printStackTrace();
-//        }
-//
-//        //Update existing Restaurant Manager obj instance
-//        restaurantManager.setRestaurants(restaurantList);
-//
-//    }
+    public void initializeRestaurantList() {
+        //get Restaurants from CSV
+        RestaurantCSVIngester restaurantImport = new RestaurantCSVIngester();
+        List<Restaurant> restaurantList = new ArrayList<>();
+        DataManager dataManager = new DataManager();
+        try {
+            if (dataManager.checkFileExistence(dataManager.getRestaurant_filename())){
+                restaurantImport.readRestaurantList(this, dataManager.getDirectory_path()+dataManager.getRestaurant_filename(), 1);
+            }else{
+                restaurantImport.readRestaurantList(this, null, 0);
+            }
+            restaurantList = restaurantImport.getRestaurantList();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //get Inspection Data of Restaurants from CSV
+        InspectionDataCSVIngester inspectionDataImport = new InspectionDataCSVIngester();
+        try {
+            if (dataManager.checkFileExistence(dataManager.getInspection_filename())){
+                inspectionDataImport.readInspectionData(this, dataManager.getDirectory_path()+dataManager.getInspection_filename(), 1);
+            }else
+            inspectionDataImport.readInspectionData(this, null, 0);
+            //Sort inspection data into proper Restaurant objects
+            if (!restaurantList.isEmpty()) {
+                for (Restaurant restaurant : restaurantList) {
+                    restaurant.setInspectionDataList(inspectionDataImport.returnInspectionByID
+                            (restaurant.getTrackNumber()));
+                }
+            }
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+        }
+
+        //Update existing Restaurant Manager obj instance
+        restaurantManager.setRestaurants(restaurantList);
+
+    }
 
     @Override
     public void onBackPressed() {
