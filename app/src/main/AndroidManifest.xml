@@ -42,7 +42,9 @@
 
         <activity
             android:name=".UI.MapsActivity"
-            android:label="@string/title_activity_maps">
+            android:label="@string/title_activity_maps"
+            android:screenOrientation="portrait"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -53,11 +55,15 @@
         <activity
             android:name=".UI.SingleRestaurantActivity"
             android:label="@string/title_activity_single_restaurant"
+            android:screenOrientation="portrait"
             android:parentActivityName=".UI.RestaurantListActivity" />
         <activity
             android:name=".UI.Inspection_Details_Activity"
+            android:screenOrientation="portrait"
             android:parentActivityName=".UI.SingleRestaurantActivity" />
-        <activity android:name=".UI.RestaurantListActivity">
+        <activity android:name=".UI.RestaurantListActivity"
+            android:screenOrientation="portrait"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
