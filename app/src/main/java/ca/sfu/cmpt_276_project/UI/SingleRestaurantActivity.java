@@ -1,9 +1,14 @@
 /*
- * Activity: Main Activity
- *
- * Activity description: Give a list of inspections of selected restaurant.
- *
- * */
+Receives a restaurant from an instance of a restaurant manager from MapsActivity or
+RestaurantListActivity. Displays the name, address coordinates of the given restaurant and displays
+a listview of the inspections the restaurant has had, based on recency. The inspections are given a
+color and icon based on the hazard rating, and have a different format to display the time since
+inspection based if the date of the inspection was withing 30 days, 1 year, or longer. If an
+inspection is selected from the list an intent to launch Inspection_Details_Activity will happen.
+Hitting the android back button or the action bar back navigation button will take the user to the
+previous screen (MapsActivity or RestaurantListActivity). Selecting the coordinates will take the
+user to the location of the restaurant on the MapActivity with the info of the restaurant displayed.
+ */
 package ca.sfu.cmpt_276_project.UI;
 
 import android.content.Context;

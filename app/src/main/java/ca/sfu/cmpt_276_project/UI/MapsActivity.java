@@ -1,3 +1,14 @@
+/*
+Displays a Google Map which is centered on the users current location on start. Pegs are placed on
+map in locations of restaurants received from a manager instance. These pegs have different icons
+and colors based off the restaurants' hazard ratings (low, medium, high). If to many pegs are
+clustered in an area of the screen, a marker will replace the pegs, with a number showing how many
+restaurants are in the area. The user's current location is on the map with a pulsing blue icon.
+The icon will move corresponding to the user's location changing. If a restaurant peg is selected,
+an info window will show the restaurant name, address, and most recent hazard rating. If the info
+window is selected by the user, they are taken to the SingleRestaurantActivity with details of that
+restaurant. A list icon is displayed on the map that allows users to go to RestaurantListActivity.
+ */
 package ca.sfu.cmpt_276_project.UI;
 
 import android.Manifest;

@@ -1,7 +1,10 @@
 /*
- * Activity: Main Activity
+ * Activity: RestaurantListActivity
  *
- * Activity description: Give a list of restaurant and brief information.
+ * Activity description: Displays a list of restaurants from an instance of a manager. Selecting
+ * a restaurant from the list will take the user to SingleRestaurantActivity. The back button will
+ * close the app. Each restaurant on the list will display it's name, icon, hazard level, date of
+ * most recent inspection, and number of issues.
  *
  * */
 package ca.sfu.cmpt_276_project.UI;
