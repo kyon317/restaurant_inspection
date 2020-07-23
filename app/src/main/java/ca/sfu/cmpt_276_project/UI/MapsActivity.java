@@ -11,11 +11,9 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
-import android.location.LocationProvider;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -65,12 +63,10 @@ import ca.sfu.cmpt_276_project.R;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
-    public static Intent makeIntent(Context context,
-                                    String trackNum, String name,
+    public static Intent makeIntent(Context context, String name,
                                     Double latitude, double longitude,
                                     Boolean fromRestaurant) {
         Intent intent = new Intent(context, MapsActivity.class);
-        intent.putExtra(EXTRA_NUM, trackNum);
         intent.putExtra(EXTRA_NAME, name);
         intent.putExtra(EXTRA_LAT, latitude);
         intent.putExtra(EXTRA_LNG, longitude);
@@ -79,12 +75,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private String restaurantName;
-    private String restaurantNum;
     private double restaurantLat;
     private double restaurantLng;
     private Boolean fromRestaurant;
 
-    private static final String EXTRA_NUM = "ca.sfu.cmpt_276_project.UI.extraNum";
     private static final String EXTRA_NAME = "ca.sfu.cmpt_276_project.UI.extraName";
     private static final String EXTRA_LAT = "ca.sfu.cmpt_276_project.UI.extraLat";
     private static final String EXTRA_LNG = "ca.sfu.cmpt_276_project.UI.extraLng";
@@ -102,7 +96,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private RestaurantManager restaurantManager;
     private int[] restaurantIcons;
-    private List<Restaurant> restaurants;
 
     private Location currentLocation;
     static MapsActivity instance;
@@ -125,7 +118,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         btnMain.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = MainActivity.makeIntent(MapsActivity.this);
+                Intent intent = RestaurantListActivity.makeIntent(MapsActivity.this);
                 startActivity(intent);
             }
         });
@@ -179,8 +172,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private PendingIntent getPendingIntent() {
-        Intent intent =new Intent(this, MyService.class);
-        intent.setAction(MyService.ACTION_PROCESS_UPDATE);
+        Intent intent =new Intent(this, LocationService.class);
+        intent.setAction(LocationService.ACTION_PROCESS_UPDATE);
         return PendingIntent.getBroadcast(this,0,intent,PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
@@ -196,7 +189,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         MapsActivity.this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                moveCamera(new LatLng(newLocation.getLatitude(),newLocation.getLongitude()),DEFAULT_ZOOM);
+                if(fromRestaurant){
+                    mClusterManager.clearItems();
+
+                    MarkerOptions options = new MarkerOptions().title(restaurantName).
+                            position(new LatLng(restaurantLat,restaurantLng));
+
+                    mMarker = mMap.addMarker(options);
+                    mMarker.showInfoWindow();
+                    moveCamera(new LatLng(restaurantLat,restaurantLng), DEFAULT_ZOOM);
+                }
+                else{
+                    moveCamera(new LatLng(newLocation.getLatitude(),newLocation.getLongitude()),DEFAULT_ZOOM);
+                }
             }
         });
     }
@@ -315,7 +320,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         Intent intent = getIntent();
         restaurantName = intent.getStringExtra(EXTRA_NAME);
-        restaurantNum = intent.getStringExtra(EXTRA_NUM);
         restaurantLat = intent.getDoubleExtra(EXTRA_LAT, 49.1915);
         restaurantLng = intent.getDoubleExtra(EXTRA_LNG, 122.8456);
         fromRestaurant = intent.getBooleanExtra(EXTRA_BOOL, false);

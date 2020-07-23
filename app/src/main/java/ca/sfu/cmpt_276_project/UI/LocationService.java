@@ -11,7 +11,7 @@ import com.google.android.gms.location.LocationResult;
 
 import java.util.Map;
 
-public class MyService extends BroadcastReceiver {
+public class LocationService extends BroadcastReceiver {
 
     public static final String ACTION_PROCESS_UPDATE = "ca.sfu.cmpt_276_project.UI.UPDATE_LOCATION";
 

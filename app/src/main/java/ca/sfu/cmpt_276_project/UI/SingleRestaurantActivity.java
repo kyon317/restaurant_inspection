@@ -21,6 +21,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -110,7 +111,7 @@ public class SingleRestaurantActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 Intent intent = MapsActivity.makeIntent(SingleRestaurantActivity.this,
-                       restaurant.getTrackNumber(), restaurant.getRestaurantName(),
+                        restaurant.getRestaurantName(),
                        restaurant.getLatitude(),
                         restaurant.getLongitude(),
                         true);
