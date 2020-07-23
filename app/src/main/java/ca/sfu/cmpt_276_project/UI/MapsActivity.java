@@ -2,6 +2,7 @@ package ca.sfu.cmpt_276_project.UI;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -22,6 +23,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -39,6 +41,12 @@ import com.google.android.gms.tasks.Task;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionDeniedResponse;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.single.PermissionListener;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -55,19 +63,23 @@ import ca.sfu.cmpt_276_project.R;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
-    public static Intent makeIntent(Context context, Double latitude, double longitude,
+    public static Intent makeIntent(Context context, String name,
+                                    Double latitude, double longitude,
                                     Boolean fromRestaurant) {
-        Intent intent= new Intent(context, MapsActivity.class);
+        Intent intent = new Intent(context, MapsActivity.class);
+        intent.putExtra(EXTRA_NAME, name);
         intent.putExtra(EXTRA_LAT, latitude);
         intent.putExtra(EXTRA_LNG, longitude);
         intent.putExtra(EXTRA_BOOL, fromRestaurant);
         return intent;
     }
 
+    private String restaurantName;
     private double restaurantLat;
     private double restaurantLng;
     private Boolean fromRestaurant;
 
+    private static final String EXTRA_NAME = "ca.sfu.cmpt_276_project.UI.extraName";
     private static final String EXTRA_LAT = "ca.sfu.cmpt_276_project.UI.extraLat";
     private static final String EXTRA_LNG = "ca.sfu.cmpt_276_project.UI.extraLng";
     private static final String EXTRA_BOOL = "ca.sfu.cmpt_276_project.UI.extraBool";
@@ -84,7 +96,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private RestaurantManager restaurantManager;
     private int[] restaurantIcons;
-    private List<Restaurant> restaurants;
+
+    private Location currentLocation;
+    static MapsActivity instance;
+    LocationRequest locationRequest;
+
+    public static MapsActivity getInstance() {
+        return instance;
+    }
 
     private ClusterManager<PegItem> mClusterManager;
 
@@ -99,7 +118,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         btnMain.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = MainActivity.makeIntent(MapsActivity.this);
+                Intent intent = RestaurantListActivity.makeIntent(MapsActivity.this);
                 startActivity(intent);
             }
         });
@@ -114,32 +133,90 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         getLocationPermission();
 
+        instance = this;
+
         restaurantManager = RestaurantManager.getInstance();
         initializeRestaurantList();
 
         init();
 
-        Intent intent = getIntent();
-        restaurantLat = intent.getDoubleExtra(EXTRA_LAT, 49.1915);
-        restaurantLng = intent.getDoubleExtra(EXTRA_LNG, 122.8456);
-        fromRestaurant = intent.getBooleanExtra(EXTRA_BOOL, false);
-        if(fromRestaurant == true){
-            //TODO: have camera move to given location
-            moveCamera(new LatLng(restaurantLat, restaurantLng), DEFAULT_ZOOM);
+        Dexter.withActivity(this).withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+                .withListener(new PermissionListener() {
+                    @Override
+                    public void onPermissionGranted(PermissionGrantedResponse response) {
+                        updateLocation();
+                    }
 
-            mMap.setInfoWindowAdapter(new CustomInfoAdapter(MapsActivity.this));
+                    @Override
+                    public void onPermissionDenied(PermissionDeniedResponse response) {
 
+                    }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
+
+                    }
+                }).check();
+
+    }
+
+    private void updateLocation() {
+        buildLocationRequest();
+
+        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
         }
+        mFusedLocationProviderClient.requestLocationUpdates(locationRequest, getPendingIntent());
+
+    }
+
+    private PendingIntent getPendingIntent() {
+        Intent intent =new Intent(this, LocationService.class);
+        intent.setAction(LocationService.ACTION_PROCESS_UPDATE);
+        return PendingIntent.getBroadcast(this,0,intent,PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
+    private void buildLocationRequest() {
+        locationRequest = new LocationRequest();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(5000);
+        locationRequest.setFastestInterval(3000);
+        locationRequest.setSmallestDisplacement(15f);
+    }
+
+    public void updateLocation(Location newLocation){
+        MapsActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if(fromRestaurant){
+                    mClusterManager.clearItems();
+
+                    MarkerOptions options = new MarkerOptions().title(restaurantName).
+                            position(new LatLng(restaurantLat,restaurantLng));
+
+                    mMarker = mMap.addMarker(options);
+                    mMarker.showInfoWindow();
+                    moveCamera(new LatLng(restaurantLat,restaurantLng), DEFAULT_ZOOM);
+                }
+                else{
+                    moveCamera(new LatLng(newLocation.getLatitude(),newLocation.getLongitude()),DEFAULT_ZOOM);
+                }
+            }
+        });
     }
 
     @Override
-    protected void onResume(){
+    protected void onResume() {
         super.onResume();
     }
 
     @Override
     public void onBackPressed(){
-        finish();
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_HOME);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        this.finishAffinity();
         super.onBackPressed();
     }
 
@@ -195,10 +272,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     @Override
                     public void onComplete(@NonNull Task task) {
                         if (task.isSuccessful()) {
-                            Location currentLocation = (Location) task.getResult();
+                            if(location != null){
+                                currentLocation = (Location) task.getResult();
 
-                            moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()),
-                                    DEFAULT_ZOOM);
+                                moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()),
+                                        DEFAULT_ZOOM);
+                            }
                         } else {
                             Toast.makeText(MapsActivity.this,
                                     "Unable to get current location", Toast.LENGTH_SHORT).show();
@@ -213,7 +292,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     // move the camera
     private void moveCamera(LatLng latLng, float zoom) {
-        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,zoom));
+
         CameraUpdate location = CameraUpdateFactory.newLatLngZoom(latLng, zoom);
         mMap.animateCamera(location);
 
@@ -228,7 +307,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
         mUiSettings = mMap.getUiSettings();
 
-        if (mLocationPermissionGranted) {
+        mClusterManager = new ClusterManager<>(this, mMap);
+
+        mMap.getUiSettings().setZoomGesturesEnabled(true);
+
+        setUpCluster();
+        //Set Custom InfoWindow Adapter
+        CustomInfoAdapter adapter = new CustomInfoAdapter(MapsActivity.this);
+        mMap.setInfoWindowAdapter(adapter);
+
+        registerClickCallback();
+
+        Intent intent = getIntent();
+        restaurantName = intent.getStringExtra(EXTRA_NAME);
+        restaurantLat = intent.getDoubleExtra(EXTRA_LAT, 49.1915);
+        restaurantLng = intent.getDoubleExtra(EXTRA_LNG, 122.8456);
+        fromRestaurant = intent.getBooleanExtra(EXTRA_BOOL, false);
+        if(fromRestaurant == true){
+            mClusterManager.clearItems();
+
+            MarkerOptions options = new MarkerOptions().title(restaurantName).
+                    position(new LatLng(restaurantLat,restaurantLng));
+
+            mMarker = mMap.addMarker(options);
+            mMarker.showInfoWindow();
+            moveCamera(new LatLng(restaurantLat,restaurantLng), DEFAULT_ZOOM);
+        }
+
+        else if (mLocationPermissionGranted) {
             getDeviceLocation();
 
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -237,24 +343,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 return;
             }
-            mMap.setMyLocationEnabled(true);
-            mMap.getUiSettings().setMyLocationButtonEnabled(false);
-            mMap.getUiSettings().setZoomControlsEnabled(true);
-
-            mClusterManager = new ClusterManager<>(this, mMap);
-
-            // somehow UI gesture doesn't work,
-            // can't pinch to zoom in and out
-            mMap.getUiSettings().setZoomGesturesEnabled(true);
-
-            setUpCluster();
-            //Set Custom InfoWindow Adapter
-            CustomInfoAdapter adapter = new CustomInfoAdapter(MapsActivity.this);
-            mMap.setInfoWindowAdapter(adapter);
-
-            registerClickCallback();
-
         }
+
+        mMap.setMyLocationEnabled(true);
+        mMap.getUiSettings().setMyLocationButtonEnabled(false);
+        mMap.getUiSettings().setZoomControlsEnabled(true);
     }
 
 
@@ -316,52 +409,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void showRestaurants() {
-        /*
-        //takes each restaurant in the manager and places it on the map.
-        MarkerOptions options;
-
-        for(int i = 0; i < restaurantManager.getRestaurants().size();i++){
-
-            Restaurant currentRestaurant = restaurantManager.getRestaurantByID(i);
-
-            // remember restaurant position in list view
-            currentRestaurant.setId(i);
-
-            String snippet = "Address:          " + currentRestaurant.getPhysicalAddress() + "\n"
-                            + "Recent Inspection Level:            ";
-
-            options = new MarkerOptions();
-            options.position(new LatLng(currentRestaurant.getLatitude(),
-                    currentRestaurant.getLongitude()));
-            options.title(currentRestaurant.getRestaurantName());
-
-            if(currentRestaurant.getInspectionDataList().isEmpty() == false) {
-
-                Hazard hazard = currentRestaurant.getInspectionDataList().get(0).getHazard();
-                if(hazard == Hazard.HIGH) {
-                    options.icon(bitmapDescriptorFromVector(getApplicationContext(),
-                            R.drawable.icon_map_high));
-                    snippet = snippet + "High";
-                }
-                else if(hazard == Hazard.MEDIUM){
-                    options.icon(bitmapDescriptorFromVector(getApplicationContext(),
-                            R.drawable.icon_map_medium));
-                    snippet = snippet + "Medium";
-                }
-                else {
-                    options.icon(bitmapDescriptorFromVector(getApplicationContext(),
-                            R.drawable.icon_map_low));
-                    snippet = snippet + "Low";
-                }
-            }
-
-            options.snippet(snippet);
-
-            mMarker = mMap.addMarker(options);
-
-        }
-
-         */
 
         for(int i = 0; i < restaurantManager.getRestaurants().size();i++){
 
@@ -396,23 +443,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mClusterManager.addItem(newItem);
         }
 
-        //testCluster();
     }
-/*
-    public void testCluster (){
-        double lat = 49.19166309;
-        double lng = -122.8136499;
 
-        // Add ten cluster items in close proximity, for purposes of this example.
-        for (int i = 0; i < 10; i++) {
-            double offset = i / 60d;
-            lat = lat + offset;
-            lng = lng + offset;
-            PegItem offsetItem = new PegItem(lat, lng);
-            mClusterManager.addItem(offsetItem);
-        }
-    }
- */
     private void registerClickCallback() {
 
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
@@ -434,7 +466,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Restaurant restaurant = restaurantManager.findRestaurantByLatLng(lat, lng);
 
             int restaurantPosition = restaurant.getId();
-            Intent intent = SingleRestaurantActivity.makeIntent(MapsActivity.this, restaurantPosition);
+            Intent intent = SingleRestaurantActivity.makeIntent(MapsActivity.this,
+                    restaurantPosition,
+                    true);
             startActivity(intent);
         });
 
@@ -523,43 +557,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         }
     }
-/*
-    public class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter{
-        private final View mWindow;
-        private Context mContext;
-
-        public CustomInfoWindowAdapter(Context context) {
-            mContext = context;
-            mWindow = LayoutInflater.from(context).inflate(R.layout.info_window,null);
-        }
-
-        private void renderWindowText(Marker marker, View view) {
-            String title = marker.getTitle();
-            TextView tvTitle = (TextView) view.findViewById(R.id.title);
-            if(!title.equals("")){
-                tvTitle.setText(title);
-            }
-            String snippet = marker.getSnippet();
-            TextView tvSnippet = (TextView) view.findViewById(R.id.snippet);
-            if(!snippet.equals("")){
-                tvSnippet.setText(snippet);
-            }
-        }
-
-        @Override
-        public View getInfoWindow(Marker marker) {
-            renderWindowText(marker, mWindow);
-            return mWindow;
-        }
-
-        @Override
-        public View getInfoContents(Marker marker) {
-            renderWindowText(marker, mWindow);
-            return mWindow;
-        }
-    }
-
- */
 
     private class MarkerClusterRenderer extends DefaultClusterRenderer<PegItem> {
 

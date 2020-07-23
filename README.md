@@ -12,3 +12,9 @@
 * Product Owner: Vincent
 * Repo Manager: Kabir
 * Team Member: Jimmy
+
+**Scrum Roles (1st iteration)**
+* Scrum Master: Kabir
+* Product Owner: Jimmy
+* Repo Manager: Vincent
+* Team Member: Simon

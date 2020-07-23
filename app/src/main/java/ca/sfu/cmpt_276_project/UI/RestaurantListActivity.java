@@ -25,16 +25,21 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import ca.sfu.cmpt_276_project.CsvIngester.InspectionDataCSVIngester;
+import ca.sfu.cmpt_276_project.CsvIngester.RestaurantCSVIngester;
 import ca.sfu.cmpt_276_project.Model.Hazard;
 import ca.sfu.cmpt_276_project.Model.Restaurant;
 import ca.sfu.cmpt_276_project.Model.RestaurantManager;
 import ca.sfu.cmpt_276_project.R;
 
-public class MainActivity extends AppCompatActivity {
+public class RestaurantListActivity extends AppCompatActivity {
 
     private RestaurantManager restaurantManager;
     private int[] restaurantIcons;
@@ -43,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_restaurant_list);
         getSupportActionBar().setTitle("Surrey Restaurant Inspections");
 
         // Define ColorDrawable object and parse color
@@ -57,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         restaurantManager = RestaurantManager.getInstance();
-        //initializeRestaurantList();//method necessary to initialize instance
+        initializeRestaurantList();//method necessary to initialize instance
 
         populateRestaurantIcons();
         populateListView();
@@ -65,10 +70,47 @@ public class MainActivity extends AppCompatActivity {
 
         init();
     }
+    
+    public void initializeRestaurantList(){
+        //get Restaurants from CSV
+        RestaurantCSVIngester restaurantImport = new RestaurantCSVIngester();
+        List<Restaurant> restaurantList = new ArrayList<>();
+
+        try {
+            restaurantImport.readRestaurantList(this, null, 0 );
+            restaurantList = restaurantImport.getRestaurantList();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //get Inspection Data of Restaurants from CSV
+        InspectionDataCSVIngester inspectionDataImport = new InspectionDataCSVIngester();
+        try {
+            inspectionDataImport.readInspectionData(this, null, 0 );
+            //Sort inspection data into proper Restaurant objects
+            if (!restaurantList.isEmpty()) {
+                for (Restaurant restaurant : restaurantList) {
+                    restaurant.setInspectionDataList(inspectionDataImport.returnInspectionByID
+                            (restaurant.getTrackNumber()));
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        //Update existing Restaurant Manager obj instance
+        restaurantManager.setRestaurants(restaurantList);
+
+    }
 
     @Override
     public void onBackPressed(){
-        finish();
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_HOME);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        this.finishAffinity();
         super.onBackPressed();
     }
 
@@ -91,47 +133,13 @@ public class MainActivity extends AppCompatActivity {
         restaurantIcons[7] = R.drawable.icon_chicken;
     }
 
-    /*public void initializeRestaurantList(){
-        //get Restaurants from CSV
-        RestaurantCSVIngester restaurantImport = new RestaurantCSVIngester();
-        List<Restaurant> restaurantList = new ArrayList<>();
-
-        try {
-            restaurantImport.readRestaurantList(this);
-            restaurantList = restaurantImport.getRestaurantList();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        //get Inspection Data of Restaurants from CSV
-        InspectionDataCSVIngester inspectionDataImport = new InspectionDataCSVIngester();
-        try {
-            inspectionDataImport.readInspectionData(this);
-            //Sort inspection data into proper Restaurant objects
-            if (!restaurantList.isEmpty()) {
-                for (Restaurant restaurant : restaurantList) {
-                    restaurant.setInspectionDataList(inspectionDataImport.returnInspectionByID
-                            (restaurant.getTrackNumber()));
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        //Update existing Restaurant Manager obj instance
-        restaurantManager.setRestaurants(restaurantList);
-
-    }*/
-
     // start Maps activity
     private void init(){
         Button btnMaps = (Button) findViewById(R.id.btnMaps);
         btnMaps.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = MapsActivity.makeIntent(MainActivity.this);
+                Intent intent = MapsActivity.makeIntent(RestaurantListActivity.this);
                 startActivity(intent);
             }
         });
@@ -139,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
 
     // allows MainActivity to be accessed
     public static Intent makeIntent(Context context){
-        Intent intent = new Intent(context, MainActivity.class);
+        Intent intent = new Intent(context, RestaurantListActivity.class);
         return intent;
     }
 
@@ -175,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
                 Restaurant clickedRestaurant = restaurantManager.getRestaurantByID(position);
 
                 // pass clicked restaurant's position to SingleRestaurantActivity
-                Intent intent = SingleRestaurantActivity.makeIntent(MainActivity.this, position);
+                Intent intent = SingleRestaurantActivity.makeIntent(RestaurantListActivity.this, position, false);
                 startActivity(intent);
             }
         });
@@ -184,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
     private class MyListAdapter extends ArrayAdapter<Restaurant> {
 
         public MyListAdapter() {
-            super(MainActivity.this, R.layout.restaurants_view, restaurants);
+            super(RestaurantListActivity.this, R.layout.restaurants_view, restaurants);
         }
 
         @NonNull

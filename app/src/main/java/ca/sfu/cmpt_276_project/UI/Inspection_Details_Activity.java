@@ -71,6 +71,8 @@ public class Inspection_Details_Activity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         restaurantManager = RestaurantManager.getInstance();
+
+
         Intent intent = getIntent();
         restaurantNum = intent.getIntExtra(EXTRA_RES_NUM, 0);
         inspectionNum = intent.getIntExtra(EXTRA_INSPECTION_NUM, 0);
