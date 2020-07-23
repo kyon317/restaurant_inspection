@@ -46,7 +46,7 @@
             android:name=".UI.MapsActivity"
             android:label="@string/title_activity_maps">
             android:label="@string/title_activity_maps"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait" />
         </activity>
 
         <activity android:name=".UI.LoadingActivity">
