@@ -25,10 +25,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import ca.sfu.cmpt_276_project.CsvIngester.InspectionDataCSVIngester;
+import ca.sfu.cmpt_276_project.CsvIngester.RestaurantCSVIngester;
 import ca.sfu.cmpt_276_project.Model.Hazard;
 import ca.sfu.cmpt_276_project.Model.Restaurant;
 import ca.sfu.cmpt_276_project.Model.RestaurantManager;
@@ -57,13 +62,47 @@ public class RestaurantListActivity extends AppCompatActivity {
 
 
         restaurantManager = RestaurantManager.getInstance();
-        //initializeRestaurantList();//method necessary to initialize instance
+        initializeRestaurantList();//method necessary to initialize instance
 
         populateRestaurantIcons();
         populateListView();
         registerClickCallback();
 
         init();
+    }
+    
+    public void initializeRestaurantList(){
+        //get Restaurants from CSV
+        RestaurantCSVIngester restaurantImport = new RestaurantCSVIngester();
+        List<Restaurant> restaurantList = new ArrayList<>();
+
+        try {
+            restaurantImport.readRestaurantList(this, null, 0 );
+            restaurantList = restaurantImport.getRestaurantList();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //get Inspection Data of Restaurants from CSV
+        InspectionDataCSVIngester inspectionDataImport = new InspectionDataCSVIngester();
+        try {
+            inspectionDataImport.readInspectionData(this, null, 0 );
+            //Sort inspection data into proper Restaurant objects
+            if (!restaurantList.isEmpty()) {
+                for (Restaurant restaurant : restaurantList) {
+                    restaurant.setInspectionDataList(inspectionDataImport.returnInspectionByID
+                            (restaurant.getTrackNumber()));
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        //Update existing Restaurant Manager obj instance
+        restaurantManager.setRestaurants(restaurantList);
+
     }
 
     @Override
