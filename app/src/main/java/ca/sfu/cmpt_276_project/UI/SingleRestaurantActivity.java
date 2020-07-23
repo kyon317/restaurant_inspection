@@ -21,7 +21,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -85,7 +84,7 @@ public class SingleRestaurantActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
         if(fromMap == false){
-            Intent intent = MainActivity.makeIntent(SingleRestaurantActivity.this);
+            Intent intent = RestaurantListActivity.makeIntent(SingleRestaurantActivity.this);
             startActivity(intent);
         }
         else if(fromMap == true){
