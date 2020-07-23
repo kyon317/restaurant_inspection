@@ -34,6 +34,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 import ca.sfu.cmpt_276_project.CsvIngester.InspectionDataCSVIngester;
 import ca.sfu.cmpt_276_project.CsvIngester.RestaurantCSVIngester;
@@ -45,8 +46,8 @@ import ca.sfu.cmpt_276_project.R;
 public class RestaurantListActivity extends AppCompatActivity {
 
     private RestaurantManager restaurantManager;
-    private int[] restaurantIcons;
     private List<Restaurant> restaurants;
+    private int[] restaurantIcons;
 
     // allows MainActivity to be accessed
     public static Intent makeIntent(Context context) {
@@ -139,11 +140,11 @@ public class RestaurantListActivity extends AppCompatActivity {
         restaurantIcons[0] = R.drawable.icon_sushi;
         restaurantIcons[1] = R.drawable.icon_dimsum;
         restaurantIcons[2] = R.drawable.icon_dimsum;
-        restaurantIcons[3] = R.drawable.icon_aw;
-        restaurantIcons[4] = R.drawable.icon_beer;
+        restaurantIcons[3] = R.drawable.icon_beer;
+        restaurantIcons[4] = R.drawable.icon_pizza;
         restaurantIcons[5] = R.drawable.icon_pizza;
-        restaurantIcons[6] = R.drawable.icon_pizza;
-        restaurantIcons[7] = R.drawable.icon_chicken;
+        restaurantIcons[6] = R.drawable.icon_chicken;
+
     }
 
     // start Maps activity
@@ -215,7 +216,33 @@ public class RestaurantListActivity extends AppCompatActivity {
 
             // Fill restaurant image
             ImageView resImageView = (ImageView) restaurantView.findViewById(R.id.restaurant_icon);
-            currentRestaurant.setIcon(restaurantIcons[(position % 8)]);
+            // currentRestaurant.setIcon(restaurantIcons.get(position));
+            if(currentRestaurant.getRestaurantName().contains("A&W"))
+                currentRestaurant.setIcon(R.drawable.icon_aw);
+            else if(currentRestaurant.getRestaurantName().contains("Booster"))
+                currentRestaurant.setIcon(R.drawable.icon_booster_juice);
+            else if(currentRestaurant.getRestaurantName().contains("Boston"))
+                currentRestaurant.setIcon(R.drawable.icon_boston_pizza);
+            else if(currentRestaurant.getRestaurantName().contains("Canuel"))
+                currentRestaurant.setIcon(R.drawable.icon_canuel_cateres);
+            else if(currentRestaurant.getRestaurantName().contains("Jugo"))
+                currentRestaurant.setIcon(R.drawable.icon_jugo_juice);
+            else if(currentRestaurant.getRestaurantName().contains("KFC"))
+                currentRestaurant.setIcon(R.drawable.icon_kfc);
+            else if(currentRestaurant.getRestaurantName().contains("Little"))
+                currentRestaurant.setIcon(R.drawable.icon_little_caesar);
+            else if(currentRestaurant.getRestaurantName().contains("McD"))
+                currentRestaurant.setIcon(R.drawable.icon_mcd);
+            else if(currentRestaurant.getRestaurantName().contains("Papa"))
+                currentRestaurant.setIcon(R.drawable.icon_papa_johns);
+            else if(currentRestaurant.getRestaurantName().contains("Eleven"))
+                currentRestaurant.setIcon(R.drawable.icon_seven_eleven);
+            else {//randomly assign icon image
+                Random random = new Random();
+                int randInt = random.nextInt(6);
+                currentRestaurant.setIcon(restaurantIcons[randInt]);
+            }
+
             resImageView.setImageResource(currentRestaurant.getIcon());
 
             // Fill hazard icon
