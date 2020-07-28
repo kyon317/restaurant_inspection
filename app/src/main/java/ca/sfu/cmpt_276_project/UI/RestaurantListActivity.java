@@ -246,6 +246,11 @@ public class RestaurantListActivity extends AppCompatActivity {
 
             resImageView.setImageResource(currentRestaurant.getIcon());
 
+            ImageView favIconView = (ImageView) restaurantView.findViewById(R.id.favouriteIcon);
+            if(currentRestaurant.getFavourite() == false){
+                favIconView.setVisibility(View.INVISIBLE);
+            }
+
             // Fill hazard icon
             ImageView hazardIconView = (ImageView) restaurantView.findViewById(
                     R.id.restaurant_hazardicon);
