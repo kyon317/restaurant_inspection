@@ -33,6 +33,7 @@ public class Restaurant implements Comparable<Restaurant> {
     private double latitude;
     private double longitude;
     private int icon;
+    private Boolean isFavourite;
     private List<InspectionData> inspectionDataList = new ArrayList<>();
 
     public int getId() {
@@ -56,6 +57,7 @@ public class Restaurant implements Comparable<Restaurant> {
         this.latitude = 0;
         this.longitude = 0;
         this.icon = 0;
+        this.isFavourite = false;
     }
 
     //Non-Default Constructor
@@ -70,6 +72,7 @@ public class Restaurant implements Comparable<Restaurant> {
         this.latitude = latitude;
         this.longitude = longitude;
         this.inspectionDataList = inspectionDataList;
+        this.isFavourite = false;
     }
 
     //Getters
@@ -165,5 +168,13 @@ public class Restaurant implements Comparable<Restaurant> {
     @Override
     public int compareTo(Restaurant other) {
         return restaurantName.compareTo(other.restaurantName);
+    }
+
+    public Boolean getFavourite() {
+        return isFavourite;
+    }
+
+    public void setFavourite(Boolean favourite) {
+        isFavourite = favourite;
     }
 }

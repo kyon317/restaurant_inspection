@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -69,7 +70,7 @@ public class SingleRestaurantActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Intent intent = getIntent();
-        fromMap = intent.getBooleanExtra(EXTRA_BOOL_FROM, false);
+        fromMap = intent.getBooleanExtra(EXTRA_BOOL_FROM, true);
 
         restaurantPosition = intent.getIntExtra(EXTRA_RES_NUM, 0);
 
@@ -101,6 +102,24 @@ public class SingleRestaurantActivity extends AppCompatActivity {
     }
 
     private void populatateView() {
+        TextView favouriteText = findViewById(R.id.btnAddFav);
+        if(restaurant.getFavourite()){
+            favouriteText.setText("Unfavourite");
+        }
+        Button favBtn = (Button) findViewById(R.id.btnAddFav);
+        favBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(restaurant.getFavourite()){
+                    restaurant.setFavourite(false);
+                    favouriteText.setText("Unfavourite");
+                }
+                else {
+                    restaurant.setFavourite(true);
+                    favouriteText.setText("Favourite");
+                }
+            }
+        });
         TextView restaurantName_textview = findViewById(R.id.Restaurant_name);
         restaurantName_textview.setText(restaurant.getRestaurantName());
         TextView addressText_textview = findViewById(R.id.addressText);
