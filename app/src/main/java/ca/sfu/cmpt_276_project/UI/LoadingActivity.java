@@ -34,6 +34,7 @@ import ca.sfu.cmpt_276_project.CsvIngester.RestaurantCSVIngester;
 import ca.sfu.cmpt_276_project.Model.Restaurant;
 import ca.sfu.cmpt_276_project.Model.RestaurantManager;
 import ca.sfu.cmpt_276_project.R;
+import ca.sfu.cmpt_276_project.TestingActivity;
 import ca.sfu.cmpt_276_project.WebScraper.CSVDownloader;
 import ca.sfu.cmpt_276_project.WebScraper.DataManager;
 import ca.sfu.cmpt_276_project.WebScraper.DataStatus;
@@ -184,6 +185,11 @@ public class LoadingActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void startTestActivity(){
+        Intent intent = new Intent(this, TestingActivity.class);
+        startActivity(intent);
+    }
+
     public class backgroundTask extends AsyncTask<String,Integer,Integer>{
 
         @Override
@@ -267,8 +273,8 @@ public class LoadingActivity extends AppCompatActivity {
                         } catch (ExecutionException | InterruptedException e) {
                             e.printStackTrace();
                         }
-                        res_downloader.execute(res_csv[0]);
-                        ins_downloader.execute(ins_csv[0]);
+//                        res_downloader.execute(res_csv[0]);
+//                        ins_downloader.execute(ins_csv[0]);
                         Date currentTimeStamp = new Date();
                         currentTimeStamp.getTime();
                         try {

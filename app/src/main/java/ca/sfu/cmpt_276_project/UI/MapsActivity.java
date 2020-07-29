@@ -19,6 +19,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -61,6 +62,7 @@ import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 
+import ca.sfu.cmpt_276_project.DBAdapter;
 import ca.sfu.cmpt_276_project.Model.Hazard;
 import ca.sfu.cmpt_276_project.Model.PegItem;
 import ca.sfu.cmpt_276_project.Model.Restaurant;
@@ -92,6 +94,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private int[] restaurantIcons;
     private Location currentLocation;
     private ClusterManager<PegItem> mClusterManager;
+    private DBAdapter dbAdapter;
 
     public static Intent makeIntent(Context context, String name,
                                     Double latitude, double longitude,
@@ -103,6 +106,48 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         intent.putExtra(EXTRA_BOOL, fromRestaurant);
         return intent;
     }
+
+    /**
+     * DATABASE FUNCTIONS
+     */
+    private void openDB(){
+        dbAdapter = new DBAdapter(this);
+        dbAdapter.open();
+    }
+
+    private void closeDB(){
+        dbAdapter.close();
+    }
+    private void addRestaurantsToDB(){
+        for(Restaurant restaurant: restaurantManager.getRestaurants()){
+            long newID = dbAdapter.insertRow(restaurant.getTrackNumber(),
+                    restaurant.getRestaurantName(), restaurant.getPhysicalAddress(),
+                    restaurant.getPhysicalCity(), restaurant.getFacType(),
+                    restaurant.getLatitude(), restaurant.getLongitude(), restaurant.getIcon());
+
+            Cursor cursor = dbAdapter.getRow(newID);
+
+            //Printer test to check injection
+            System.out.println("Injected: \n"
+                    + cursor.getInt(DBAdapter.COL_ROWID)
+                    + "\tTrack#: " + cursor.getString(DBAdapter.COL_TRACK_NUM) + "\n"
+                    + "\tName: " + cursor.getString(DBAdapter.COL_RES_NAME) + "\n"
+                    + "\tAddr: " + cursor.getString(DBAdapter.COL_ADDRESS) + "\n"
+                    + "\tCity: " + cursor.getString(DBAdapter.COL_CITY) + "\n"
+                    + "\tFacType: " + cursor.getString(DBAdapter.COL_FAC_TYPE) + "\n"
+                    + "\tLatitude: " + cursor.getDouble(DBAdapter.COL_LATITUDE) + "\n"
+                    + "\tLongitude: " + cursor.getDouble(DBAdapter.COL_LONGITUDE) + "\n");
+        }
+    }
+
+    public void clearDB() {
+        System.out.println("Wiped DB clean");
+        dbAdapter.deleteAll();
+    }
+    /**
+     * ENDOF DATABASE FUNCTIONS
+     */
+
 
     public static MapsActivity getInstance() {
         return instance;
@@ -157,6 +202,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     }
                 }).check();
+
+        //opening database
+        openDB();
+        addRestaurantsToDB();
+        clearDB();
 
     }
 
@@ -223,6 +273,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onDestroy() {
         android.os.Process.killProcess(android.os.Process.myPid());
         super.onDestroy();
+        closeDB();
     }
 
 
