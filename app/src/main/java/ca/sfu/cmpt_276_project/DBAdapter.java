@@ -33,6 +33,7 @@ public class DBAdapter {
     public static final String KEY_LATITUDE = "latitude";
     public static final String KEY_LONGITUDE = "longitude";
     public static final String KEY_ICON = "icon";
+    public static final String KEY_INSPECTION = "icon";
 
     // TODO: Setup your field numbers here (0 = KEY_ROWID, 1=...)
     public static final int COL_TRACK_NUM = 1;
@@ -43,9 +44,10 @@ public class DBAdapter {
     public static final int COL_LATITUDE = 6;
     public static final int COL_LONGITUDE = 7;
     public static final int COL_ICON = 8;
+    public static final int COL_INSPECTION = 8;
 
     public static final String[] ALL_KEYS = new String[] {KEY_ROWID, KEY_TRACK_NUM, KEY_RES_NAME,
-            KEY_ADDRESS, KEY_CITY, KEY_FAC_TYPE, KEY_LATITUDE, KEY_LONGITUDE, KEY_ICON};
+            KEY_ADDRESS, KEY_CITY, KEY_FAC_TYPE, KEY_LATITUDE, KEY_LONGITUDE, KEY_ICON, KEY_INSPECTION};
 
     // DB info: it's name, and the table we are using (just one).
     public static final String DATABASE_NAME = "MyDb";
@@ -74,7 +76,8 @@ public class DBAdapter {
                     + KEY_FAC_TYPE + " text not null, "
                     + KEY_LATITUDE + " real not null, "
                     + KEY_LONGITUDE + " real not null, "
-                    + KEY_ICON + " integer not null"
+                    + KEY_ICON + " integer not null,"
+                    + KEY_INSPECTION + " text not null"
 
                     // Rest  of creation:
                     + ");";
@@ -82,7 +85,7 @@ public class DBAdapter {
     // Context of application who uses us.
     private final Context context;
 
-    private DatabaseHelper myDBHelper;
+    private DatabaseHelper myDBHelper = null;
     private SQLiteDatabase db;
 
     /////////////////////////////////////////////////////////////////////
@@ -113,7 +116,7 @@ public class DBAdapter {
             String facType,
             double latitude,
             double longitude,
-            int icon) {
+            int icon, String inspectionJSON) {
         /*
          * CHANGE 3:
          */
@@ -129,6 +132,7 @@ public class DBAdapter {
         initialValues.put(KEY_LATITUDE, latitude);
         initialValues.put(KEY_LONGITUDE, longitude);
         initialValues.put(KEY_ICON, icon);
+        initialValues.put(KEY_INSPECTION, inspectionJSON);
 
         // Insert it into the database.
         return db.insert(DATABASE_TABLE, null, initialValues);
@@ -149,6 +153,10 @@ public class DBAdapter {
             } while (c.moveToNext());
         }
         c.close();
+
+        //Resets ID sequence to 0
+        db.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME = '" + DATABASE_TABLE + "'");
+        db.execSQL("UPDATE SQLITE_SEQUENCE SET SEQ = 0 WHERE NAME = '" + DATABASE_TABLE + "'");
     }
 
     // Return all data in the database.
@@ -181,7 +189,7 @@ public class DBAdapter {
                              String facType,
                              double latitude,
                              double longitude,
-                             int icon) {
+                             int icon, String inspectionJSON) {
         String where = KEY_ROWID + "=" + rowId;
 
         /*
@@ -199,6 +207,7 @@ public class DBAdapter {
         newValues.put(KEY_LATITUDE, latitude);
         newValues.put(KEY_LONGITUDE, longitude);
         newValues.put(KEY_ICON, icon);
+        newValues.put(KEY_INSPECTION, inspectionJSON);
 
         // Insert it into the database.
         return db.update(DATABASE_TABLE, newValues, where, null) != 0;

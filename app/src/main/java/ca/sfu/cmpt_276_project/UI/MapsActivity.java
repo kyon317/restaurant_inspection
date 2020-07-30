@@ -52,6 +52,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
@@ -62,8 +64,13 @@ import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
+
 import ca.sfu.cmpt_276_project.DBAdapter;
 import ca.sfu.cmpt_276_project.Model.Hazard;
+import ca.sfu.cmpt_276_project.Model.InspectionData;
 import ca.sfu.cmpt_276_project.Model.PegItem;
 import ca.sfu.cmpt_276_project.Model.Restaurant;
 import ca.sfu.cmpt_276_project.Model.RestaurantManager;
@@ -119,17 +126,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         dbAdapter.close();
     }
     private void addRestaurantsToDB(){
+        //TODO: Look over the methods outlined, understand what they do
+        Gson gson = new Gson();//necessary to convert Array list
+
         for(Restaurant restaurant: restaurantManager.getRestaurants()){
+
+            String inspectionJSON = gson.toJson(restaurant.getInspectionDataList());
+            /*PRINTER TO COMPARE INSPECTION ARRAY LIST SIZE
+            System.out.println("\tInitial InspectionJSON: " + inspectionJSON + "\n");
+            if(!restaurant.getInspectionDataList().isEmpty())
+                System.out.println("\tInitial Inspection SIZE: " + restaurant.getInspectionDataList().size() + "\n");*/
+
+            //THIS PROCESS ADDS ITEM TO THE DM
             long newID = dbAdapter.insertRow(restaurant.getTrackNumber(),
                     restaurant.getRestaurantName(), restaurant.getPhysicalAddress(),
                     restaurant.getPhysicalCity(), restaurant.getFacType(),
-                    restaurant.getLatitude(), restaurant.getLongitude(), restaurant.getIcon());
+                    restaurant.getLatitude(), restaurant.getLongitude(), restaurant.getIcon(),
+                    inspectionJSON);
 
+            //THIS CURSOR IS USED TO SCAN THE DB
             Cursor cursor = dbAdapter.getRow(newID);
+
+            //THIS PAIR OF LINES ARE USED TO DESERIALIZE THE JSON STRING EXTRACTED FROM DB
+            Type type = new TypeToken<ArrayList<InspectionData>>() {}.getType();
+            List<InspectionData> tempList = gson.fromJson(cursor.getString(DBAdapter.COL_INSPECTION), type);
 
             //Printer test to check injection
             System.out.println("Injected: \n"
-                    + cursor.getInt(DBAdapter.COL_ROWID)
+                    + "\tDB-ID#: " + cursor.getInt(DBAdapter.COL_ROWID) + "\n"
                     + "\tTrack#: " + cursor.getString(DBAdapter.COL_TRACK_NUM) + "\n"
                     + "\tName: " + cursor.getString(DBAdapter.COL_RES_NAME) + "\n"
                     + "\tAddr: " + cursor.getString(DBAdapter.COL_ADDRESS) + "\n"
@@ -137,6 +161,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     + "\tFacType: " + cursor.getString(DBAdapter.COL_FAC_TYPE) + "\n"
                     + "\tLatitude: " + cursor.getDouble(DBAdapter.COL_LATITUDE) + "\n"
                     + "\tLongitude: " + cursor.getDouble(DBAdapter.COL_LONGITUDE) + "\n");
+            if(!tempList.isEmpty()) {
+                System.out.println("\tInspection Details: ");
+                for(InspectionData inspectionData: tempList)
+                    inspectionData.Display();
+            }
+
+            //CLOSE CURSOR TO AVOID RESOURCE LEAKS
+            cursor.close();
         }
     }
 
@@ -205,8 +237,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //opening database
         openDB();
-        addRestaurantsToDB();
-        clearDB();
+        addRestaurantsToDB();//Instatiating DB data
+        clearDB();//Clearing data instantly, cause I have no use for it
 
     }
 
