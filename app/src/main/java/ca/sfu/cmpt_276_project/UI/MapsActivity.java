@@ -238,7 +238,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //opening database
         openDB();
         addRestaurantsToDB();//Instatiating DB data
-        clearDB();//Clearing data instantly, cause I have no use for it
+//        clearDB();//Clearing data instantly, cause I have no use for it
 
     }
 
@@ -501,9 +501,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void initMap() {
-
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
+        assert mapFragment != null;
         mapFragment.getMapAsync(MapsActivity.this);
     }
 

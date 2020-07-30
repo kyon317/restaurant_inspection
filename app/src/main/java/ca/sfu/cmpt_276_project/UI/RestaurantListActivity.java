@@ -73,13 +73,15 @@ public class RestaurantListActivity extends AppCompatActivity {
 
 
         restaurantManager = RestaurantManager.getInstance();
-        initializeRestaurantList();//method necessary to initialize instance
+//        initializeRestaurantList();//method necessary to initialize instance
 
         populateRestaurantIcons();
         populateListView();
         registerClickCallback();
 
         init();
+
+
     }
 
     public void initializeRestaurantList() {
