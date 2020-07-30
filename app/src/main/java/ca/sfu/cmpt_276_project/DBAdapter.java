@@ -145,14 +145,19 @@ public class DBAdapter {
     }
 
     public void deleteAll() {
-        Cursor c = getAllRows();
-        long rowId = c.getColumnIndexOrThrow(KEY_ROWID);
-        if (c.moveToFirst()) {
-            do {
-                deleteRow(c.getLong((int) rowId));
-            } while (c.moveToNext());
-        }
-        c.close();
+//        Cursor c = getAllRows();
+//        long rowId = c.getColumnIndexOrThrow(KEY_ROWID);
+//        int limit = 0;
+//
+//        while (c.moveToFirst()) {
+//            do {
+//                deleteRow(c.getLong((int) rowId));
+//            } while (c.moveToNext());
+//        }
+//        c.close();
+        myDBHelper = new DBAdapter.DatabaseHelper(context);
+        db = myDBHelper.getWritableDatabase();
+        db.delete(DATABASE_TABLE,null,null);
 
         //Resets ID sequence to 0
         db.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME = '" + DATABASE_TABLE + "'");

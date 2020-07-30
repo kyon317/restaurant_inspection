@@ -117,6 +117,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     /**
      * DATABASE FUNCTIONS
      */
+    //TODO: move the database functions into a separate class
     private void openDB(){
         dbAdapter = new DBAdapter(this);
         dbAdapter.open();
@@ -151,21 +152,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Type type = new TypeToken<ArrayList<InspectionData>>() {}.getType();
             List<InspectionData> tempList = gson.fromJson(cursor.getString(DBAdapter.COL_INSPECTION), type);
 
-            //Printer test to check injection
-            System.out.println("Injected: \n"
-                    + "\tDB-ID#: " + cursor.getInt(DBAdapter.COL_ROWID) + "\n"
-                    + "\tTrack#: " + cursor.getString(DBAdapter.COL_TRACK_NUM) + "\n"
-                    + "\tName: " + cursor.getString(DBAdapter.COL_RES_NAME) + "\n"
-                    + "\tAddr: " + cursor.getString(DBAdapter.COL_ADDRESS) + "\n"
-                    + "\tCity: " + cursor.getString(DBAdapter.COL_CITY) + "\n"
-                    + "\tFacType: " + cursor.getString(DBAdapter.COL_FAC_TYPE) + "\n"
-                    + "\tLatitude: " + cursor.getDouble(DBAdapter.COL_LATITUDE) + "\n"
-                    + "\tLongitude: " + cursor.getDouble(DBAdapter.COL_LONGITUDE) + "\n");
-            if(!tempList.isEmpty()) {
-                System.out.println("\tInspection Details: ");
-                for(InspectionData inspectionData: tempList)
-                    inspectionData.Display();
-            }
+//            //Printer test to check injection
+//            System.out.println("Injected: \n"
+//                    + "\tDB-ID#: " + cursor.getInt(DBAdapter.COL_ROWID) + "\n"
+//                    + "\tTrack#: " + cursor.getString(DBAdapter.COL_TRACK_NUM) + "\n"
+//                    + "\tName: " + cursor.getString(DBAdapter.COL_RES_NAME) + "\n"
+//                    + "\tAddr: " + cursor.getString(DBAdapter.COL_ADDRESS) + "\n"
+//                    + "\tCity: " + cursor.getString(DBAdapter.COL_CITY) + "\n"
+//                    + "\tFacType: " + cursor.getString(DBAdapter.COL_FAC_TYPE) + "\n"
+//                    + "\tLatitude: " + cursor.getDouble(DBAdapter.COL_LATITUDE) + "\n"
+//                    + "\tLongitude: " + cursor.getDouble(DBAdapter.COL_LONGITUDE) + "\n");
+//            if(!tempList.isEmpty()) {
+//                System.out.println("\tInspection Details: ");
+//                for(InspectionData inspectionData: tempList)
+//                    inspectionData.Display();
+//            }
 
             //CLOSE CURSOR TO AVOID RESOURCE LEAKS
             cursor.close();
@@ -238,7 +239,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //opening database
         openDB();
         addRestaurantsToDB();//Instatiating DB data
-//        clearDB();//Clearing data instantly, cause I have no use for it
+        clearDB();//Clearing data instantly, cause I have no use for it
 
     }
 

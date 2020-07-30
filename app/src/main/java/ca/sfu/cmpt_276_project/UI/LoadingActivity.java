@@ -273,8 +273,8 @@ public class LoadingActivity extends AppCompatActivity {
                         } catch (ExecutionException | InterruptedException e) {
                             e.printStackTrace();
                         }
-//                        res_downloader.execute(res_csv[0]);
-//                        ins_downloader.execute(ins_csv[0]);
+                        res_downloader.execute(res_csv[0]);
+                        ins_downloader.execute(ins_csv[0]);
                         Date currentTimeStamp = new Date();
                         currentTimeStamp.getTime();
                         try {
