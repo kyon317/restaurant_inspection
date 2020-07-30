@@ -76,7 +76,7 @@ public class DBAdapter {
                     + KEY_FAC_TYPE + " text not null, "
                     + KEY_LATITUDE + " real not null, "
                     + KEY_LONGITUDE + " real not null, "
-                    + KEY_ICON + " integer not null,"
+//                    + KEY_ICON + " integer not null,"
                     + KEY_INSPECTION + " text not null"
 
                     // Rest  of creation:
@@ -131,7 +131,7 @@ public class DBAdapter {
         initialValues.put(KEY_FAC_TYPE, facType);
         initialValues.put(KEY_LATITUDE, latitude);
         initialValues.put(KEY_LONGITUDE, longitude);
-        initialValues.put(KEY_ICON, icon);
+//        initialValues.put(KEY_ICON, icon);
         initialValues.put(KEY_INSPECTION, inspectionJSON);
 
         // Insert it into the database.
@@ -211,7 +211,7 @@ public class DBAdapter {
         newValues.put(KEY_FAC_TYPE, facType);
         newValues.put(KEY_LATITUDE, latitude);
         newValues.put(KEY_LONGITUDE, longitude);
-        newValues.put(KEY_ICON, icon);
+//        newValues.put(KEY_ICON, icon);
         newValues.put(KEY_INSPECTION, inspectionJSON);
 
         // Insert it into the database.
