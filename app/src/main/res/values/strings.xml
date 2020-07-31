@@ -44,4 +44,11 @@
     <string name="title_activity_maps">Map</string>
     <string name="more_info">More Info</string>
     <string name="launches_search_criterea">launches search criterea</string>
+    <string name="searchHint">eg) Pizza or 7-11</string>
+    <string name="hazard_level_options_text">Hazard Level:</string>
+    <string name="low_button_text">LOW</string>
+    <string name="medium_btn_text">MEDIUM</string>
+    <string name="high_btn_text">HIGH</string>
+    <string name="minimum_critical_inspections">Minimum Critical Inspections :</string>
+    <string name="numInspectionsHint">eg) 5</string>
 </resources>
