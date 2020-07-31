@@ -129,9 +129,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
     private void addRestaurantsToDB(){
         //TODO: Look over the methods outlined, understand what they do
-
+        int i = 0;
         for(Restaurant restaurant: restaurantManager.getRestaurants()){
-
+            if(i >= 5){
+                break;
+            }
             String inspectionJSON = gson.toJson(restaurant.getInspectionDataList());
 
             //THIS PROCESS ADDS ITEM TO THE DM
@@ -140,6 +142,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     restaurant.getPhysicalCity(), restaurant.getFacType(),
                     restaurant.getLatitude(), restaurant.getLongitude(), restaurant.getIcon(),
                     inspectionJSON);
+            i++;
 
         }
     }
@@ -162,12 +165,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         + "\tCity: " + cursor.getString(DBAdapter.COL_CITY) + "\n"
                         + "\tFacType: " + cursor.getString(DBAdapter.COL_FAC_TYPE) + "\n"
                         + "\tLatitude: " + cursor.getDouble(DBAdapter.COL_LATITUDE) + "\n"
-                        + "\tLongitude: " + cursor.getDouble(DBAdapter.COL_LONGITUDE) + "\n");
-                if(!tempList.isEmpty()) {
+                        + "\tLongitude: " + cursor.getDouble(DBAdapter.COL_LONGITUDE) + "\n"
+                        + "---------------------------------------------------------------------\n");
+               /* if(!tempList.isEmpty()) {
                     System.out.println("\tInspection Details: ");
                     for(InspectionData inspectionData: tempList)
                         inspectionData.Display();
-                }
+                }uncomment if you want to see inspections */
             }while (cursor.moveToNext());
         }
         cursor.close();

@@ -91,7 +91,6 @@ public class RestaurantListActivity extends AppCompatActivity {
         registerClickCallback();
 
         init();
-        printDB();
 
     }
 
@@ -103,7 +102,7 @@ public class RestaurantListActivity extends AppCompatActivity {
         dbAdapter.open();
     }
 
-    private void addRestaurantsToDB(){
+ /*   private void addRestaurantsToDB(){
         //TODO: Look over the methods outlined, understand what they do
 
         for(Restaurant restaurant: restaurantManager.getRestaurants()){
@@ -118,7 +117,7 @@ public class RestaurantListActivity extends AppCompatActivity {
                     inspectionJSON);
 
         }
-    }
+    }*/
 
     private void printDB(){
         Cursor cursor = dbAdapter.getAllRows();
@@ -138,12 +137,13 @@ public class RestaurantListActivity extends AppCompatActivity {
                         + "\tCity: " + cursor.getString(DBAdapter.COL_CITY) + "\n"
                         + "\tFacType: " + cursor.getString(DBAdapter.COL_FAC_TYPE) + "\n"
                         + "\tLatitude: " + cursor.getDouble(DBAdapter.COL_LATITUDE) + "\n"
-                        + "\tLongitude: " + cursor.getDouble(DBAdapter.COL_LONGITUDE) + "\n");
-                if(!tempList.isEmpty()) {
+                        + "\tLongitude: " + cursor.getDouble(DBAdapter.COL_LONGITUDE) + "\n"
+                        + "---------------------------------------------------------------------\n");
+                /*if(!tempList.isEmpty()) {
                     System.out.println("\tInspection Details: ");
                     for(InspectionData inspectionData: tempList)
                         inspectionData.Display();
-                }
+                }uncomment to see inspections(takes a long time to list)*/
             }while (cursor.moveToNext());
         }
         cursor.close();
@@ -197,7 +197,7 @@ public class RestaurantListActivity extends AppCompatActivity {
 
         //Updating DB list as well
         clearDB();
-        addRestaurantsToDB();
+        //addRestaurantsToDB();
 
     }
 
@@ -214,6 +214,11 @@ public class RestaurantListActivity extends AppCompatActivity {
     public void onDestroy() {
         android.os.Process.killProcess(android.os.Process.myPid());
         super.onDestroy();
+        closeDB();
+    }
+
+    private void closeDB(){
+        dbAdapter.close();
     }
 
     private void populateRestaurantIcons() {
