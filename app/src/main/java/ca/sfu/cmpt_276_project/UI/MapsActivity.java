@@ -27,13 +27,16 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -105,7 +108,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ClusterManager<PegItem> mClusterManager;
     private DBAdapter dbAdapter;
     private Gson gson = new Gson();//necessary to convert Array list
-    private ConstraintLayout searchLayout;
+    private LinearLayout searchLayout;
 
     public static Intent makeIntent(Context context, String name,
                                     Double latitude, double longitude,
@@ -210,14 +213,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
         ImageButton srchBtn = (ImageButton) findViewById(R.id.searchBtn);
-        searchLayout = (ConstraintLayout) findViewById(R.layout.search_window);
+        searchLayout = (LinearLayout) findViewById(R.id.searchLayout);
+        if(searchLayout.getVisibility() == View.INVISIBLE) {
+            srchBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
 
-        srchBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //show search layout
-                /*AlertDialog.Builder mBuilder = new AlertDialog.Builder(MapsActivity.this);
-                View mView = getLayoutInflater().inflate(R.layout.search_window, null);
+                    EditText searchInput = (EditText) findViewById(R.id.searchInput);
+                    EditText minCritIssues = (EditText) findViewById(R.id.minCritInput);
+                    EditText maxCritIssues = (EditText) findViewById(R.id.maxCritInput);
+                    //Todo set on
+                    RadioGroup hazardLevelGroup = (RadioGroup) findViewById(
+                            R.id.search_hazard_group);
+                    RadioButton lowRadioButton = (RadioButton) findViewById(R.id.radioButtonLow);
+                    RadioButton mediumRadioButton = (RadioButton) findViewById(R.id.radioButtonMedium);
+                    RadioButton highRadioButton = (RadioButton) findViewById(R.id.radioButtonHigh);
+                    hazardLevelGroup.addView(lowRadioButton);
+                    hazardLevelGroup.addView(mediumRadioButton);
+                    hazardLevelGroup.addView(highRadioButton);
+                    Switch favouritesSwitch = (Switch) findViewById(R.id.favouritesSwitch);
+                    searchLayout.setVisibility(View.VISIBLE);
+                    //show search layout
+                    // AlertDialog.Builder mBuilder = new AlertDialog.Builder(MapsActivity.this);
+               /* //View mView = getLayoutInflater().inflate(R.layout.search_window, null);
                 EditText searchInput = (EditText) mView.findViewById(R.id.searchInput);
                 EditText minCritIssues = (EditText) mView.findViewById(R.id.minCritInput);
                 EditText maxCritIssues = (EditText) mView.findViewById(R.id.maxCritInput);
@@ -233,8 +251,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 mBuilder.setView(mView);
                 AlertDialog dialog = mBuilder.create();
                 dialog.show();*/
-            }
-        });
+                }
+            });
+        }
+        else{
+            searchLayout.setVisibility(View.INVISIBLE);
+        }
 
     }
 

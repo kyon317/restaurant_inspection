@@ -53,4 +53,6 @@
     <string name="numInspectionsHint">eg) 5</string>
     <string name="maximum_critical_issues">Maximum Critical Issues</string>
     <string name="favourites_switch_text">Favourites</string>
+    <string name="min_crit_issues_hint">Enter Minimum Critical Issues</string>
+    <string name="max_crit_issues_hint">Enter Maximum Critical Issues</string>
 </resources>

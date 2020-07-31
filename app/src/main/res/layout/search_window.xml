@@ -13,7 +13,6 @@
         android:layout_marginTop="8dp"
         android:autofillHints=""
         android:hint="@string/searchHint"
-        android:inputType="textFilter"
         android:textSize="12sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
