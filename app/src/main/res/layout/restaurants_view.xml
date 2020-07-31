@@ -6,8 +6,8 @@
 
     <ImageView
         android:id="@+id/restaurant_icon"
-        android:layout_width="77dp"
-        android:layout_height="95dp"
+        android:layout_width="79dp"
+        android:layout_height="107dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_marginTop="0dp"
@@ -18,7 +18,7 @@
     <TextView
         android:id="@+id/restaurant_txtName"
         android:layout_width="wrap_content"
-        android:layout_height="45dp"
+        android:layout_height="61dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
@@ -36,12 +36,12 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="59dp"
-        android:layout_marginEnd="167dp"
-        android:layout_marginBottom="5dp"
+        android:layout_marginTop="73dp"
+        android:layout_marginEnd="170dp"
+        android:layout_marginBottom="-9dp"
         android:text="@string/issues"
         android:textAlignment="center"
-        android:textSize="16sp" />
+        android:textSize="20sp" />
 
     <TextView
         android:id="@+id/restaurant_txtDate"
@@ -49,19 +49,19 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="56dp"
-        android:layout_marginEnd="1dp"
+        android:layout_marginTop="71dp"
+        android:layout_marginEnd="7dp"
         android:text="@string/inspect_date"
         android:textSize="22sp" />
 
     <ImageView
         android:id="@+id/restaurant_hazardicon"
-        android:layout_width="35dp"
-        android:layout_height="29dp"
+        android:layout_width="38dp"
+        android:layout_height="36dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="58dp"
-        android:layout_marginEnd="285dp"
+        android:layout_marginTop="69dp"
+        android:layout_marginEnd="287dp"
         android:maxWidth="40dp"
         android:maxHeight="30dp"
         app:srcCompat="@drawable/hazardlow" />
@@ -73,8 +73,8 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginStart="132dp"
-        android:layout_marginTop="59dp"
+        android:layout_marginStart="130dp"
+        android:layout_marginTop="74dp"
         android:text="@string/h_level"
-        android:textSize="16dp" />
+        android:textSize="20sp" />
 </RelativeLayout>
