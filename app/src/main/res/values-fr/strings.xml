@@ -44,6 +44,7 @@
     <string name="more_info">Plus d\'informations</string>
 
     <string name = "Hold_on">Attends, on charge les données</string>
+    <string name="Yes">Oui</string>
     <string name="Cancel">Annuler</string>
     <string name="Done">Terminé</string>
     <string name="done_download">Téléchargement terminé</string>

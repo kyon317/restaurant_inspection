@@ -145,6 +145,7 @@ public class Inspection_Details_Activity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View viewClicked, int position, long id) {
                 Violation clickedViolation = violations.get(position);
 
+
                 // Toast full detail of the clicked violation
                 Toast.makeText(Inspection_Details_Activity.this, clickedViolation.getDescription(),
                         Toast.LENGTH_SHORT).show();

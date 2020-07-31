@@ -249,7 +249,7 @@ public class LoadingActivity extends AppCompatActivity {
                 .setTitle(R.string.newUpdate)
                 .setCancelable(false)
                 .setMessage(R.string.downloadUpdate)
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.Yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         CSVDownloader res_downloader = new CSVDownloader(dataManager.getRestaurant_filename(),LoadingActivity.this);

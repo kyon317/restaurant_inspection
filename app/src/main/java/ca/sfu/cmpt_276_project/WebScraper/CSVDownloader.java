@@ -25,7 +25,7 @@ import ca.sfu.cmpt_276_project.R;
 public class CSVDownloader extends AsyncTask<String, String, String> {
     private ProgressDialog progreassDiag;
     private String filename = "";
-
+    private Context context;
     public CSVDownloader(String filename, Context context) {
         this.filename = filename;
         setPdialog(context);
@@ -37,7 +37,7 @@ public class CSVDownloader extends AsyncTask<String, String, String> {
 
     public void setPdialog(Context context) {
         progreassDiag = new ProgressDialog(context);
-
+        this.context = context;
     }
     public boolean checkFileExistence(String filename){
         File dummyFile = new File(Environment.getExternalStorageDirectory().getPath() + "/Download/"+filename);
@@ -77,7 +77,8 @@ public class CSVDownloader extends AsyncTask<String, String, String> {
         progreassDiag.setProgress(0);
         progreassDiag.setCancelable(false);
         progreassDiag.setMax(100);
-        progreassDiag.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
+
+        progreassDiag.setButton(DialogInterface.BUTTON_NEGATIVE, context.getResources().getString(R.string.Cancel), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         CSVDownloader.this.cancel(true);
@@ -88,7 +89,7 @@ public class CSVDownloader extends AsyncTask<String, String, String> {
                     }
                 });
         progreassDiag.setCanceledOnTouchOutside(false);
-        progreassDiag.setButton(DialogInterface.BUTTON_POSITIVE, "Done", new DialogInterface.OnClickListener() {
+        progreassDiag.setButton(DialogInterface.BUTTON_POSITIVE, context.getResources().getString(R.string.Done), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 progreassDiag.dismiss();

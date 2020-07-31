@@ -25,6 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import ca.sfu.cmpt_276_project.Model.Hazard;
@@ -105,8 +106,12 @@ public class InspectionDataCSVIngester {
             //conditions for Inspection Type ENUM
             if (fields.get(2).equals("Routine"))
                 temp.setInspectionType(Type.ROUTINE);
-            else
+            else{
                 temp.setInspectionType(Type.FOLLOW_UP);
+                if (Locale.getDefault().getLanguage().equals("fr"))
+                    temp.setInspectionType(Type.SUIVRE);
+            }
+
 
             temp.setCriticalViolations(Integer.parseInt(fields.get(3)));
             temp.setNonCriticalViolations(Integer.parseInt(fields.get(4)));

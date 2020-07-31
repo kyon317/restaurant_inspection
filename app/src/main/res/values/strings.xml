@@ -44,6 +44,7 @@
     <string name="more_info">More Info</string>
 
     <string name = "Hold_on">Hold on, we are loading the data</string>
+    <string name="Yes">OK</string>
     <string name="Cancel">Cancel</string>
     <string name="Done">Done</string>
     <string name="done_download">DONE Downloading</string>
