@@ -20,6 +20,8 @@ import java.net.URLConnection;
 import java.util.Arrays;
 import java.util.Objects;
 
+import ca.sfu.cmpt_276_project.R;
+
 public class CSVDownloader extends AsyncTask<String, String, String> {
     private ProgressDialog progreassDiag;
     private String filename = "";
@@ -70,7 +72,7 @@ public class CSVDownloader extends AsyncTask<String, String, String> {
             backupFile(filename);
         }
 
-        progreassDiag.setTitle("Hold on, we are loading the data");
+        progreassDiag.setTitle(R.string.Hold_on);
         progreassDiag.setIndeterminate(false);
         progreassDiag.setProgress(0);
         progreassDiag.setCancelable(false);
@@ -79,7 +81,7 @@ public class CSVDownloader extends AsyncTask<String, String, String> {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         CSVDownloader.this.cancel(true);
-                        deleteFile(filename);
+                        deleteFile(filename);//TODO: correctly delete file
                         restoreFile(filename+"(1)");
                         progreassDiag.cancel();
                         progreassDiag.dismiss();

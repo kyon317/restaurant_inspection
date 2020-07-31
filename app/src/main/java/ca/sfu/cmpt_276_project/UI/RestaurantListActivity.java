@@ -60,7 +60,7 @@ public class RestaurantListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_restaurant_list);
-        getSupportActionBar().setTitle("Surrey Restaurant Inspections");
+        getSupportActionBar().setTitle(R.string.surreyTitle);
 
         // Define ColorDrawable object and parse color
         // using parseColor method
@@ -254,21 +254,21 @@ public class RestaurantListActivity extends AppCompatActivity {
             //Fill hazard level with color
             TextView hazardLevelView = (TextView) restaurantView.findViewById(R.id.hazard_level);
             if (currentRestaurant.getInspectionDataList().isEmpty()) {
-                hazardLevelView.setText("None");
+                hazardLevelView.setText(R.string.none);
             } else {
                 Hazard hazard = currentRestaurant.getInspectionDataList().get(0).getHazard();
                 if (hazard == Hazard.LOW) {
                     hazardLevelView.setTextColor(Color.rgb(37, 148, 55));
                     hazardIconView.setImageResource(R.drawable.hazardlow);
-                    hazardLevelView.setText("LOW");
+                    hazardLevelView.setText(R.string.low);
                 } else if (hazard == Hazard.MEDIUM) {
                     hazardLevelView.setTextColor(Color.MAGENTA);
                     hazardIconView.setImageResource(R.drawable.hazardyellow);
-                    hazardLevelView.setText("MEDIUM");
+                    hazardLevelView.setText(R.string.medium);
                 } else {
                     hazardLevelView.setTextColor((Color.RED));
                     hazardIconView.setImageResource(R.drawable.hazardhigh);
-                    hazardLevelView.setText("HIGH");
+                    hazardLevelView.setText(R.string.high);
                 }
 
 

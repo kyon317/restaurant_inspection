@@ -58,7 +58,7 @@ public class Inspection_Details_Activity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inspection__details);
-        getSupportActionBar().setTitle("Inspection Details");
+        getSupportActionBar().setTitle(R.string.Inspection_Details);
 
         // Define ColorDrawable object and parse color
         // using parseColor method
@@ -104,15 +104,15 @@ public class Inspection_Details_Activity extends AppCompatActivity {
         Hazard hazardLevel = inspection.getHazard();
         if (hazardLevel == Hazard.LOW) {
             hazard.setTextColor(Color.rgb(37, 148, 55));
-            hazard.setText("Low");
+            hazard.setText(R.string.low);
             hazardIcon.setImageResource(R.drawable.hazardlow);
         } else if (hazardLevel == Hazard.MEDIUM) {
             hazard.setTextColor(Color.MAGENTA);
-            hazard.setText("Moderate");
+            hazard.setText(R.string.medium);
             hazardIcon.setImageResource(R.drawable.hazardyellow);
         } else {
             hazard.setTextColor((Color.RED));
-            hazard.setText("High");
+            hazard.setText(R.string.high);
             hazardIcon.setImageResource(R.drawable.hazardhigh);
         }
 
@@ -192,16 +192,16 @@ public class Inspection_Details_Activity extends AppCompatActivity {
             int violationNum = Integer.valueOf(currentViolation.getViolationNumber());
             switch (violationNum) {
                 case 101:
-                    violationTxt.setText("Plans not in regulation.");
+                    violationTxt.setText(R.string.Plans);
                     violationLevelImage.setImageResource(R.drawable.icon_plans);
                     break;
                 case 102:
-                    violationTxt.setText("Unapproved food premises.");
+                    violationTxt.setText(R.string.Unapproved);
                     violationLevelImage.setImageResource(R.drawable.icon_premises);
                     break;
                 case 103:
                 case 104:
-                    violationTxt.setText("Invalid permits.");
+                    violationTxt.setText(R.string.Invalid_permit);
                     violationLevelImage.setImageResource(R.drawable.icon_plans);
                     break;
                 case 201:
@@ -217,13 +217,13 @@ public class Inspection_Details_Activity extends AppCompatActivity {
                 case 211:
                 case 212:
                 case 306:
-                    violationTxt.setText("Unsafe foods.");
+                    violationTxt.setText(R.string.Unsafe_foods);
                     violationLevelImage.setImageResource(R.drawable.foods);
                     break;
                 case 301:
                 case 302:
                 case 303:
-                    violationTxt.setText("Equipment is not clean.");
+                    violationTxt.setText(R.string.Equipment_not_clean);
                     violationLevelImage.setImageResource(R.drawable.equipments);
                     break;
                 case 307:
@@ -231,19 +231,19 @@ public class Inspection_Details_Activity extends AppCompatActivity {
                 case 309:
                 case 310:
                 case 315:
-                    violationTxt.setText("Unsafe equipment");
+                    violationTxt.setText(R.string.Unsafe_equipment);
                     violationLevelImage.setImageResource(R.drawable.equipments);
                     break;
                 case 311:
                 case 312:
                 case 313:
                 case 314:
-                    violationTxt.setText("Premises not maintain well.");
+                    violationTxt.setText(R.string.Premises);
                     violationLevelImage.setImageResource(R.drawable.icon_premises);
                     break;
                 case 304:
                 case 305:
-                    violationTxt.setText("Pests control failed.");
+                    violationTxt.setText(R.string.Pets);
                     violationLevelImage.setImageResource(R.drawable.pest);
                     break;
                 case 401:
@@ -252,7 +252,7 @@ public class Inspection_Details_Activity extends AppCompatActivity {
                 case 404:
                 case 501:
                 case 502:
-                    violationTxt.setText("Employee safety failed.");
+                    violationTxt.setText(R.string.Employee_safety);
                     violationLevelImage.setImageResource(R.drawable.icon_employee);
                     break;
                 default:

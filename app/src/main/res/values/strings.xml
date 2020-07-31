@@ -4,7 +4,6 @@
         Display Format:\n
         Restaurant Name\n
         Hazard Level, # issues, most recent inspection date
-
     </string>
     <string name="restaurant_menu">Select to see restaurant details</string>
     <string name="inspection_type">Inspection Type:</string>
@@ -43,4 +42,38 @@
     <string name="maps">Maps</string>
     <string name="title_activity_maps">Map</string>
     <string name="more_info">More Info</string>
+
+    <string name = "Hold_on">Hold on, we are loading the data</string>
+    <string name="Cancel">Cancel</string>
+    <string name="Done">Done</string>
+    <string name="done_download">DONE Downloading</string>
+    <string name="progress">Progress: </string>
+
+    <string name="none">None</string>
+    <string name="low">Low</string>
+    <string name="medium">Medium</string>
+    <string name="high">High</string>
+    <string name="loading">LoadingActivity</string>
+    <string name="surreyTitle">Surrey Restaurant Inspections</string>
+    <string name="noNetwork">No Network Connection, loading from local directory</string>
+    <string name="newUpdate">A NEW UPDATE FOUND</string>
+    <string name="downloadUpdate">Download Update?</string>
+    <string name="load">Load</string>
+    <string name="startMapActivity">startMapActivity</string>
+    <string name="Inspection_Details">Inspection Details</string>
+
+<string name="Plans">Plans not in regulation.</string>
+    <string name="Unapproved">Unapproved food premises.</string>
+    <string name="Invalid_permit">Invalid permits.</string>
+    <string name="Unsafe_foods">Unsafe foods.</string>
+    <string name="Equipment_not_clean">Equipment is not clean.</string>
+    <string name="Unsafe_equipment">Unsafe equipment.</string>
+    <string name="Premises">Premises not maintain well.</string>
+    <string name="Pets">Pests control failed.</string>
+    <string name="Employee_safety">Employee safety failed.</string>
+    <string name="type">type</string>
+    <string name="address">Address:</string>
+    <string name="most_recent_inspection_level">Most Recent Inspection Level:</string>
+    <string name="Unable_location">Unable to get current location</string>
+
 </resources>

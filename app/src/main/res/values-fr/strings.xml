@@ -1,0 +1,79 @@
+<resources>
+    <string name="app_name">projet cmpt-276</string>
+    <string name="textview">
+        Format d\'affichage:\n
+        Nom du restaurant\n
+        Niveau de danger, nombre de problèmes, date d\'inspection la plus récente
+    </string>
+    <string name="restaurant_menu">Sélectionnez pour voir les détails du restaurant</string>
+    <string name="inspection_type">Type d\'inspection:</string>
+    <string name="critical_issues"># Des problèmes critiques:</string>
+    <string name="hazard_rating">Cote de danger</string>
+    <string name="non_critical_issues"># Problèmes non critiques:</string>
+    <string name="inspection_date">Date d\'inspection:</string>
+    <string name="title_activity_single_restaurant">Activité de restaurant unique</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">Premier fragment</string>
+    <string name="second_fragment_label">Deuxième fragment</string>
+    <string name="next">Prochain</string>
+    <string name="previous">Précédente</string>
+    <string name="run_mode">Mode course</string>
+    <string name="hello_first_fragment">Bonjour premier fragment</string>
+    <string name="hello_second_fragment">Hbonjour deuxième fragment. Arg:% 1 $ s</string>
+    <string name="restaurant_name">Restaurant</string>
+    <string name="restaurant_address">Adresse</string>
+    <string name="restaurant_coordinates">Coordonnées</string>
+    <string name="restaurant">Restaurant</string>
+    <string name="hazard_icon">icône de danger</string>
+    <string name="hazardicon">icône de danger</string>
+    <string name="numCritIssuesText">Nombre de problèmes critiques:</string>
+    <string name="numCritIssueVal">0</string>
+    <string name="numNonCritText"># de problèmes non critiques:</string>
+    <string name="numNonCritVal">0</string>
+    <string name="time_since_last_visit">Temps depuis l\'inspection:</string>
+    <string name="inspectionDateVal">30 journées</string>
+    <string name="title_activity_single_inspection">Activité d\'inspection unique</string>
+    <string name="no_violation">Aucune violation</string>
+    <string name="inspections">Inspections:</string>
+    <string name="inspect_date">inspect date</string>
+    <string name="issues"># problèmes</string>
+    <string name="txtname">txtName</string>
+    <string name="h_level">h_level</string>
+    <string name="maps">Plans</string>
+    <string name="title_activity_maps">Carte</string>
+    <string name="more_info">Plus d\'informations</string>
+
+    <string name = "Hold_on">Attends, on charge les données</string>
+    <string name="Cancel">Annuler</string>
+    <string name="Done">Terminé</string>
+    <string name="done_download">Téléchargement terminé</string>
+    <string name="progress">Le progrès: </string>
+
+    <string name="none">Aucune</string>
+    <string name="low">Faible</string>
+    <string name="medium">Moyen</string>
+    <string name="high">Haute</string>
+    <string name="loading">Activité de chargement</string>
+    <string name="surreyTitle">Inspections des restaurants de Surrey</string>
+    <string name="noNetwork">Pas de connexion réseau, chargement à partir du répertoire local</string>
+    <string name="newUpdate">UNE NOUVELLE MISE À JOUR TROUVÉE</string>
+    <string name="downloadUpdate">Télécharger la mise à jour?</string>
+    <string name="load">Charge</string>
+    <string name="startMapActivity">démarrer l\'activité de la carte</string>
+    <string name="Inspection_Details">Détails d\'inspection</string>
+
+<string name="Plans">Les plans ne sont pas réglementés.</string>
+    <string name="Unapproved">Locaux alimentaires non approuvés.</string>
+    <string name="Invalid_permit">Permis invalides.</string>
+    <string name="Unsafe_foods">Aliments dangereux.</string>
+    <string name="Equipment_not_clean">L\'équipement n\'est pas propre.</string>
+    <string name="Unsafe_equipment">Équipement dangereux.</string>
+    <string name="Premises">Les locaux ne sont pas bien entretenus.</string>
+    <string name="Pets">La lutte antiparasitaire a échoué.</string>
+    <string name="Employee_safety">La sécurité des employés a échoué.</string>
+    <string name="type">type</string>
+    <string name="address">Adresse:</string>
+    <string name="most_recent_inspection_level">Niveau d\'inspection le plus récent:</string>
+    <string name="Unable_location">Impossible d\'obtenir la position actuelle</string>
+
+</resources>

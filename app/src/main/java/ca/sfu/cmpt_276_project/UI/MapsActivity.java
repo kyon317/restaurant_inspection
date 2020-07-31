@@ -244,7 +244,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             }
                         } else {
                             Toast.makeText(MapsActivity.this,
-                                    "Unable to get current location", Toast.LENGTH_SHORT).show();
+                                    R.string.Unable_location, Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -498,18 +498,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             TextView restaurantLevel = itemView.findViewById(R.id.info_restaurant_level);
             if (restaurant.getInspectionDataList().isEmpty()) {
-                restaurantLevel.setText("None");
+                restaurantLevel.setText(R.string.none);
             } else {
                 Hazard hazard = restaurant.getInspectionDataList().get(0).getHazard();
                 if (hazard == Hazard.LOW) {
                     restaurantLevel.setTextColor(Color.rgb(37, 148, 55));
-                    restaurantLevel.setText("LOW");
+                    restaurantLevel.setText(R.string.low);
                 } else if (hazard == Hazard.MEDIUM) {
                     restaurantLevel.setTextColor(Color.MAGENTA);
-                    restaurantLevel.setText("MEDIUM");
+                    restaurantLevel.setText(R.string.medium);
                 } else {
                     restaurantLevel.setTextColor((Color.RED));
-                    restaurantLevel.setText("HIGH");
+                    restaurantLevel.setText(R.string.high);
                 }
             }
 
