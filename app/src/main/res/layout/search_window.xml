@@ -19,16 +19,30 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
+        android:id="@+id/maxCritInput"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="2dp"
+        android:autofillHints=""
+        android:hint="@string/numInspectionsHint"
+        android:inputType="number"
+        android:textSize="12sp"
+        app:layout_constraintStart_toEndOf="@+id/maxCritIssues"
+        app:layout_constraintTop_toBottomOf="@id/minCritInput" />
+
+    <EditText
+        android:id="@+id/minCritInput"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
         android:layout_marginTop="42dp"
+        android:autofillHints=""
         android:hint="@string/numInspectionsHint"
         android:inputType="number"
         android:textSize="12sp"
         app:layout_constraintStart_toEndOf="@+id/MinNumInspections"
-        app:layout_constraintTop_toTopOf="parent"
-        android:autofillHints="" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/textView"
@@ -79,5 +93,26 @@
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@+id/textView"
         app:layout_constraintTop_toBottomOf="@+id/searchInput" />
+
+    <TextView
+        android:id="@+id/maxCritIssues"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="20dp"
+        android:text="@string/maximum_critical_issues"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="@+id/MinNumInspections"
+        app:layout_constraintTop_toBottomOf="@+id/MinNumInspections" />
+
+    <Switch
+        android:id="@+id/switch1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="100dp"
+        android:layout_marginTop="23dp"
+        android:text="@string/favourites_switch_text"
+        app:layout_constraintStart_toEndOf="@+id/search_hazard_group"
+        app:layout_constraintTop_toBottomOf="@+id/maxCritIssues" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

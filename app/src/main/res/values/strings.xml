@@ -51,4 +51,6 @@
     <string name="high_btn_text">HIGH</string>
     <string name="minimum_critical_inspections">Minimum Critical Inspections :</string>
     <string name="numInspectionsHint">eg) 5</string>
+    <string name="maximum_critical_issues">Maximum Critical Issues</string>
+    <string name="favourites_switch_text">Favourites</string>
 </resources>
