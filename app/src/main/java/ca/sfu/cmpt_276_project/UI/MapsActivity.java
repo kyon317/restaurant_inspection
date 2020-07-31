@@ -28,10 +28,12 @@ import android.location.Location;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -103,6 +105,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ClusterManager<PegItem> mClusterManager;
     private DBAdapter dbAdapter;
     private Gson gson = new Gson();//necessary to convert Array list
+    private ConstraintLayout searchLayout;
 
     public static Intent makeIntent(Context context, String name,
                                     Double latitude, double longitude,
@@ -206,6 +209,33 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
+        ImageButton srchBtn = (ImageButton) findViewById(R.id.searchBtn);
+        searchLayout = (ConstraintLayout) findViewById(R.layout.search_window);
+
+        srchBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //show search layout
+                /*AlertDialog.Builder mBuilder = new AlertDialog.Builder(MapsActivity.this);
+                View mView = getLayoutInflater().inflate(R.layout.search_window, null);
+                EditText searchInput = (EditText) mView.findViewById(R.id.searchInput);
+                EditText minCritIssues = (EditText) mView.findViewById(R.id.minCritInput);
+                EditText maxCritIssues = (EditText) mView.findViewById(R.id.maxCritInput);
+                RadioGroup hazardLevelGroup = (RadioGroup) mView.findViewById(
+                        R.id.search_hazard_group);
+                RadioButton lowRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonLow);
+                RadioButton mediumRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonMedium);
+                RadioButton highRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonHigh);
+                hazardLevelGroup.addView(lowRadioButton);
+                hazardLevelGroup.addView(mediumRadioButton);
+                hazardLevelGroup.addView(highRadioButton);
+                Switch favouritesSwitch = (Switch) mView.findViewById(R.id.favouritesSwitch);
+                mBuilder.setView(mView);
+                AlertDialog dialog = mBuilder.create();
+                dialog.show();*/
+            }
+        });
+
     }
 
 
@@ -244,6 +274,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         openDB();
         addRestaurantsToDB();
         printDB();
+
+
     }
 
     private void updateLocation() {
