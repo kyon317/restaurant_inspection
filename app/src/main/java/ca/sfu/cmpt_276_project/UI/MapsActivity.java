@@ -102,6 +102,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Location currentLocation;
     private ClusterManager<PegItem> mClusterManager;
     private DBAdapter dbAdapter;
+    private Gson gson = new Gson();//necessary to convert Array list
 
     public static Intent makeIntent(Context context, String name,
                                     Double latitude, double longitude,
@@ -128,15 +129,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
     private void addRestaurantsToDB(){
         //TODO: Look over the methods outlined, understand what they do
-        Gson gson = new Gson();//necessary to convert Array list
 
         for(Restaurant restaurant: restaurantManager.getRestaurants()){
 
             String inspectionJSON = gson.toJson(restaurant.getInspectionDataList());
-            /*PRINTER TO COMPARE INSPECTION ARRAY LIST SIZE
-            System.out.println("\tInitial InspectionJSON: " + inspectionJSON + "\n");
-            if(!restaurant.getInspectionDataList().isEmpty())
-                System.out.println("\tInitial Inspection SIZE: " + restaurant.getInspectionDataList().size() + "\n");*/
 
             //THIS PROCESS ADDS ITEM TO THE DM
             long newID = dbAdapter.insertRow(restaurant.getTrackNumber(),
@@ -145,32 +141,36 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     restaurant.getLatitude(), restaurant.getLongitude(), restaurant.getIcon(),
                     inspectionJSON);
 
-            //THIS CURSOR IS USED TO SCAN THE DB
-            Cursor cursor = dbAdapter.getRow(newID);
-
-            //THIS PAIR OF LINES ARE USED TO DESERIALIZE THE JSON STRING EXTRACTED FROM DB
-            Type type = new TypeToken<ArrayList<InspectionData>>() {}.getType();
-            List<InspectionData> tempList = gson.fromJson(cursor.getString(DBAdapter.COL_INSPECTION), type);
-
-//            //Printer test to check injection
-//            System.out.println("Injected: \n"
-//                    + "\tDB-ID#: " + cursor.getInt(DBAdapter.COL_ROWID) + "\n"
-//                    + "\tTrack#: " + cursor.getString(DBAdapter.COL_TRACK_NUM) + "\n"
-//                    + "\tName: " + cursor.getString(DBAdapter.COL_RES_NAME) + "\n"
-//                    + "\tAddr: " + cursor.getString(DBAdapter.COL_ADDRESS) + "\n"
-//                    + "\tCity: " + cursor.getString(DBAdapter.COL_CITY) + "\n"
-//                    + "\tFacType: " + cursor.getString(DBAdapter.COL_FAC_TYPE) + "\n"
-//                    + "\tLatitude: " + cursor.getDouble(DBAdapter.COL_LATITUDE) + "\n"
-//                    + "\tLongitude: " + cursor.getDouble(DBAdapter.COL_LONGITUDE) + "\n");
-//            if(!tempList.isEmpty()) {
-//                System.out.println("\tInspection Details: ");
-//                for(InspectionData inspectionData: tempList)
-//                    inspectionData.Display();
-//            }
-
-            //CLOSE CURSOR TO AVOID RESOURCE LEAKS
-            cursor.close();
         }
+    }
+
+    private void printDB(){
+        Cursor cursor = dbAdapter.getAllRows();
+
+        if(cursor.moveToFirst()){
+            do{
+                //THIS PAIR OF LINES ARE USED TO DESERIALIZE THE JSON STRING EXTRACTED FROM DB
+                Type type = new TypeToken<ArrayList<InspectionData>>() {}.getType();
+                List<InspectionData> tempList = gson.fromJson(cursor.getString(DBAdapter.COL_INSPECTION), type);
+
+                //Printer test to check injection
+                System.out.println("Injected: \n"
+                        + "\tDB-ID#: " + cursor.getInt(DBAdapter.COL_ROWID) + "\n"
+                        + "\tTrack#: " + cursor.getString(DBAdapter.COL_TRACK_NUM) + "\n"
+                        + "\tName: " + cursor.getString(DBAdapter.COL_RES_NAME) + "\n"
+                        + "\tAddr: " + cursor.getString(DBAdapter.COL_ADDRESS) + "\n"
+                        + "\tCity: " + cursor.getString(DBAdapter.COL_CITY) + "\n"
+                        + "\tFacType: " + cursor.getString(DBAdapter.COL_FAC_TYPE) + "\n"
+                        + "\tLatitude: " + cursor.getDouble(DBAdapter.COL_LATITUDE) + "\n"
+                        + "\tLongitude: " + cursor.getDouble(DBAdapter.COL_LONGITUDE) + "\n");
+                if(!tempList.isEmpty()) {
+                    System.out.println("\tInspection Details: ");
+                    for(InspectionData inspectionData: tempList)
+                        inspectionData.Display();
+                }
+            }while (cursor.moveToNext());
+        }
+        cursor.close();
     }
 
     public void clearDB() {
@@ -238,9 +238,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //opening database
         openDB();
-        addRestaurantsToDB();//Instatiating DB data
-        clearDB();//Clearing data instantly, cause I have no use for it
-
+        addRestaurantsToDB();
+        printDB();
     }
 
     private void updateLocation() {
@@ -306,6 +305,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onDestroy() {
         android.os.Process.killProcess(android.os.Process.myPid());
         super.onDestroy();
+        clearDB();
         closeDB();
     }
 

@@ -85,7 +85,7 @@ public class DBAdapter {
     // Context of application who uses us.
     private final Context context;
 
-    private DatabaseHelper myDBHelper = null;
+    private static DatabaseHelper myDBHelper;
     private SQLiteDatabase db;
 
     /////////////////////////////////////////////////////////////////////
@@ -94,7 +94,7 @@ public class DBAdapter {
 
     public DBAdapter(Context ctx) {
         this.context = ctx;
-        myDBHelper = new DatabaseHelper(context);
+        myDBHelper = DatabaseHelper.getHelper(ctx);
     }
 
     // Open the database connection.
@@ -230,6 +230,18 @@ public class DBAdapter {
      */
     private static class DatabaseHelper extends SQLiteOpenHelper
     {
+        private static DatabaseHelper instance;
+
+        public static synchronized DatabaseHelper getHelper(Context context)
+        {
+            if (instance == null){
+                System.out.println("DB instance was null");
+                instance = new DatabaseHelper(context.getApplicationContext());
+            }
+
+            return instance;
+        }
+
         DatabaseHelper(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
         }
