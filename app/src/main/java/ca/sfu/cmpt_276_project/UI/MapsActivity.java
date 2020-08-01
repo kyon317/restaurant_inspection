@@ -20,6 +20,7 @@ import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -113,6 +114,48 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private DBAdapter dbAdapter;
     private Gson gson = new Gson();//necessary to convert Array list
     private ConstraintLayout searchLayout;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_maps);
+
+        getLocationPermission();
+
+        instance = this;
+
+        restaurantManager = RestaurantManager.getInstance();
+
+        //Toast.makeText(MapsActivity.this,
+        //        getSearchName(this),Toast.LENGTH_SHORT).show(); test to see savedpref works
+
+        init();
+
+        Dexter.withActivity(this).withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+                .withListener(new PermissionListener() {
+                    @Override
+                    public void onPermissionGranted(PermissionGrantedResponse response) {
+                        updateLocation();
+                    }
+
+                    @Override
+                    public void onPermissionDenied(PermissionDeniedResponse response) {
+
+                    }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
+
+                    }
+                }).check();
+
+        //opening database
+        openDB();
+        addRestaurantsToDB();
+        printDB();
+
+
+    }
 
     public static Intent makeIntent(Context context, String name,
                                     Double latitude, double longitude,
@@ -222,9 +265,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         * Saves name, minCritInspections, maxCritInspections, showFavourites, hazardRating
         *
         * */
-        ImageButton srchBtn = (ImageButton) findViewById(R.id.searchBtn);
-        searchLayout = (ConstraintLayout) findViewById(R.layout.search_window);
 
+        searchLayout = (ConstraintLayout) findViewById(R.layout.search_window);
+        SharedPreferences savePreferences = this.getSharedPreferences("SavePrefs",
+                MODE_PRIVATE);
+        SharedPreferences.Editor editor = savePreferences.edit();
+        String savedSearch = getSearchName(this);
+        int savedMinCritIssuesInput = getMinCritIssuesInput(this);
+        int savedMaxCritIssuesInput = getMaxCritIssuesInput(this);
+        String savedHazardChecked = getHazardLevelChecked(this);
+        boolean getFavouritesCheck = getFavouritesChecked(this);
+
+        ImageButton srchBtn = (ImageButton) findViewById(R.id.searchBtn);
         srchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -233,6 +285,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 AlertDialog.Builder mBuilder = new AlertDialog.Builder(MapsActivity.this);
                 View mView = getLayoutInflater().inflate(R.layout.search_window, null);
                 EditText searchInput = (EditText) mView.findViewById(R.id.searchInput);
+                if(savedSearch != ""){
+                    searchInput.setText(savedSearch, TextView.BufferType.EDITABLE);
+                }
                 searchInput.addTextChangedListener(new TextWatcher() {
                     @Override
                     public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -241,7 +296,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     @Override
                     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                        //todo save string to shared prefs and change map display
+                        //todo change map display
+                        editor.putString("Search Name Input", String.valueOf(charSequence));
+                        editor.apply();
                     }
 
                     @Override
@@ -251,6 +308,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 });
 
                 EditText minCritIssues = (EditText) mView.findViewById(R.id.minCritInput);
+                if(savedMinCritIssuesInput != 0){
+                    String intString = Integer.toString(savedMinCritIssuesInput) ;
+                    minCritIssues.setText(intString, TextView.BufferType.EDITABLE);
+                }
                 minCritIssues.addTextChangedListener(new TextWatcher() {
                     @Override
                     public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -259,7 +320,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     @Override
                     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                        //todo change value to int, save it as min in a shared pref update display
+                        //todo update display
+                        String minvalue = String.valueOf(charSequence);
+                        editor.putInt("Minimum Issues Input", Integer.valueOf(minvalue));
+                        editor.apply();
                     }
 
                     @Override
@@ -269,6 +333,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 });
 
                 EditText maxCritIssues = (EditText) mView.findViewById(R.id.maxCritInput);
+                if(savedMaxCritIssuesInput != 50000){
+                    String intString = Integer.toString(savedMaxCritIssuesInput) ;
+                    maxCritIssues.setText(intString, TextView.BufferType.EDITABLE);
+                }
                 maxCritIssues.addTextChangedListener(new TextWatcher() {
                     @Override
                     public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -277,7 +345,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     @Override
                     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                        //todo change value to int, save it as max in a shared pref, update display
+                        //todo update display
+                        String maxValue = String.valueOf(charSequence);
+                        editor.putInt("Maximum Issues Input", Integer.valueOf(maxValue));
+                        editor.apply();
                     }
 
                     @Override
@@ -288,13 +359,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 RadioGroup hazardLevelGroup = (RadioGroup) mView.findViewById(
                         R.id.search_hazard_group);
+                if(savedHazardChecked.contains("NONE")){
+                    RadioButton noneRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonNone);
+                    noneRadioButton.setChecked(true);
+                }
+                else if(savedHazardChecked.contains("LOW")){
+                    RadioButton lowRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonLow);
+                    lowRadioButton.setChecked(true);
+                }
+                else if(savedHazardChecked.contains("MEDIUM")){
+                    RadioButton mediumRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonMedium);
+                    mediumRadioButton.setChecked(true);
+                }
+                else if(savedHazardChecked.contains("HIGH")){
+                    RadioButton highRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonHigh);
+                    highRadioButton.setChecked(true);
+                }
+                else{
+                    System.out.println(savedHazardChecked);
+                }
 
                 hazardLevelGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(RadioGroup radioGroup, int i) {
                         RadioButton checked = (RadioButton) mView.findViewById(i);
-                        Toast.makeText(MapsActivity.this,
-                                checked.getText(),Toast.LENGTH_SHORT).show();
+                        editor.putString("Hazard Check Change", String.valueOf(checked.getText()));
+                        editor.apply();
                     }
                 });
 /*
@@ -311,18 +401,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
 */
                 Switch favouritesSwitch = (Switch) mView.findViewById(R.id.favouritesSwitch);
+                if(getFavouritesCheck){
+                    favouritesSwitch.setChecked(true);
+                }
                 favouritesSwitch.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         if(favouritesSwitch.isChecked()){
                             //favourites has been checked
-                            Toast.makeText(MapsActivity.this,
-                                   "Showing favourites",Toast.LENGTH_SHORT).show();
+                            //Todo: only display favourites
+                            editor.putBoolean("Display Favourites", true);
+                            editor.apply();
                         }
                         else{
                             //favourites not checked
-                            Toast.makeText(MapsActivity.this,
-                                   "Showing all",Toast.LENGTH_SHORT).show();
+                            //todo: display all
+                            editor.putBoolean("Display Favourites", false);
+                            editor.apply();
                         }
                     }
                 });
@@ -336,45 +431,37 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
+    public static String getSearchName(Context context){
+        SharedPreferences searchPrefs = context.getSharedPreferences("SavePrefs",
+                MODE_PRIVATE);
+        return searchPrefs.getString("Search Name Input", "");
+    }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps);
+    public static  int getMinCritIssuesInput(Context context){
+        SharedPreferences searchPrefs = context.getSharedPreferences("SavePrefs",
+                MODE_PRIVATE);
+        return searchPrefs.getInt("Minimum Issues Input", 0);
+    }
 
-        getLocationPermission();
+    public static int getMaxCritIssuesInput(Context context){
+        SharedPreferences searchPrefs = context.getSharedPreferences("SavePrefs",
+                MODE_PRIVATE);
+        return searchPrefs.getInt("Maximum Issues Input", 50000);
+    }
 
-        instance = this;
+    public static String getHazardLevelChecked(Context context){
+        SharedPreferences searchPrefs = context.getSharedPreferences("SavePrefs",
+                MODE_PRIVATE);
+        return searchPrefs.getString("Hazard Check Change", "NONE");
+    }
 
-        restaurantManager = RestaurantManager.getInstance();
-
-        init();
-
-        Dexter.withActivity(this).withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
-                .withListener(new PermissionListener() {
-                    @Override
-                    public void onPermissionGranted(PermissionGrantedResponse response) {
-                        updateLocation();
-                    }
-
-                    @Override
-                    public void onPermissionDenied(PermissionDeniedResponse response) {
-
-                    }
-
-                    @Override
-                    public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
-
-                    }
-                }).check();
-
-        //opening database
-        openDB();
-        addRestaurantsToDB();
-        printDB();
-
+    public static boolean getFavouritesChecked(Context context){
+        SharedPreferences searchPrefs = context.getSharedPreferences("SavePrefs",
+                MODE_PRIVATE);
+        return searchPrefs.getBoolean("Display Favourites", false);
 
     }
+
 
     private void updateLocation() {
         buildLocationRequest();
