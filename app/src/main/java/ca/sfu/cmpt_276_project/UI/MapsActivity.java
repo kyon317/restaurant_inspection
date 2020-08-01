@@ -14,7 +14,9 @@ restaurant. A list icon is displayed on the map that allows users to go to Resta
 package ca.sfu.cmpt_276_project.UI;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -29,7 +31,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Switch;
@@ -37,6 +38,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -108,7 +110,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ClusterManager<PegItem> mClusterManager;
     private DBAdapter dbAdapter;
     private Gson gson = new Gson();//necessary to convert Array list
-    private LinearLayout searchLayout;
+    private ConstraintLayout searchLayout;
 
     public static Intent makeIntent(Context context, String name,
                                     Double latitude, double longitude,
@@ -202,6 +204,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return intent;
     }
 
+    @SuppressLint("ResourceType")
     private void init() {
         ImageButton btnMain = (ImageButton) findViewById(R.id.btnMain);
         btnMain.setOnClickListener(new View.OnClickListener() {
@@ -213,50 +216,38 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
         ImageButton srchBtn = (ImageButton) findViewById(R.id.searchBtn);
-        searchLayout = (LinearLayout) findViewById(R.id.searchLayout);
-        if(searchLayout.getVisibility() == View.INVISIBLE) {
-            srchBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
+        searchLayout = (ConstraintLayout) findViewById(R.layout.search_window);
 
-                    EditText searchInput = (EditText) findViewById(R.id.searchInput);
-                    EditText minCritIssues = (EditText) findViewById(R.id.minCritInput);
-                    EditText maxCritIssues = (EditText) findViewById(R.id.maxCritInput);
-                    //Todo set on
-                    RadioGroup hazardLevelGroup = (RadioGroup) findViewById(
-                            R.id.search_hazard_group);
-                    RadioButton lowRadioButton = (RadioButton) findViewById(R.id.radioButtonLow);
-                    RadioButton mediumRadioButton = (RadioButton) findViewById(R.id.radioButtonMedium);
-                    RadioButton highRadioButton = (RadioButton) findViewById(R.id.radioButtonHigh);
-                    hazardLevelGroup.addView(lowRadioButton);
-                    hazardLevelGroup.addView(mediumRadioButton);
-                    hazardLevelGroup.addView(highRadioButton);
-                    Switch favouritesSwitch = (Switch) findViewById(R.id.favouritesSwitch);
-                    searchLayout.setVisibility(View.VISIBLE);
-                    //show search layout
-                    // AlertDialog.Builder mBuilder = new AlertDialog.Builder(MapsActivity.this);
-               /* //View mView = getLayoutInflater().inflate(R.layout.search_window, null);
+        srchBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //show search layout
+
+                AlertDialog.Builder mBuilder = new AlertDialog.Builder(MapsActivity.this);
+                View mView = getLayoutInflater().inflate(R.layout.search_window, null);
                 EditText searchInput = (EditText) mView.findViewById(R.id.searchInput);
                 EditText minCritIssues = (EditText) mView.findViewById(R.id.minCritInput);
                 EditText maxCritIssues = (EditText) mView.findViewById(R.id.maxCritInput);
                 RadioGroup hazardLevelGroup = (RadioGroup) mView.findViewById(
                         R.id.search_hazard_group);
+
                 RadioButton lowRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonLow);
                 RadioButton mediumRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonMedium);
                 RadioButton highRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonHigh);
-                hazardLevelGroup.addView(lowRadioButton);
-                hazardLevelGroup.addView(mediumRadioButton);
-                hazardLevelGroup.addView(highRadioButton);
+                
+                if(hazardLevelGroup.getParent() == null){
+                    hazardLevelGroup.addView(lowRadioButton);
+                    hazardLevelGroup.addView(mediumRadioButton);
+                    hazardLevelGroup.addView(highRadioButton);
+                }
+
                 Switch favouritesSwitch = (Switch) mView.findViewById(R.id.favouritesSwitch);
                 mBuilder.setView(mView);
                 AlertDialog dialog = mBuilder.create();
-                dialog.show();*/
-                }
-            });
-        }
-        else{
-            searchLayout.setVisibility(View.INVISIBLE);
-        }
+                dialog.show();
+
+            }
+        });
 
     }
 
