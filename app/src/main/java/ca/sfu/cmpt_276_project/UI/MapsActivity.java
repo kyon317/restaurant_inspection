@@ -28,6 +28,8 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -137,6 +139,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
     private void addRestaurantsToDB(){
         //TODO: Look over the methods outlined, understand what they do
+
         int i = 0;
         for(Restaurant restaurant: restaurantManager.getRestaurants()){
             if(i >= 5){
@@ -214,7 +217,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 startActivity(intent);
             }
         });
-
+        /*
+        * Search funtionality defined below
+        * Saves name, minCritInspections, maxCritInspections, showFavourites, hazardRating
+        *
+        * */
         ImageButton srchBtn = (ImageButton) findViewById(R.id.searchBtn);
         searchLayout = (ConstraintLayout) findViewById(R.layout.search_window);
 
@@ -226,22 +233,100 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 AlertDialog.Builder mBuilder = new AlertDialog.Builder(MapsActivity.this);
                 View mView = getLayoutInflater().inflate(R.layout.search_window, null);
                 EditText searchInput = (EditText) mView.findViewById(R.id.searchInput);
+                searchInput.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                        //todo save string to shared prefs and change map display
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable editable) {
+
+                    }
+                });
+
                 EditText minCritIssues = (EditText) mView.findViewById(R.id.minCritInput);
+                minCritIssues.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                        //todo change value to int, save it as min in a shared pref update display
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable editable) {
+
+                    }
+                });
+
                 EditText maxCritIssues = (EditText) mView.findViewById(R.id.maxCritInput);
+                maxCritIssues.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                        //todo change value to int, save it as max in a shared pref, update display
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable editable) {
+
+                    }
+                });
+
                 RadioGroup hazardLevelGroup = (RadioGroup) mView.findViewById(
                         R.id.search_hazard_group);
 
+                hazardLevelGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                        RadioButton checked = (RadioButton) mView.findViewById(i);
+                        Toast.makeText(MapsActivity.this,
+                                checked.getText(),Toast.LENGTH_SHORT).show();
+                    }
+                });
+/*
                 RadioButton lowRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonLow);
                 RadioButton mediumRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonMedium);
                 RadioButton highRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonHigh);
-                
+                RadioButton noneRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonNone);
+
                 if(hazardLevelGroup.getParent() == null){
+                    hazardLevelGroup.addView(noneRadioButton);
                     hazardLevelGroup.addView(lowRadioButton);
                     hazardLevelGroup.addView(mediumRadioButton);
                     hazardLevelGroup.addView(highRadioButton);
                 }
-
+*/
                 Switch favouritesSwitch = (Switch) mView.findViewById(R.id.favouritesSwitch);
+                favouritesSwitch.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if(favouritesSwitch.isChecked()){
+                            //favourites has been checked
+                            Toast.makeText(MapsActivity.this,
+                                   "Showing favourites",Toast.LENGTH_SHORT).show();
+                        }
+                        else{
+                            //favourites not checked
+                            Toast.makeText(MapsActivity.this,
+                                   "Showing all",Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+                //Todo: make the search layout change what pegs are displayed
                 mBuilder.setView(mView);
                 AlertDialog dialog = mBuilder.create();
                 dialog.show();
