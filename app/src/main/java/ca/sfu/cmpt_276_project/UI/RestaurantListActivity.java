@@ -15,6 +15,7 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,7 +59,8 @@ public class RestaurantListActivity extends AppCompatActivity {
     private int[] restaurantIcons;
     private DBAdapter dbAdapter;
     private Gson gson = new Gson();
-
+    //TODO: Change it to true in search function, will enable customized listview
+    private boolean search_mode = false;    //Search mode will change how list view be populated
     // allows MainActivity to be accessed
     public static Intent makeIntent(Context context) {
         Intent intent = new Intent(context, RestaurantListActivity.class);
@@ -83,8 +85,11 @@ public class RestaurantListActivity extends AppCompatActivity {
 
         restaurantManager = RestaurantManager.getInstance();
         testOpenDB();
-        printDB();
         initializeRestaurantList();//method necessary to initialize instance
+        System.out.println("after injection: "+dbAdapter.getAllRows().getCount());
+//        Restaurant dummyRestaurant = new Restaurant();
+//        dummyRestaurant = getRestaurantFromDB(1430);
+//        dummyRestaurant.Display();
 
         populateRestaurantIcons();
         populateListView();
@@ -100,11 +105,10 @@ public class RestaurantListActivity extends AppCompatActivity {
     public void testOpenDB(){
         dbAdapter = new DBAdapter(this);
         dbAdapter.open();
+        Log.d("TAG", "testOpenDB: "+dbAdapter.getAllRows().getCount());
     }
 
- /*   private void addRestaurantsToDB(){
-        //TODO: Look over the methods outlined, understand what they do
-
+    private void addRestaurantsToDB(){
         for(Restaurant restaurant: restaurantManager.getRestaurants()){
 
             String inspectionJSON = gson.toJson(restaurant.getInspectionDataList());
@@ -115,9 +119,8 @@ public class RestaurantListActivity extends AppCompatActivity {
                     restaurant.getPhysicalCity(), restaurant.getFacType(),
                     restaurant.getLatitude(), restaurant.getLongitude(), restaurant.getIcon(),
                     inspectionJSON);
-
         }
-    }*/
+    }
 
     private void printDB(){
         Cursor cursor = dbAdapter.getAllRows();
@@ -149,6 +152,8 @@ public class RestaurantListActivity extends AppCompatActivity {
         cursor.close();
     }
 
+
+
     public void clearDB() {
         System.out.println("Wiped DB clean");
         dbAdapter.deleteAll();
@@ -157,6 +162,30 @@ public class RestaurantListActivity extends AppCompatActivity {
      * ENDOF EXPORTED METHODS FROM MAPS_ACTIVITY
      */
 
+    /**
+     * Get restaurant from DB by ROw_ID
+     * */
+    private Restaurant getRestaurantFromDB(int ROW_ID){
+        Cursor cursor = dbAdapter.getAllRows();
+        Restaurant restaurant = new Restaurant();
+        if (cursor.move(ROW_ID)){
+            Type type = new TypeToken<ArrayList<InspectionData>>() {}.getType();
+            List<InspectionData> tempList = gson.fromJson(cursor.getString(DBAdapter.COL_INSPECTION), type);
+
+            restaurant.setTrackNumber(cursor.getString(DBAdapter.COL_TRACK_NUM));
+            restaurant.setRestaurantName(cursor.getString(DBAdapter.COL_RES_NAME));
+            restaurant.setPhysicalAddress(cursor.getString(DBAdapter.COL_ADDRESS));
+            restaurant.setPhysicalCity(cursor.getString(DBAdapter.COL_CITY));
+            restaurant.setFacType(cursor.getString(DBAdapter.COL_FAC_TYPE));
+            restaurant.setLatitude(cursor.getDouble(DBAdapter.COL_LATITUDE));
+            restaurant.setLongitude(cursor.getDouble(DBAdapter.COL_LONGITUDE));
+            if(!tempList.isEmpty()) {
+                restaurant.setInspectionDataList(tempList);
+            }
+        }
+        cursor.close();
+        return restaurant;
+    }
 
     public void initializeRestaurantList() {
         //get Restaurants from CSV
@@ -197,7 +226,7 @@ public class RestaurantListActivity extends AppCompatActivity {
 
         //Updating DB list as well
         clearDB();
-        //addRestaurantsToDB();
+        addRestaurantsToDB();
 
     }
 
@@ -260,8 +289,17 @@ public class RestaurantListActivity extends AppCompatActivity {
         registerClickCallback();
     }
 
+    //TODO: Change the size of db based on search result
     private void populateListView() {
-        restaurants = restaurantManager.getRestaurants();
+        if (search_mode){
+            int size_of_db = 30;    //Dummy value for testing
+            restaurants = new ArrayList<>();
+            for (int i = 0;i<size_of_db;i++){
+                restaurants.add(getRestaurantFromDB(i));
+            }
+            System.out.println("size of restaurants fetched from DB: "+restaurants.size());
+        }else
+            restaurants = restaurantManager.getRestaurants();
         ArrayAdapter<Restaurant> adapter = new MyListAdapter();
         ListView list = (ListView) findViewById(R.id.restaurantsListView);
         list.setAdapter(adapter);
@@ -274,14 +312,15 @@ public class RestaurantListActivity extends AppCompatActivity {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View viewClicked, int position, long id) {
-                Restaurant clickedRestaurant = restaurantManager.getRestaurantByID(position);
-
+//                Restaurant clickedRestaurant = restaurantManager.getRestaurantByID(position);
+                Restaurant clickedRestaurant = getRestaurantFromDB(position);
                 // pass clicked restaurant's position to SingleRestaurantActivity
                 Intent intent = SingleRestaurantActivity.makeIntent(RestaurantListActivity.this, position, false);
                 startActivity(intent);
             }
         });
     }
+
 
     private class MyListAdapter extends ArrayAdapter<Restaurant> {
 
@@ -295,10 +334,11 @@ public class RestaurantListActivity extends AppCompatActivity {
             View restaurantView = convertView;
             if (restaurantView == null) {
                 restaurantView = getLayoutInflater().inflate(R.layout.restaurants_view, parent, false);
-
             }
 
-            Restaurant currentRestaurant = restaurantManager.getRestaurantByID(position);
+//            System.out.println("position: "+position);
+//            Restaurant currentRestaurant = restaurantManager.getRestaurantByID(position);
+            Restaurant currentRestaurant = getRestaurantFromDB(position);
 
             // Fill restaurant image
             ImageView resImageView = (ImageView) restaurantView.findViewById(R.id.restaurant_icon);
