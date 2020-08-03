@@ -22,7 +22,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:text="@string/restaurant_address"
         android:textSize="24sp"
         app:layout_constraintStart_toStartOf="parent"
@@ -33,10 +33,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
+        android:clickable="true"
+        android:focusable="true"
         android:text="@string/restaurant_coordinates"
         android:textSize="24sp"
-        android:clickable="true"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/addressText" />
 
@@ -45,7 +46,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="4dp"
         android:text="@string/inspections"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
@@ -55,11 +56,21 @@
         android:id="@+id/inspectionsListView"
         android:layout_width="403dp"
         android:layout_height="403dp"
-        android:layout_marginTop="11dp"
+        android:layout_marginTop="24dp"
         android:paddingBottom="12dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/Inspections"
         app:layout_constraintVertical_bias="1.0" />
+
+    <Button
+        android:id="@+id/btnAddFav"
+        android:layout_width="129dp"
+        android:layout_height="50dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginBottom="4dp"
+        android:text="@string/favourite"
+        app:layout_constraintBottom_toTopOf="@+id/inspectionsListView"
+        app:layout_constraintEnd_toEndOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
