@@ -11,10 +11,13 @@ package ca.sfu.cmpt_276_project.UI;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,12 +25,18 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.gson.Gson;
@@ -94,10 +103,192 @@ public class RestaurantListActivity extends AppCompatActivity {
         populateRestaurantIcons();
         populateListView();
         registerClickCallback();
+        setUpSearchWindow();
 
         init();
 
     }
+
+    private void setUpSearchWindow() {
+        ImageButton srchButton = (ImageButton) findViewById(R.id.srchBtn);
+        SharedPreferences savePreferences = this.getSharedPreferences("SavePrefs",
+                MODE_PRIVATE);
+        SharedPreferences.Editor editor = savePreferences.edit();
+        String savedSearch = getSearchName(this);
+        int savedMinCritIssuesInput = getMinCritIssuesInput(this);
+        int savedMaxCritIssuesInput = getMaxCritIssuesInput(this);
+        String savedHazardChecked = getHazardLevelChecked(this);
+        boolean getFavouritesCheck = getFavouritesChecked(this);
+        srchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder mBuilder = new AlertDialog.Builder(
+                        RestaurantListActivity.this);
+                View mView = getLayoutInflater().inflate(R.layout.search_window, null);
+                EditText searchInput = (EditText) mView.findViewById(R.id.searchInput);
+                if(savedSearch != ""){
+                    searchInput.setText(savedSearch, TextView.BufferType.EDITABLE);
+                }
+                searchInput.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                        //todo change map display
+                        editor.putString("Search Name Input", String.valueOf(charSequence));
+                        editor.apply();
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable editable) {
+
+                    }
+                });
+
+                EditText minCritIssues = (EditText) mView.findViewById(R.id.minCritInput);
+                if(savedMinCritIssuesInput != 0){
+                    String intString = Integer.toString(savedMinCritIssuesInput) ;
+                    minCritIssues.setText(intString, TextView.BufferType.EDITABLE);
+                }
+                minCritIssues.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                        //todo update display
+                        String minvalue = String.valueOf(charSequence);
+                        editor.putInt("Minimum Issues Input", Integer.valueOf(minvalue));
+                        editor.apply();
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable editable) {
+
+                    }
+                });
+
+                EditText maxCritIssues = (EditText) mView.findViewById(R.id.maxCritInput);
+                if(savedMaxCritIssuesInput != 50000){
+                    String intString = Integer.toString(savedMaxCritIssuesInput) ;
+                    maxCritIssues.setText(intString, TextView.BufferType.EDITABLE);
+                }
+                maxCritIssues.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                        //todo update display
+                        String maxValue = String.valueOf(charSequence);
+                        editor.putInt("Maximum Issues Input", Integer.valueOf(maxValue));
+                        editor.apply();
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable editable) {
+
+                    }
+                });
+
+                RadioGroup hazardLevelGroup = (RadioGroup) mView.findViewById(
+                        R.id.search_hazard_group);
+                if(savedHazardChecked.contains("NONE")){
+                    RadioButton noneRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonNone);
+                    noneRadioButton.setChecked(true);
+                }
+                else if(savedHazardChecked.contains("LOW")){
+                    RadioButton lowRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonLow);
+                    lowRadioButton.setChecked(true);
+                }
+                else if(savedHazardChecked.contains("MEDIUM")){
+                    RadioButton mediumRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonMedium);
+                    mediumRadioButton.setChecked(true);
+                }
+                else if(savedHazardChecked.contains("HIGH")){
+                    RadioButton highRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonHigh);
+                    highRadioButton.setChecked(true);
+                }
+                else{
+                    System.out.println(savedHazardChecked);
+                }
+
+                hazardLevelGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                        RadioButton checked = (RadioButton) mView.findViewById(i);
+                        editor.putString("Hazard Check Change", String.valueOf(checked.getText()));
+                        editor.apply();
+                    }
+                });
+
+                Switch favouritesSwitch = (Switch) mView.findViewById(R.id.favouritesSwitch);
+                if(getFavouritesCheck){
+                    favouritesSwitch.setChecked(true);
+                }
+                favouritesSwitch.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if(favouritesSwitch.isChecked()){
+                            //favourites has been checked
+                            //Todo: only display favourites
+                            editor.putBoolean("Display Favourites", true);
+                            editor.apply();
+                        }
+                        else{
+                            //favourites not checked
+                            //todo: display all
+                            editor.putBoolean("Display Favourites", false);
+                            editor.apply();
+                        }
+                    }
+                });
+                //Todo: make the search layout change what pegs are displayed
+                mBuilder.setView(mView);
+                AlertDialog dialog = mBuilder.create();
+                dialog.show();
+            }
+        });
+    }
+
+    public static String getSearchName(Context context){
+        SharedPreferences searchPrefs = context.getSharedPreferences("SavePrefs",
+                MODE_PRIVATE);
+        return searchPrefs.getString("Search Name Input", "");
+    }
+
+    public static  int getMinCritIssuesInput(Context context){
+        SharedPreferences searchPrefs = context.getSharedPreferences("SavePrefs",
+                MODE_PRIVATE);
+        return searchPrefs.getInt("Minimum Issues Input", 0);
+    }
+
+    public static int getMaxCritIssuesInput(Context context){
+        SharedPreferences searchPrefs = context.getSharedPreferences("SavePrefs",
+                MODE_PRIVATE);
+        return searchPrefs.getInt("Maximum Issues Input", 50000);
+    }
+
+    public static String getHazardLevelChecked(Context context){
+        SharedPreferences searchPrefs = context.getSharedPreferences("SavePrefs",
+                MODE_PRIVATE);
+        return searchPrefs.getString("Hazard Check Change", "NONE");
+    }
+
+    public static boolean getFavouritesChecked(Context context){
+        SharedPreferences searchPrefs = context.getSharedPreferences("SavePrefs",
+                MODE_PRIVATE);
+        return searchPrefs.getBoolean("Display Favourites", false);
+
+    }
+
 
     /**
      * EXPORTED METHODS FROM MAPS_ACTIVITY

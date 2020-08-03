@@ -387,19 +387,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         editor.apply();
                     }
                 });
-/*
-                RadioButton lowRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonLow);
-                RadioButton mediumRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonMedium);
-                RadioButton highRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonHigh);
-                RadioButton noneRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonNone);
 
-                if(hazardLevelGroup.getParent() == null){
-                    hazardLevelGroup.addView(noneRadioButton);
-                    hazardLevelGroup.addView(lowRadioButton);
-                    hazardLevelGroup.addView(mediumRadioButton);
-                    hazardLevelGroup.addView(highRadioButton);
-                }
-*/
                 Switch favouritesSwitch = (Switch) mView.findViewById(R.id.favouritesSwitch);
                 if(getFavouritesCheck){
                     favouritesSwitch.setChecked(true);
