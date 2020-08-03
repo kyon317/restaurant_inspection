@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <EditText
+        android:id="@+id/searchInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:autofillHints=""
+        android:hint="@string/searchHint"
+        android:inputType="text"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/maxCritInput"
+        android:layout_width="27dp"
+        android:layout_height="39dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="2dp"
+        android:autofillHints=""
+        android:hint="@string/numInspectionsHint"
+        android:inputType="number"
+        android:textSize="12sp"
+        app:layout_constraintStart_toEndOf="@+id/maxCritIssues"
+        app:layout_constraintTop_toBottomOf="@id/minCritInput" />
+
+    <EditText
+        android:id="@+id/minCritInput"
+        android:layout_width="27dp"
+        android:layout_height="32dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="4dp"
+        android:autofillHints=""
+        android:hint="@string/numInspectionsHint"
+        android:inputType="number"
+        android:textSize="12sp"
+        app:layout_constraintStart_toEndOf="@+id/MinNumInspections"
+        app:layout_constraintTop_toBottomOf="@+id/searchInput" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/hazard_level_options_text"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/searchInput" />
+
+    <RadioGroup
+        android:id="@+id/search_hazard_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView" >
+
+        <RadioButton
+            android:id="@+id/radioButtonNone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/none" />
+
+        <RadioButton
+            android:id="@+id/radioButtonLow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/low_button_text" />
+
+        <RadioButton
+            android:id="@+id/radioButtonMedium"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/medium_btn_text" />
+
+        <RadioButton
+            android:id="@+id/radioButtonHigh"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/high_btn_text" />
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/MinNumInspections"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/minimum_critical_inspections"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@+id/textView"
+        app:layout_constraintTop_toBottomOf="@+id/searchInput" />
+
+    <TextView
+        android:id="@+id/maxCritIssues"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="20dp"
+        android:text="@string/maximum_critical_issues"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="@+id/MinNumInspections"
+        app:layout_constraintTop_toBottomOf="@+id/MinNumInspections" />
+
+    <Switch
+        android:id="@+id/favouritesSwitch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="100dp"
+        android:layout_marginTop="23dp"
+        android:text="@string/favourites_switch_text"
+        app:layout_constraintStart_toEndOf="@+id/search_hazard_group"
+        app:layout_constraintTop_toBottomOf="@+id/maxCritIssues" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

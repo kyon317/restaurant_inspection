@@ -34,6 +34,7 @@ import ca.sfu.cmpt_276_project.CsvIngester.RestaurantCSVIngester;
 import ca.sfu.cmpt_276_project.Model.Restaurant;
 import ca.sfu.cmpt_276_project.Model.RestaurantManager;
 import ca.sfu.cmpt_276_project.R;
+import ca.sfu.cmpt_276_project.TestingActivity;
 import ca.sfu.cmpt_276_project.WebScraper.CSVDownloader;
 import ca.sfu.cmpt_276_project.WebScraper.DataManager;
 import ca.sfu.cmpt_276_project.WebScraper.DataStatus;
@@ -181,6 +182,11 @@ public class LoadingActivity extends AppCompatActivity {
 
     public void startMapActivity(){
         Intent intent = new Intent(this,MapsActivity.class);
+        startActivity(intent);
+    }
+
+    public void startTestActivity(){
+        Intent intent = new Intent(this, TestingActivity.class);
         startActivity(intent);
     }
 

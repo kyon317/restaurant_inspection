@@ -6,6 +6,8 @@
 package ca.sfu.cmpt_276_project;
 
 import android.Manifest;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 
@@ -21,12 +23,14 @@ import java.util.concurrent.ExecutionException;
 import ca.sfu.cmpt_276_project.Model.InspectionData;
 import ca.sfu.cmpt_276_project.Model.Restaurant;
 import ca.sfu.cmpt_276_project.Model.RestaurantManager;
+import ca.sfu.cmpt_276_project.UI.MapsActivity;
 import ca.sfu.cmpt_276_project.WebScraper.CSVDownloader;
 import ca.sfu.cmpt_276_project.WebScraper.DataManager;
 
 public class TestingActivity extends AppCompatActivity {
     private static final int MY_PERMISSIONS_WRITE_EXTERNAL_STORAGE = 1;
     private RestaurantManager restaurantManager;
+    static TestingActivity instance;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +66,16 @@ public class TestingActivity extends AppCompatActivity {
         } catch (ExecutionException | InterruptedException | ParseException | IOException e) {
             e.printStackTrace();
         }*/
+    }
+
+    public static TestingActivity getInstance() {
+        return instance;
+    }
+
+    // allows TestingActivity to be accessed
+    public static Intent makeIntent(Context context) {
+        Intent intent = new Intent(context, TestingActivity.class);
+        return intent;
     }
 
     public void SingletonTest() {

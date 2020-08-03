@@ -21,7 +21,7 @@ public class RestaurantManager {
         this.restaurants = new ArrayList<>();
     }
 
-    public static RestaurantManager getInstance() {
+    public static synchronized RestaurantManager getInstance() {
         if (instance == null)
             instance = new RestaurantManager();
         return instance;
