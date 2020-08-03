@@ -14,23 +14,34 @@ restaurant. A list icon is displayed on the map that allows users to go to Resta
 package ca.sfu.cmpt_276_project.UI;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -51,6 +62,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
@@ -61,7 +74,13 @@ import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
+
+import ca.sfu.cmpt_276_project.DBAdapter;
 import ca.sfu.cmpt_276_project.Model.Hazard;
+import ca.sfu.cmpt_276_project.Model.InspectionData;
 import ca.sfu.cmpt_276_project.Model.PegItem;
 import ca.sfu.cmpt_276_project.Model.Restaurant;
 import ca.sfu.cmpt_276_project.Model.RestaurantManager;
@@ -92,40 +111,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private int[] restaurantIcons;
     private Location currentLocation;
     private ClusterManager<PegItem> mClusterManager;
-
-    public static Intent makeIntent(Context context, String name,
-                                    Double latitude, double longitude,
-                                    Boolean fromRestaurant) {
-        Intent intent = new Intent(context, MapsActivity.class);
-        intent.putExtra(EXTRA_NAME, name);
-        intent.putExtra(EXTRA_LAT, latitude);
-        intent.putExtra(EXTRA_LNG, longitude);
-        intent.putExtra(EXTRA_BOOL, fromRestaurant);
-        return intent;
-    }
-
-    public static MapsActivity getInstance() {
-        return instance;
-    }
-
-    // allows MapsActivity to be accessed
-    public static Intent makeIntent(Context context) {
-        Intent intent = new Intent(context, MapsActivity.class);
-        return intent;
-    }
-
-    private void init() {
-        ImageButton btnMain = (ImageButton) findViewById(R.id.btnMain);
-        btnMain.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = RestaurantListActivity.makeIntent(MapsActivity.this);
-                startActivity(intent);
-            }
-        });
-
-    }
-
+    private DBAdapter dbAdapter;
+    private Gson gson = new Gson();//necessary to convert Array list
+    private ConstraintLayout searchLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,6 +125,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         instance = this;
 
         restaurantManager = RestaurantManager.getInstance();
+
+        //Toast.makeText(MapsActivity.this,
+        //        getSearchName(this),Toast.LENGTH_SHORT).show(); test to see savedpref works
 
         init();
 
@@ -158,7 +149,319 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     }
                 }).check();
 
+        //opening database
+        openDB();
+        addRestaurantsToDB();
+        printDB();
+
+
     }
+
+    public static Intent makeIntent(Context context, String name,
+                                    Double latitude, double longitude,
+                                    Boolean fromRestaurant) {
+        Intent intent = new Intent(context, MapsActivity.class);
+        intent.putExtra(EXTRA_NAME, name);
+        intent.putExtra(EXTRA_LAT, latitude);
+        intent.putExtra(EXTRA_LNG, longitude);
+        intent.putExtra(EXTRA_BOOL, fromRestaurant);
+        return intent;
+    }
+
+    /**
+     * DATABASE FUNCTIONS
+     */
+    //TODO: move the database functions into a separate class
+    private void openDB(){
+        dbAdapter = new DBAdapter(this);
+        dbAdapter.open();
+    }
+
+    private void closeDB(){
+        dbAdapter.close();
+    }
+    private void addRestaurantsToDB(){
+        //TODO: Look over the methods outlined, understand what they do
+
+        int i = 0;
+        for(Restaurant restaurant: restaurantManager.getRestaurants()){
+            if(i >= 5){
+                break;
+            }
+            String inspectionJSON = gson.toJson(restaurant.getInspectionDataList());
+
+            //THIS PROCESS ADDS ITEM TO THE DM
+            long newID = dbAdapter.insertRow(restaurant.getTrackNumber(),
+                    restaurant.getRestaurantName(), restaurant.getPhysicalAddress(),
+                    restaurant.getPhysicalCity(), restaurant.getFacType(),
+                    restaurant.getLatitude(), restaurant.getLongitude(), restaurant.getIcon(),
+                    inspectionJSON);
+            i++;
+
+        }
+    }
+
+    private void printDB(){
+        Cursor cursor = dbAdapter.getAllRows();
+
+        if(cursor.moveToFirst()){
+            do{
+                //THIS PAIR OF LINES ARE USED TO DESERIALIZE THE JSON STRING EXTRACTED FROM DB
+                Type type = new TypeToken<ArrayList<InspectionData>>() {}.getType();
+                List<InspectionData> tempList = gson.fromJson(cursor.getString(DBAdapter.COL_INSPECTION), type);
+
+                //Printer test to check injection
+                System.out.println("Injected: \n"
+                        + "\tDB-ID#: " + cursor.getInt(DBAdapter.COL_ROWID) + "\n"
+                        + "\tTrack#: " + cursor.getString(DBAdapter.COL_TRACK_NUM) + "\n"
+                        + "\tName: " + cursor.getString(DBAdapter.COL_RES_NAME) + "\n"
+                        + "\tAddr: " + cursor.getString(DBAdapter.COL_ADDRESS) + "\n"
+                        + "\tCity: " + cursor.getString(DBAdapter.COL_CITY) + "\n"
+                        + "\tFacType: " + cursor.getString(DBAdapter.COL_FAC_TYPE) + "\n"
+                        + "\tLatitude: " + cursor.getDouble(DBAdapter.COL_LATITUDE) + "\n"
+                        + "\tLongitude: " + cursor.getDouble(DBAdapter.COL_LONGITUDE) + "\n"
+                        + "---------------------------------------------------------------------\n");
+               /* if(!tempList.isEmpty()) {
+                    System.out.println("\tInspection Details: ");
+                    for(InspectionData inspectionData: tempList)
+                        inspectionData.Display();
+                }uncomment if you want to see inspections */
+            }while (cursor.moveToNext());
+        }
+        cursor.close();
+    }
+
+    public void clearDB() {
+        System.out.println("Wiped DB clean");
+        dbAdapter.deleteAll();
+    }
+    /**
+     * ENDOF DATABASE FUNCTIONS
+     */
+
+
+    public static MapsActivity getInstance() {
+        return instance;
+    }
+
+    // allows MapsActivity to be accessed
+    public static Intent makeIntent(Context context) {
+        Intent intent = new Intent(context, MapsActivity.class);
+        return intent;
+    }
+
+    @SuppressLint("ResourceType")
+    private void init() {
+        ImageButton btnMain = (ImageButton) findViewById(R.id.btnMain);
+        btnMain.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = RestaurantListActivity.makeIntent(MapsActivity.this);
+                startActivity(intent);
+            }
+        });
+        /*
+        * Search funtionality defined below
+        * Saves name, minCritInspections, maxCritInspections, showFavourites, hazardRating
+        *
+        * */
+
+        searchLayout = (ConstraintLayout) findViewById(R.layout.search_window);
+        SharedPreferences savePreferences = this.getSharedPreferences("SavePrefs",
+                MODE_PRIVATE);
+        SharedPreferences.Editor editor = savePreferences.edit();
+        String savedSearch = getSearchName(this);
+        int savedMinCritIssuesInput = getMinCritIssuesInput(this);
+        int savedMaxCritIssuesInput = getMaxCritIssuesInput(this);
+        String savedHazardChecked = getHazardLevelChecked(this);
+        boolean getFavouritesCheck = getFavouritesChecked(this);
+
+        ImageButton srchBtn = (ImageButton) findViewById(R.id.searchBtn);
+        srchBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //show search layout
+
+                AlertDialog.Builder mBuilder = new AlertDialog.Builder(MapsActivity.this);
+                View mView = getLayoutInflater().inflate(R.layout.search_window, null);
+                EditText searchInput = (EditText) mView.findViewById(R.id.searchInput);
+                if(savedSearch != ""){
+                    searchInput.setText(savedSearch, TextView.BufferType.EDITABLE);
+                }
+                searchInput.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                        //todo change map display
+                        editor.putString("Search Name Input", String.valueOf(charSequence));
+                        editor.apply();
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable editable) {
+
+                    }
+                });
+
+                EditText minCritIssues = (EditText) mView.findViewById(R.id.minCritInput);
+                if(savedMinCritIssuesInput != 0){
+                    String intString = Integer.toString(savedMinCritIssuesInput) ;
+                    minCritIssues.setText(intString, TextView.BufferType.EDITABLE);
+                }
+                minCritIssues.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                        //todo update display
+                        String minvalue = String.valueOf(charSequence);
+                        editor.putInt("Minimum Issues Input", Integer.valueOf(minvalue));
+                        editor.apply();
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable editable) {
+
+                    }
+                });
+
+                EditText maxCritIssues = (EditText) mView.findViewById(R.id.maxCritInput);
+                if(savedMaxCritIssuesInput != 50000){
+                    String intString = Integer.toString(savedMaxCritIssuesInput) ;
+                    maxCritIssues.setText(intString, TextView.BufferType.EDITABLE);
+                }
+                maxCritIssues.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                        //todo update display
+                        String maxValue = String.valueOf(charSequence);
+                        editor.putInt("Maximum Issues Input", Integer.valueOf(maxValue));
+                        editor.apply();
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable editable) {
+
+                    }
+                });
+
+                RadioGroup hazardLevelGroup = (RadioGroup) mView.findViewById(
+                        R.id.search_hazard_group);
+                if(savedHazardChecked.contains("NONE")){
+                    RadioButton noneRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonNone);
+                    noneRadioButton.setChecked(true);
+                }
+                else if(savedHazardChecked.contains("LOW")){
+                    RadioButton lowRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonLow);
+                    lowRadioButton.setChecked(true);
+                }
+                else if(savedHazardChecked.contains("MEDIUM")){
+                    RadioButton mediumRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonMedium);
+                    mediumRadioButton.setChecked(true);
+                }
+                else if(savedHazardChecked.contains("HIGH")){
+                    RadioButton highRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonHigh);
+                    highRadioButton.setChecked(true);
+                }
+                else{
+                    System.out.println(savedHazardChecked);
+                }
+
+                hazardLevelGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                        RadioButton checked = (RadioButton) mView.findViewById(i);
+                        editor.putString("Hazard Check Change", String.valueOf(checked.getText()));
+                        editor.apply();
+                    }
+                });
+/*
+                RadioButton lowRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonLow);
+                RadioButton mediumRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonMedium);
+                RadioButton highRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonHigh);
+                RadioButton noneRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonNone);
+
+                if(hazardLevelGroup.getParent() == null){
+                    hazardLevelGroup.addView(noneRadioButton);
+                    hazardLevelGroup.addView(lowRadioButton);
+                    hazardLevelGroup.addView(mediumRadioButton);
+                    hazardLevelGroup.addView(highRadioButton);
+                }
+*/
+                Switch favouritesSwitch = (Switch) mView.findViewById(R.id.favouritesSwitch);
+                if(getFavouritesCheck){
+                    favouritesSwitch.setChecked(true);
+                }
+                favouritesSwitch.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if(favouritesSwitch.isChecked()){
+                            //favourites has been checked
+                            //Todo: only display favourites
+                            editor.putBoolean("Display Favourites", true);
+                            editor.apply();
+                        }
+                        else{
+                            //favourites not checked
+                            //todo: display all
+                            editor.putBoolean("Display Favourites", false);
+                            editor.apply();
+                        }
+                    }
+                });
+                //Todo: make the search layout change what pegs are displayed
+                mBuilder.setView(mView);
+                AlertDialog dialog = mBuilder.create();
+                dialog.show();
+
+            }
+        });
+
+    }
+
+    public static String getSearchName(Context context){
+        SharedPreferences searchPrefs = context.getSharedPreferences("SavePrefs",
+                MODE_PRIVATE);
+        return searchPrefs.getString("Search Name Input", "");
+    }
+
+    public static  int getMinCritIssuesInput(Context context){
+        SharedPreferences searchPrefs = context.getSharedPreferences("SavePrefs",
+                MODE_PRIVATE);
+        return searchPrefs.getInt("Minimum Issues Input", 0);
+    }
+
+    public static int getMaxCritIssuesInput(Context context){
+        SharedPreferences searchPrefs = context.getSharedPreferences("SavePrefs",
+                MODE_PRIVATE);
+        return searchPrefs.getInt("Maximum Issues Input", 50000);
+    }
+
+    public static String getHazardLevelChecked(Context context){
+        SharedPreferences searchPrefs = context.getSharedPreferences("SavePrefs",
+                MODE_PRIVATE);
+        return searchPrefs.getString("Hazard Check Change", "NONE");
+    }
+
+    public static boolean getFavouritesChecked(Context context){
+        SharedPreferences searchPrefs = context.getSharedPreferences("SavePrefs",
+                MODE_PRIVATE);
+        return searchPrefs.getBoolean("Display Favourites", false);
+
+    }
+
 
     private void updateLocation() {
         buildLocationRequest();
@@ -223,6 +526,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onDestroy() {
         android.os.Process.killProcess(android.os.Process.myPid());
         super.onDestroy();
+        clearDB();
+        closeDB();
     }
 
 
@@ -418,9 +723,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void initMap() {
-
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
+        assert mapFragment != null;
         mapFragment.getMapAsync(MapsActivity.this);
     }
 

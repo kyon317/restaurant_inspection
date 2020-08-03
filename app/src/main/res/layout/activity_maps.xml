@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -37,5 +38,97 @@
         android:layout_marginTop="32dp"
         android:layout_marginEnd="22dp"
         android:src="@drawable/maps_list" />
+
+    <ImageButton
+        android:id="@+id/searchBtn"
+        android:layout_width="47dp"
+        android:layout_height="42dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="32dp"
+        android:layout_marginStart="22dp"
+        android:contentDescription="@string/launches_search_criterea"
+        android:src="@drawable/icon_search" />
+
+    <LinearLayout
+        android:id="@+id/searchLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/searchBtn"
+        android:visibility="invisible"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/searchInput"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="4dp"
+            android:autofillHints=""
+            android:hint="@string/searchHint"
+            android:textSize="12sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:inputType="text" />
+        <TextView
+            android:id="@+id/hazard_level"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/hazard_level_options_text"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/searchInput" />
+        <RadioGroup
+            android:id="@+id/search_hazard_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/radioButtonLow"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/low_button_text" />
+
+            <RadioButton
+                android:id="@+id/radioButtonMedium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/medium_btn_text" />
+
+            <RadioButton
+                android:id="@+id/radioButtonHigh"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/high_btn_text" />
+        </RadioGroup>
+
+        <EditText
+            android:id="@+id/minCritInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/min_crit_issues_hint"/>
+
+        <EditText
+            android:id="@+id/maxCritInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/max_crit_issues_hint"/>
+
+        <Switch
+            android:id="@+id/favouritesSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="100dp"
+            android:layout_marginTop="23dp"
+            android:text="@string/favourites_switch_text"
+            />
+
+
+    </LinearLayout>
 
 </RelativeLayout>

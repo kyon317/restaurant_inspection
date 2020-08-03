@@ -11,6 +11,7 @@ package ca.sfu.cmpt_276_project.UI;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -28,7 +29,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -38,7 +43,9 @@ import java.util.Random;
 
 import ca.sfu.cmpt_276_project.CsvIngester.InspectionDataCSVIngester;
 import ca.sfu.cmpt_276_project.CsvIngester.RestaurantCSVIngester;
+import ca.sfu.cmpt_276_project.DBAdapter;
 import ca.sfu.cmpt_276_project.Model.Hazard;
+import ca.sfu.cmpt_276_project.Model.InspectionData;
 import ca.sfu.cmpt_276_project.Model.Restaurant;
 import ca.sfu.cmpt_276_project.Model.RestaurantManager;
 import ca.sfu.cmpt_276_project.R;
@@ -49,6 +56,8 @@ public class RestaurantListActivity extends AppCompatActivity {
     private RestaurantManager restaurantManager;
     private List<Restaurant> restaurants;
     private int[] restaurantIcons;
+    private DBAdapter dbAdapter;
+    private Gson gson = new Gson();
 
     // allows MainActivity to be accessed
     public static Intent makeIntent(Context context) {
@@ -73,6 +82,8 @@ public class RestaurantListActivity extends AppCompatActivity {
 
 
         restaurantManager = RestaurantManager.getInstance();
+        testOpenDB();
+        printDB();
         initializeRestaurantList();//method necessary to initialize instance
 
         populateRestaurantIcons();
@@ -80,7 +91,72 @@ public class RestaurantListActivity extends AppCompatActivity {
         registerClickCallback();
 
         init();
+
     }
+
+    /**
+     * EXPORTED METHODS FROM MAPS_ACTIVITY
+     */
+    public void testOpenDB(){
+        dbAdapter = new DBAdapter(this);
+        dbAdapter.open();
+    }
+
+ /*   private void addRestaurantsToDB(){
+        //TODO: Look over the methods outlined, understand what they do
+
+        for(Restaurant restaurant: restaurantManager.getRestaurants()){
+
+            String inspectionJSON = gson.toJson(restaurant.getInspectionDataList());
+
+            //THIS PROCESS ADDS ITEM TO THE DM
+            long newID = dbAdapter.insertRow(restaurant.getTrackNumber(),
+                    restaurant.getRestaurantName(), restaurant.getPhysicalAddress(),
+                    restaurant.getPhysicalCity(), restaurant.getFacType(),
+                    restaurant.getLatitude(), restaurant.getLongitude(), restaurant.getIcon(),
+                    inspectionJSON);
+
+        }
+    }*/
+
+    private void printDB(){
+        Cursor cursor = dbAdapter.getAllRows();
+
+        if(cursor.moveToFirst()){
+            do{
+                //THIS PAIR OF LINES ARE USED TO DESERIALIZE THE JSON STRING EXTRACTED FROM DB
+                Type type = new TypeToken<ArrayList<InspectionData>>() {}.getType();
+                List<InspectionData> tempList = gson.fromJson(cursor.getString(DBAdapter.COL_INSPECTION), type);
+
+                //Printer test to check injection
+                System.out.println("Injected: \n"
+                        + "\tDB-ID#: " + cursor.getInt(DBAdapter.COL_ROWID) + "\n"
+                        + "\tTrack#: " + cursor.getString(DBAdapter.COL_TRACK_NUM) + "\n"
+                        + "\tName: " + cursor.getString(DBAdapter.COL_RES_NAME) + "\n"
+                        + "\tAddr: " + cursor.getString(DBAdapter.COL_ADDRESS) + "\n"
+                        + "\tCity: " + cursor.getString(DBAdapter.COL_CITY) + "\n"
+                        + "\tFacType: " + cursor.getString(DBAdapter.COL_FAC_TYPE) + "\n"
+                        + "\tLatitude: " + cursor.getDouble(DBAdapter.COL_LATITUDE) + "\n"
+                        + "\tLongitude: " + cursor.getDouble(DBAdapter.COL_LONGITUDE) + "\n"
+                        + "---------------------------------------------------------------------\n");
+                /*if(!tempList.isEmpty()) {
+                    System.out.println("\tInspection Details: ");
+                    for(InspectionData inspectionData: tempList)
+                        inspectionData.Display();
+                }uncomment to see inspections(takes a long time to list)*/
+            }while (cursor.moveToNext());
+        }
+        cursor.close();
+    }
+
+    public void clearDB() {
+        System.out.println("Wiped DB clean");
+        dbAdapter.deleteAll();
+    }
+    /**
+     * ENDOF EXPORTED METHODS FROM MAPS_ACTIVITY
+     */
+
 
     public void initializeRestaurantList() {
         //get Restaurants from CSV
@@ -119,6 +195,10 @@ public class RestaurantListActivity extends AppCompatActivity {
         //Update existing Restaurant Manager obj instance
         restaurantManager.setRestaurants(restaurantList);
 
+        //Updating DB list as well
+        clearDB();
+        //addRestaurantsToDB();
+
     }
 
     @Override
@@ -134,6 +214,11 @@ public class RestaurantListActivity extends AppCompatActivity {
     public void onDestroy() {
         android.os.Process.killProcess(android.os.Process.myPid());
         super.onDestroy();
+        closeDB();
+    }
+
+    private void closeDB(){
+        dbAdapter.close();
     }
 
     private void populateRestaurantIcons() {
