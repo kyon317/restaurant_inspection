@@ -32,6 +32,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
@@ -108,6 +109,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Boolean mLocationPermissionGranted = false;
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private RestaurantManager restaurantManager;
+
+    List<Restaurant> filteredRestaurants = new ArrayList<>();
+
     private int[] restaurantIcons;
     private Location currentLocation;
     private ClusterManager<PegItem> mClusterManager;
@@ -222,6 +226,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         //todo change map display
                         editor.putString("Search Name Input", String.valueOf(charSequence));
                         editor.apply();
+
+                        restaurantManager.setSearchTerm(getSearchName(MapsActivity.this));
+                        showRestaurants();
+
                     }
 
                     @Override
@@ -247,6 +255,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         String minvalue = String.valueOf(charSequence);
                         editor.putInt("Minimum Issues Input", Integer.valueOf(minvalue));
                         editor.apply();
+
+                        restaurantManager.setMinimumCritical(getMinCritIssuesInput(MapsActivity.this));
+                        showRestaurants();
                     }
 
                     @Override
@@ -272,6 +283,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         String maxValue = String.valueOf(charSequence);
                         editor.putInt("Maximum Issues Input", Integer.valueOf(maxValue));
                         editor.apply();
+
+                        restaurantManager.setMaximumCritical(getMaxCritIssuesInput(MapsActivity.this));
+                        showRestaurants();
                     }
 
                     @Override
@@ -308,6 +322,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         RadioButton checked = (RadioButton) mView.findViewById(i);
                         editor.putString("Hazard Check Change", String.valueOf(checked.getText()));
                         editor.apply();
+
+                        restaurantManager.setHazardLevelFilter(getHazardLevelChecked(MapsActivity.this));
+                        showRestaurants();
                     }
                 });
 
@@ -323,13 +340,39 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             //Todo: only display favourites
                             editor.putBoolean("Display Favourites", true);
                             editor.apply();
+
+                            restaurantManager.setFavouriteOnly(getFavouritesChecked(MapsActivity.this));
+                            showRestaurants();
                         }
                         else{
                             //favourites not checked
                             //todo: display all
                             editor.putBoolean("Display Favourites", false);
                             editor.apply();
+
+                            restaurantManager.setFavouriteOnly(getFavouritesChecked(MapsActivity.this));
+                            showRestaurants();
+
                         }
+
+                    }
+                });
+                Button resetBtn = (Button) mView.findViewById(R.id.resetBtn);
+                resetBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        searchInput.setText(null);
+                        editor.putString("Search Name Input", null);
+                        minCritIssues.setText(null);
+                        editor.putInt("Minimum Issues Input", 0);
+                        maxCritIssues.setText(null);
+                        editor.putInt("Maximum Issues Input", 99);
+                        RadioButton noneRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonNone);
+                        noneRadioButton.setChecked(true);
+                        editor.putString("Hazard Check Change", String.valueOf(R.string.none));
+                        favouritesSwitch.setChecked(false);
+                        editor.putBoolean("Display Favourites", false);
+                        editor.apply();
                     }
                 });
                 //Todo: make the search layout change what pegs are displayed
@@ -534,15 +577,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void showRestaurants() {
+        mMap.clear();
+        //get filtered restaurants
+        filteredRestaurants = restaurantManager.getFilteredRestaurants();
 
         for (int i = 0; i < restaurantManager.getRestaurants().size(); i++) {
 
             Restaurant currentRestaurant = restaurantManager.getRestaurantByID(i);
-            BitmapDescriptor hazardIcon = null;
-
-            // remember restaurant position in list view
+            // remember restaurant position in restaurants list view
             currentRestaurant.setId(i);
-
+            /*
+            BitmapDescriptor hazardIcon = null;
             if (currentRestaurant.getInspectionDataList().isEmpty() == false) {
 
                 Hazard hazard = currentRestaurant.getInspectionDataList().get(0).getHazard();
@@ -561,6 +606,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             PegItem newItem = new PegItem(currentRestaurant.getLatitude(),
                     currentRestaurant.getLongitude(),
                     currentRestaurant.getRestaurantName(),
+                    hazardIcon);
+
+            mClusterManager.addItem(newItem);
+            */
+        }
+
+        int i = 0;
+        BitmapDescriptor hazardIcon = null;
+        for (Restaurant currentFilteredRestaurant : filteredRestaurants) {
+
+            if (currentFilteredRestaurant.getInspectionDataList().isEmpty() == false) {
+
+                Hazard hazard = currentFilteredRestaurant.getInspectionDataList().get(0).getHazard();
+                if (hazard == Hazard.HIGH) {
+                    hazardIcon = bitmapDescriptorFromVector(getApplicationContext(),
+                            R.drawable.icon_map_high);
+                } else if (hazard == Hazard.MEDIUM) {
+                    hazardIcon = bitmapDescriptorFromVector(getApplicationContext(),
+                            R.drawable.icon_map_medium);
+                } else {
+                    hazardIcon = bitmapDescriptorFromVector(getApplicationContext(),
+                            R.drawable.icon_map_low);
+                }
+            }
+
+            PegItem newItem = new PegItem(currentFilteredRestaurant.getLatitude(),
+                    currentFilteredRestaurant.getLongitude(),
+                    currentFilteredRestaurant.getRestaurantName(),
                     hazardIcon);
 
             mClusterManager.addItem(newItem);
