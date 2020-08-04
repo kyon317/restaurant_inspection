@@ -111,8 +111,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private int[] restaurantIcons;
     private Location currentLocation;
     private ClusterManager<PegItem> mClusterManager;
-    private DBAdapter dbAdapter;
-    private Gson gson = new Gson();//necessary to convert Array list
     private ConstraintLayout searchLayout;
 
     @Override
@@ -149,12 +147,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     }
                 }).check();
 
-        //opening database
-        openDB();
-        addRestaurantsToDB();
-        printDB();
-
-
     }
 
     public static Intent makeIntent(Context context, String name,
@@ -167,78 +159,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         intent.putExtra(EXTRA_BOOL, fromRestaurant);
         return intent;
     }
-
-    /**
-     * DATABASE FUNCTIONS
-     */
-    //TODO: move the database functions into a separate class
-    private void openDB(){
-        dbAdapter = new DBAdapter(this);
-        dbAdapter.open();
-    }
-
-    private void closeDB(){
-        dbAdapter.close();
-    }
-    private void addRestaurantsToDB(){
-        //TODO: Look over the methods outlined, understand what they do
-
-        int i = 0;
-        for(Restaurant restaurant: restaurantManager.getRestaurants()){
-            if(i >= 5){
-                break;
-            }
-            String inspectionJSON = gson.toJson(restaurant.getInspectionDataList());
-
-            //THIS PROCESS ADDS ITEM TO THE DM
-            long newID = dbAdapter.insertRow(restaurant.getTrackNumber(),
-                    restaurant.getRestaurantName(), restaurant.getPhysicalAddress(),
-                    restaurant.getPhysicalCity(), restaurant.getFacType(),
-                    restaurant.getLatitude(), restaurant.getLongitude(), restaurant.getIcon(),
-                    inspectionJSON);
-            i++;
-
-        }
-    }
-
-    private void printDB(){
-        Cursor cursor = dbAdapter.getAllRows();
-
-        if(cursor.moveToFirst()){
-            do{
-                //THIS PAIR OF LINES ARE USED TO DESERIALIZE THE JSON STRING EXTRACTED FROM DB
-                Type type = new TypeToken<ArrayList<InspectionData>>() {}.getType();
-                List<InspectionData> tempList = gson.fromJson(cursor.getString(DBAdapter.COL_INSPECTION), type);
-
-                //Printer test to check injection
-                System.out.println("Injected: \n"
-                        + "\tDB-ID#: " + cursor.getInt(DBAdapter.COL_ROWID) + "\n"
-                        + "\tTrack#: " + cursor.getString(DBAdapter.COL_TRACK_NUM) + "\n"
-                        + "\tName: " + cursor.getString(DBAdapter.COL_RES_NAME) + "\n"
-                        + "\tAddr: " + cursor.getString(DBAdapter.COL_ADDRESS) + "\n"
-                        + "\tCity: " + cursor.getString(DBAdapter.COL_CITY) + "\n"
-                        + "\tFacType: " + cursor.getString(DBAdapter.COL_FAC_TYPE) + "\n"
-                        + "\tLatitude: " + cursor.getDouble(DBAdapter.COL_LATITUDE) + "\n"
-                        + "\tLongitude: " + cursor.getDouble(DBAdapter.COL_LONGITUDE) + "\n"
-                        + "---------------------------------------------------------------------\n");
-               /* if(!tempList.isEmpty()) {
-                    System.out.println("\tInspection Details: ");
-                    for(InspectionData inspectionData: tempList)
-                        inspectionData.Display();
-                }uncomment if you want to see inspections */
-            }while (cursor.moveToNext());
-        }
-        cursor.close();
-    }
-
-    public void clearDB() {
-        System.out.println("Wiped DB clean");
-        dbAdapter.deleteAll();
-    }
-    /**
-     * ENDOF DATABASE FUNCTIONS
-     */
-
 
     public static MapsActivity getInstance() {
         return instance;
@@ -526,8 +446,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onDestroy() {
         android.os.Process.killProcess(android.os.Process.myPid());
         super.onDestroy();
-        clearDB();
-        closeDB();
     }
 
 

@@ -20,23 +20,25 @@ import java.net.URLConnection;
 import java.util.Arrays;
 import java.util.Objects;
 
+import ca.sfu.cmpt_276_project.UI.LoadingActivity;
+
 public class CSVDownloader extends AsyncTask<String, String, String> {
-    private ProgressDialog progreassDiag;
+    //private ProgressDialog progreassDiag;
     private String filename = "";
 
     public CSVDownloader(String filename, Context context) {
         this.filename = filename;
-        setPdialog(context);
+        //setPdialog(context);
     }
 
     public void setFilename(String filename) {
         this.filename = filename;
     }
 
-    public void setPdialog(Context context) {
-        progreassDiag = new ProgressDialog(context);
-
-    }
+//    public void setPdialog(Context context) {
+//        progreassDiag = new ProgressDialog(LoadingActivity.this);
+//
+//    }
     public boolean checkFileExistence(String filename){
         File dummyFile = new File(Environment.getExternalStorageDirectory().getPath() + "/Download/"+filename);
         return dummyFile.exists();
@@ -70,29 +72,29 @@ public class CSVDownloader extends AsyncTask<String, String, String> {
             backupFile(filename);
         }
 
-        progreassDiag.setTitle("Hold on, we are loading the data");
-        progreassDiag.setIndeterminate(false);
-        progreassDiag.setProgress(0);
-        progreassDiag.setCancelable(false);
-        progreassDiag.setMax(100);
-        progreassDiag.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        CSVDownloader.this.cancel(true);
-                        deleteFile(filename);
-                        restoreFile(filename+"(1)");
-                        progreassDiag.cancel();
-                        progreassDiag.dismiss();
-                    }
-                });
-        progreassDiag.setCanceledOnTouchOutside(false);
-        progreassDiag.setButton(DialogInterface.BUTTON_POSITIVE, "Done", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                progreassDiag.dismiss();
-            }
-        });
-        progreassDiag.show();
+//        progreassDiag.setTitle("Hold on, we are loading the data");
+//        progreassDiag.setIndeterminate(false);
+//        progreassDiag.setProgress(0);
+//        progreassDiag.setCancelable(false);
+//        progreassDiag.setMax(100);
+//        progreassDiag.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialogInterface, int i) {
+//                        CSVDownloader.this.cancel(true);
+//                        deleteFile(filename);
+//                        restoreFile(filename+"(1)");
+//                        progreassDiag.cancel();
+//                        progreassDiag.dismiss();
+//                    }
+//                });
+//        progreassDiag.setCanceledOnTouchOutside(false);
+//        progreassDiag.setButton(DialogInterface.BUTTON_POSITIVE, "Done", new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialogInterface, int i) {
+//                progreassDiag.dismiss();
+//            }
+//        });
+//        progreassDiag.show();
     }
 
     /**
@@ -100,7 +102,7 @@ public class CSVDownloader extends AsyncTask<String, String, String> {
      */
     @Override
     protected String doInBackground(String... f_url) {
-        progreassDiag.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(false);
+//        progreassDiag.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(false);
         int count;
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
@@ -155,7 +157,7 @@ public class CSVDownloader extends AsyncTask<String, String, String> {
     protected void onProgressUpdate(String... progress) {
         // setting progress percentage
         System.out.println("Progress: " + Integer.parseInt(progress[0]));
-        progreassDiag.setProgress(Integer.parseInt(progress[0]));
+        //progreassDiag.setProgress(Integer.parseInt(progress[0]));
     }
 
     /**
@@ -163,8 +165,8 @@ public class CSVDownloader extends AsyncTask<String, String, String> {
      **/
     @Override
     protected void onPostExecute(String file_url) {
-        progreassDiag.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(true);
-        progreassDiag.getButton(DialogInterface.BUTTON_NEGATIVE).setEnabled(false);
+//        progreassDiag.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(true);
+//        progreassDiag.getButton(DialogInterface.BUTTON_NEGATIVE).setEnabled(false);
         System.out.println("DONE Downloading");
         // dismiss the dialog after the file was downloaded
         //progressBar.setVisibility(View.GONE);
