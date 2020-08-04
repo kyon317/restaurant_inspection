@@ -115,11 +115,19 @@ public class RestaurantListActivity extends AppCompatActivity {
             System.out.println("result base number: "+restaurantList.size());
             for (int i = 0;i<restaurantList.size();i++) {
                 if (restaurantList.get(i).getInspectionDataList().size()<minCrit||
-                        restaurantList.get(i).getInspectionDataList().size()>maxCrit)
+                        restaurantList.get(i).getInspectionDataList().size()>maxCrit){
                     restaurantList.remove(i);
-                if (restaurantList.get(i).getInspectionDataList().size()>0){
-                    if (!restaurantList.get(i).getInspectionDataList().get(0).getHazard().toString().equals(hazard_check))
+                    continue;
+                }
+                if (!restaurantList.get(i).getInspectionDataList().isEmpty()){
+                    Hazard this_hazard = restaurantList.get(i).getInspectionDataList().get(0).getHazard();
+                    System.out.println(this_hazard);
+                    System.out.println(hazard_check);
+                    if (!(restaurantList.get(i).getInspectionDataList().get(0).getHazard().toString().equals(hazard_check))){
                         restaurantList.remove(i);
+                    }
+                }else if (hazard_check.equals("NONE")){
+                    restaurantList.remove(i);
                 }
             }
             return restaurantList;
