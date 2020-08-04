@@ -646,14 +646,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //get filtered restaurants
         filteredRestaurants = restaurantManager.getFilteredRestaurants();
 
-        for (int i = 0; i < filteredRestaurants.size(); i++) {
+        for (int i = 0; i < restaurantManager.getRestaurants().size(); i++) {
 
             Restaurant currentRestaurant = restaurantManager.getRestaurantByID(i);
-            BitmapDescriptor hazardIcon = null;
-
-            // remember restaurant position in list view
+            // remember restaurant position in restaurants list view
             currentRestaurant.setId(i);
-
+            /*
+            BitmapDescriptor hazardIcon = null;
             if (currentRestaurant.getInspectionDataList().isEmpty() == false) {
 
                 Hazard hazard = currentRestaurant.getInspectionDataList().get(0).getHazard();
@@ -672,6 +671,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             PegItem newItem = new PegItem(currentRestaurant.getLatitude(),
                     currentRestaurant.getLongitude(),
                     currentRestaurant.getRestaurantName(),
+                    hazardIcon);
+
+            mClusterManager.addItem(newItem);
+            */
+        }
+
+        int i = 0;
+        BitmapDescriptor hazardIcon = null;
+        for (Restaurant currentFilteredRestaurant : filteredRestaurants) {
+
+            if (currentFilteredRestaurant.getInspectionDataList().isEmpty() == false) {
+
+                Hazard hazard = currentFilteredRestaurant.getInspectionDataList().get(0).getHazard();
+                if (hazard == Hazard.HIGH) {
+                    hazardIcon = bitmapDescriptorFromVector(getApplicationContext(),
+                            R.drawable.icon_map_high);
+                } else if (hazard == Hazard.MEDIUM) {
+                    hazardIcon = bitmapDescriptorFromVector(getApplicationContext(),
+                            R.drawable.icon_map_medium);
+                } else {
+                    hazardIcon = bitmapDescriptorFromVector(getApplicationContext(),
+                            R.drawable.icon_map_low);
+                }
+            }
+
+            PegItem newItem = new PegItem(currentFilteredRestaurant.getLatitude(),
+                    currentFilteredRestaurant.getLongitude(),
+                    currentFilteredRestaurant.getRestaurantName(),
                     hazardIcon);
 
             mClusterManager.addItem(newItem);
