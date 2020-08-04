@@ -108,6 +108,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Boolean mLocationPermissionGranted = false;
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private RestaurantManager restaurantManager;
+
+    List<Restaurant> filteredRestaurants = new ArrayList<>();
+
     private int[] restaurantIcons;
     private Location currentLocation;
     private ClusterManager<PegItem> mClusterManager;
@@ -299,6 +302,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         //todo change map display
                         editor.putString("Search Name Input", String.valueOf(charSequence));
                         editor.apply();
+
+                        restaurantManager.setSearchTerm(savedSearch);
+
                     }
 
                     @Override
@@ -324,6 +330,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         String minvalue = String.valueOf(charSequence);
                         editor.putInt("Minimum Issues Input", Integer.valueOf(minvalue));
                         editor.apply();
+
+                        restaurantManager.setMinimumCritical(savedMinCritIssuesInput);
                     }
 
                     @Override
@@ -349,6 +357,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         String maxValue = String.valueOf(charSequence);
                         editor.putInt("Maximum Issues Input", Integer.valueOf(maxValue));
                         editor.apply();
+
+                        restaurantManager.setMaximumCritical(savedMaxCritIssuesInput);
                     }
 
                     @Override
@@ -385,6 +395,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         RadioButton checked = (RadioButton) mView.findViewById(i);
                         editor.putString("Hazard Check Change", String.valueOf(checked.getText()));
                         editor.apply();
+
+                        restaurantManager.setHazardLevelFilter(savedHazardChecked);
                     }
                 });
 /*
@@ -412,12 +424,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             //Todo: only display favourites
                             editor.putBoolean("Display Favourites", true);
                             editor.apply();
+
+                            restaurantManager.setFavouriteOnly(getFavouritesCheck);
                         }
                         else{
                             //favourites not checked
                             //todo: display all
                             editor.putBoolean("Display Favourites", false);
                             editor.apply();
+
+                            restaurantManager.setFavouriteOnly(getFavouritesCheck);
+
                         }
                     }
                 });
@@ -626,7 +643,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void showRestaurants() {
 
-        for (int i = 0; i < restaurantManager.getRestaurants().size(); i++) {
+        //get filtered restaurants
+        filteredRestaurants = restaurantManager.getFilteredRestaurants();
+
+        for (int i = 0; i < filteredRestaurants.size(); i++) {
 
             Restaurant currentRestaurant = restaurantManager.getRestaurantByID(i);
             BitmapDescriptor hazardIcon = null;
