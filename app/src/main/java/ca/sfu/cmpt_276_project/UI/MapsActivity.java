@@ -303,7 +303,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         editor.putString("Search Name Input", String.valueOf(charSequence));
                         editor.apply();
 
-                        restaurantManager.setSearchTerm(savedSearch);
+                        restaurantManager.setSearchTerm(getSearchName(MapsActivity.this));
+                        showRestaurants();
 
                     }
 
@@ -331,7 +332,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         editor.putInt("Minimum Issues Input", Integer.valueOf(minvalue));
                         editor.apply();
 
-                        restaurantManager.setMinimumCritical(savedMinCritIssuesInput);
+                        restaurantManager.setMinimumCritical(getMinCritIssuesInput(MapsActivity.this));
+                        showRestaurants();
                     }
 
                     @Override
@@ -358,7 +360,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         editor.putInt("Maximum Issues Input", Integer.valueOf(maxValue));
                         editor.apply();
 
-                        restaurantManager.setMaximumCritical(savedMaxCritIssuesInput);
+                        restaurantManager.setMaximumCritical(getMaxCritIssuesInput(MapsActivity.this));
+                        showRestaurants();
                     }
 
                     @Override
@@ -396,7 +399,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         editor.putString("Hazard Check Change", String.valueOf(checked.getText()));
                         editor.apply();
 
-                        restaurantManager.setHazardLevelFilter(savedHazardChecked);
+                        restaurantManager.setHazardLevelFilter(getHazardLevelChecked(MapsActivity.this));
+                        showRestaurants();
                     }
                 });
 /*
@@ -425,7 +429,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             editor.putBoolean("Display Favourites", true);
                             editor.apply();
 
-                            restaurantManager.setFavouriteOnly(getFavouritesCheck);
+                            restaurantManager.setFavouriteOnly(getFavouritesChecked(MapsActivity.this));
+                            showRestaurants();
                         }
                         else{
                             //favourites not checked
@@ -433,7 +438,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             editor.putBoolean("Display Favourites", false);
                             editor.apply();
 
-                            restaurantManager.setFavouriteOnly(getFavouritesCheck);
+                            restaurantManager.setFavouriteOnly(getFavouritesChecked(MapsActivity.this));
+                            showRestaurants();
 
                         }
                     }
@@ -642,7 +648,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void showRestaurants() {
-
+        mMap.clear();
         //get filtered restaurants
         filteredRestaurants = restaurantManager.getFilteredRestaurants();
 
