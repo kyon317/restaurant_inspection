@@ -22,7 +22,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -64,7 +63,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
@@ -75,13 +73,11 @@ import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
 import ca.sfu.cmpt_276_project.DBAdapter;
 import ca.sfu.cmpt_276_project.Model.Hazard;
-import ca.sfu.cmpt_276_project.Model.InspectionData;
 import ca.sfu.cmpt_276_project.Model.PegItem;
 import ca.sfu.cmpt_276_project.Model.Restaurant;
 import ca.sfu.cmpt_276_project.Model.RestaurantManager;
@@ -253,7 +249,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                         //todo update display
                         String minvalue = String.valueOf(charSequence);
-                        editor.putInt("Minimum Issues Input", Integer.valueOf(minvalue));
+                        editor.putInt("Minimum Issues Input", Integer.parseInt(minvalue));
                         editor.apply();
 
                         restaurantManager.setMinimumCritical(getMinCritIssuesInput(MapsActivity.this));
@@ -281,7 +277,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                         //todo update display
                         String maxValue = String.valueOf(charSequence);
-                        editor.putInt("Maximum Issues Input", Integer.valueOf(maxValue));
+                        editor.putInt("Maximum Issues Input", Integer.parseInt(maxValue));
                         editor.apply();
 
                         restaurantManager.setMaximumCritical(getMaxCritIssuesInput(MapsActivity.this));

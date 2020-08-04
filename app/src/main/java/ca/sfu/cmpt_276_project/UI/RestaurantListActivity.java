@@ -12,13 +12,11 @@ package ca.sfu.cmpt_276_project.UI;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,10 +38,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -55,7 +51,6 @@ import ca.sfu.cmpt_276_project.CsvIngester.InspectionDataCSVIngester;
 import ca.sfu.cmpt_276_project.CsvIngester.RestaurantCSVIngester;
 import ca.sfu.cmpt_276_project.DBAdapter;
 import ca.sfu.cmpt_276_project.Model.Hazard;
-import ca.sfu.cmpt_276_project.Model.InspectionData;
 import ca.sfu.cmpt_276_project.Model.Restaurant;
 import ca.sfu.cmpt_276_project.Model.RestaurantManager;
 import ca.sfu.cmpt_276_project.R;
@@ -118,7 +113,7 @@ public class RestaurantListActivity extends AppCompatActivity {
                         restaurantList.get(i).getInspectionDataList().size()>maxCrit)
                     restaurantList.remove(i);
                 if (restaurantList.get(i).getInspectionDataList().size()>0){
-                    if (!restaurantList.get(i).getInspectionDataList().get(0).getHazard().toString().equals(hazard_check))
+                    if (!restaurantList.get(i).getInspectionDataList().get(0).getHazard().toString().contains(hazard_check))
                         restaurantList.remove(i);
                 }
             }
@@ -305,6 +300,32 @@ public class RestaurantListActivity extends AppCompatActivity {
                             restaurants = temp_restaurant_list;
                             refreshListView(temp_restaurant_list);
                         }
+                    }
+                });
+
+                Button resetBtn = (Button) mView.findViewById(R.id.resetBtn);
+                resetBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        searchInput.setText(null);
+                        editor.putString("Search Name Input", null);
+                        minCritIssues.setText(String.valueOf(0));
+                        editor.putInt("Minimum Issues Input", 0);
+                        maxCritIssues.setText(String.valueOf(99));
+                        editor.putInt("Maximum Issues Input", 99);
+                        RadioButton noneRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonNone);
+                        noneRadioButton.setChecked(true);
+                        editor.putString("Hazard Check Change", String.valueOf(R.string.none));
+                        favouritesSwitch.setChecked(false);
+                        editor.putBoolean("Display Favourites", false);
+                        editor.apply();
+                        List<Restaurant> temp_restaurant_list = restaurantSearcher(getSearchName(RestaurantListActivity.this),
+                                getMinCritIssuesInput(RestaurantListActivity.this),
+                                getMaxCritIssuesInput(RestaurantListActivity.this),
+                                getHazardLevelChecked(RestaurantListActivity.this),
+                                getFavouritesChecked(RestaurantListActivity.this));
+                        restaurants = temp_restaurant_list;
+                        refreshListView(temp_restaurant_list);
                     }
                 });
                 //Todo: make the search layout change what pegs are displayed
