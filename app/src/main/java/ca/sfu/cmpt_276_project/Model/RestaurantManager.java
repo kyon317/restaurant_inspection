@@ -65,6 +65,7 @@ public class RestaurantManager {
         return null;
     }
 
+
     //THIS IS FOR RETRIEVING RESTAURANTS USING ARRAYLIST INDEXING
     public Restaurant getRestaurantByID(int ID) throws IndexOutOfBoundsException {
 

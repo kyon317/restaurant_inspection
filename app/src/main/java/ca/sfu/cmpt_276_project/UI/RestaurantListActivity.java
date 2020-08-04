@@ -93,9 +93,7 @@ public class RestaurantListActivity extends AppCompatActivity {
 
 
         restaurantManager = RestaurantManager.getInstance();
-        testOpenDB();
         initializeRestaurantList();//method necessary to initialize instance
-        System.out.println("after injection: "+dbAdapter.getAllRows().getCount());
 //        Restaurant dummyRestaurant = new Restaurant();
 //        dummyRestaurant = getRestaurantFromDB(1430);
 //        dummyRestaurant.Display();
@@ -109,6 +107,35 @@ public class RestaurantListActivity extends AppCompatActivity {
 
     }
 
+    private List<Restaurant> restaurantSearcher(String search_name,int minCrit,int maxCrit,String hazard_check,boolean is_favourited){
+        if (is_favourited){
+            // TODO: Fetch data from DB
+        }else{
+            List<Restaurant> restaurantList = findRestaurantByNames(search_name);
+            System.out.println("result base number: "+restaurantList.size());
+            for (int i = 0;i<restaurantList.size();i++) {
+                if (restaurantList.get(i).getInspectionDataList().size()<minCrit||
+                        restaurantList.get(i).getInspectionDataList().size()>maxCrit)
+                    restaurantList.remove(i);
+                if (restaurantList.get(i).getInspectionDataList().size()>0){
+                    if (!restaurantList.get(i).getInspectionDataList().get(0).getHazard().toString().equals(hazard_check))
+                        restaurantList.remove(i);
+                }
+            }
+            return restaurantList;
+        }
+        return null;
+    }
+
+    private List<Restaurant> findRestaurantByNames(String search_name) {
+        List<Restaurant> restaurantList = new ArrayList<>();
+        for (Restaurant res: restaurantManager.getRestaurants()) {
+            if (res.getRestaurantName().toLowerCase().contains(search_name.toLowerCase())) {
+                restaurantList.add(res);
+            }
+        }
+        return restaurantList;
+    }
     private void setUpSearchWindow() {
         ImageButton srchButton = (ImageButton) findViewById(R.id.srchBtn);
         SharedPreferences savePreferences = this.getSharedPreferences("SavePrefs",
@@ -140,10 +167,23 @@ public class RestaurantListActivity extends AppCompatActivity {
                         //todo change map display
                         editor.putString("Search Name Input", String.valueOf(charSequence));
                         editor.apply();
+                        System.out.println("minCrit: "+savedMinCritIssuesInput);
+                        System.out.println("maxCrit: "+savedMaxCritIssuesInput);
+                        System.out.println("savedHazardChecked: "+savedHazardChecked);
+                        System.out.println("getFavouritesCheck: "+getFavouritesCheck);
+                        List<Restaurant> temp_restaurant_list = restaurantSearcher(charSequence.toString(),savedMinCritIssuesInput,savedMaxCritIssuesInput,savedHazardChecked,false);
+//                        for (int j =0; j<5;j++){
+//                            temp_restaurant_list.get(j).Display();
+//                        }
+                        System.out.println("result size: "+temp_restaurant_list.size());
+                        restaurants = temp_restaurant_list;
+                        refreshListView(temp_restaurant_list);
                     }
 
                     @Override
                     public void afterTextChanged(Editable editable) {
+                        String result = editable.toString();
+                        System.out.println("result: "+ result);
 
                     }
                 });
@@ -153,6 +193,7 @@ public class RestaurantListActivity extends AppCompatActivity {
                     String intString = Integer.toString(savedMinCritIssuesInput) ;
                     minCritIssues.setText(intString, TextView.BufferType.EDITABLE);
                 }
+
                 minCritIssues.addTextChangedListener(new TextWatcher() {
                     @Override
                     public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -161,10 +202,13 @@ public class RestaurantListActivity extends AppCompatActivity {
 
                     @Override
                     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                        //todo update display
+                        //TODO: Limit min smaller than max
                         String minvalue = String.valueOf(charSequence);
-                        editor.putInt("Minimum Issues Input", Integer.valueOf(minvalue));
+                        editor.putInt("Minimum Issues Input", Integer.parseInt(minvalue));
                         editor.apply();
+                        List<Restaurant> temp_restaurant_list = restaurantSearcher(savedSearch,Integer.parseInt(minvalue),savedMaxCritIssuesInput,savedHazardChecked,getFavouritesCheck);
+                        restaurants = temp_restaurant_list;
+                        refreshListView(temp_restaurant_list);
                     }
 
                     @Override
@@ -186,10 +230,13 @@ public class RestaurantListActivity extends AppCompatActivity {
 
                     @Override
                     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                        //todo update display
+                        //TODO: Limit max larger than min
                         String maxValue = String.valueOf(charSequence);
-                        editor.putInt("Maximum Issues Input", Integer.valueOf(maxValue));
+                        editor.putInt("Maximum Issues Input", Integer.parseInt(maxValue));
                         editor.apply();
+                        List<Restaurant> temp_restaurant_list = restaurantSearcher(savedSearch,savedMinCritIssuesInput,Integer.parseInt(maxValue),savedHazardChecked,getFavouritesCheck);
+                        restaurants = temp_restaurant_list;
+                        refreshListView(temp_restaurant_list);
                     }
 
                     @Override
@@ -226,6 +273,9 @@ public class RestaurantListActivity extends AppCompatActivity {
                         RadioButton checked = (RadioButton) mView.findViewById(i);
                         editor.putString("Hazard Check Change", String.valueOf(checked.getText()));
                         editor.apply();
+                        List<Restaurant> temp_restaurant_list = restaurantSearcher(savedSearch,savedMinCritIssuesInput,savedMaxCritIssuesInput,savedHazardChecked,getFavouritesCheck);
+                        restaurants = temp_restaurant_list;
+                        refreshListView(temp_restaurant_list);
                     }
                 });
 
@@ -238,15 +288,22 @@ public class RestaurantListActivity extends AppCompatActivity {
                     public void onClick(View view) {
                         if(favouritesSwitch.isChecked()){
                             //favourites has been checked
-                            //Todo: only display favourites
+                            //Todo: only display favourites ... waiting for DB
+
                             editor.putBoolean("Display Favourites", true);
                             editor.apply();
+                            List<Restaurant> temp_restaurant_list = restaurantSearcher(savedSearch,savedMinCritIssuesInput,savedMaxCritIssuesInput,savedHazardChecked,getFavouritesCheck);
+                            restaurants = temp_restaurant_list;
+                            refreshListView(temp_restaurant_list);
                         }
                         else{
                             //favourites not checked
-                            //todo: display all
+                            //Todo: display all ... waiting for DB
                             editor.putBoolean("Display Favourites", false);
                             editor.apply();
+                            List<Restaurant> temp_restaurant_list = restaurantSearcher(savedSearch,savedMinCritIssuesInput,savedMaxCritIssuesInput,savedHazardChecked,getFavouritesCheck);
+                            restaurants = temp_restaurant_list;
+                            refreshListView(temp_restaurant_list);
                         }
                     }
                 });
@@ -290,93 +347,30 @@ public class RestaurantListActivity extends AppCompatActivity {
     }
 
 
-    /**
-     * EXPORTED METHODS FROM MAPS_ACTIVITY
-     */
-    public void testOpenDB(){
-        dbAdapter = new DBAdapter(this);
-        dbAdapter.open();
-        Log.d("TAG", "testOpenDB: "+dbAdapter.getAllRows().getCount());
-    }
-
-    private void addRestaurantsToDB(){
-        for(Restaurant restaurant: restaurantManager.getRestaurants()){
-
-            String inspectionJSON = gson.toJson(restaurant.getInspectionDataList());
-
-            //THIS PROCESS ADDS ITEM TO THE DM
-            long newID = dbAdapter.insertRow(restaurant.getTrackNumber(),
-                    restaurant.getRestaurantName(), restaurant.getPhysicalAddress(),
-                    restaurant.getPhysicalCity(), restaurant.getFacType(),
-                    restaurant.getLatitude(), restaurant.getLongitude(), restaurant.getIcon(),
-                    inspectionJSON);
-        }
-    }
-
-    private void printDB(){
-        Cursor cursor = dbAdapter.getAllRows();
-
-        if(cursor.moveToFirst()){
-            do{
-                //THIS PAIR OF LINES ARE USED TO DESERIALIZE THE JSON STRING EXTRACTED FROM DB
-                Type type = new TypeToken<ArrayList<InspectionData>>() {}.getType();
-                List<InspectionData> tempList = gson.fromJson(cursor.getString(DBAdapter.COL_INSPECTION), type);
-
-                //Printer test to check injection
-                System.out.println("Injected: \n"
-                        + "\tDB-ID#: " + cursor.getInt(DBAdapter.COL_ROWID) + "\n"
-                        + "\tTrack#: " + cursor.getString(DBAdapter.COL_TRACK_NUM) + "\n"
-                        + "\tName: " + cursor.getString(DBAdapter.COL_RES_NAME) + "\n"
-                        + "\tAddr: " + cursor.getString(DBAdapter.COL_ADDRESS) + "\n"
-                        + "\tCity: " + cursor.getString(DBAdapter.COL_CITY) + "\n"
-                        + "\tFacType: " + cursor.getString(DBAdapter.COL_FAC_TYPE) + "\n"
-                        + "\tLatitude: " + cursor.getDouble(DBAdapter.COL_LATITUDE) + "\n"
-                        + "\tLongitude: " + cursor.getDouble(DBAdapter.COL_LONGITUDE) + "\n"
-                        + "---------------------------------------------------------------------\n");
-                /*if(!tempList.isEmpty()) {
-                    System.out.println("\tInspection Details: ");
-                    for(InspectionData inspectionData: tempList)
-                        inspectionData.Display();
-                }uncomment to see inspections(takes a long time to list)*/
-            }while (cursor.moveToNext());
-        }
-        cursor.close();
-    }
-
-
-
-    public void clearDB() {
-        System.out.println("Wiped DB clean");
-        dbAdapter.deleteAll();
-    }
-    /**
-     * ENDOF EXPORTED METHODS FROM MAPS_ACTIVITY
-     */
-
-    /**
-     * Get restaurant from DB by ROw_ID
-     * */
-    private Restaurant getRestaurantFromDB(int ROW_ID){
-        Cursor cursor = dbAdapter.getAllRows();
-        Restaurant restaurant = new Restaurant();
-        if (cursor.move(ROW_ID)){
-            Type type = new TypeToken<ArrayList<InspectionData>>() {}.getType();
-            List<InspectionData> tempList = gson.fromJson(cursor.getString(DBAdapter.COL_INSPECTION), type);
-
-            restaurant.setTrackNumber(cursor.getString(DBAdapter.COL_TRACK_NUM));
-            restaurant.setRestaurantName(cursor.getString(DBAdapter.COL_RES_NAME));
-            restaurant.setPhysicalAddress(cursor.getString(DBAdapter.COL_ADDRESS));
-            restaurant.setPhysicalCity(cursor.getString(DBAdapter.COL_CITY));
-            restaurant.setFacType(cursor.getString(DBAdapter.COL_FAC_TYPE));
-            restaurant.setLatitude(cursor.getDouble(DBAdapter.COL_LATITUDE));
-            restaurant.setLongitude(cursor.getDouble(DBAdapter.COL_LONGITUDE));
-            if(!tempList.isEmpty()) {
-                restaurant.setInspectionDataList(tempList);
-            }
-        }
-        cursor.close();
-        return restaurant;
-    }
+//    /**
+//     * Get restaurant from DB by ROw_ID
+//     * */
+//    private Restaurant getRestaurantFromDB(int ROW_ID){
+//        Cursor cursor = dbAdapter.getAllRows();
+//        Restaurant restaurant = new Restaurant();
+//        if (cursor.move(ROW_ID)){
+//            Type type = new TypeToken<ArrayList<InspectionData>>() {}.getType();
+//            List<InspectionData> tempList = gson.fromJson(cursor.getString(DBAdapter.COL_INSPECTION), type);
+//
+//            restaurant.setTrackNumber(cursor.getString(DBAdapter.COL_TRACK_NUM));
+//            restaurant.setRestaurantName(cursor.getString(DBAdapter.COL_RES_NAME));
+//            restaurant.setPhysicalAddress(cursor.getString(DBAdapter.COL_ADDRESS));
+//            restaurant.setPhysicalCity(cursor.getString(DBAdapter.COL_CITY));
+//            restaurant.setFacType(cursor.getString(DBAdapter.COL_FAC_TYPE));
+//            restaurant.setLatitude(cursor.getDouble(DBAdapter.COL_LATITUDE));
+//            restaurant.setLongitude(cursor.getDouble(DBAdapter.COL_LONGITUDE));
+//            if(!tempList.isEmpty()) {
+//                restaurant.setInspectionDataList(tempList);
+//            }
+//        }
+//        cursor.close();
+//        return restaurant;
+//    }
 
     public void initializeRestaurantList() {
         //get Restaurants from CSV
@@ -415,9 +409,6 @@ public class RestaurantListActivity extends AppCompatActivity {
         //Update existing Restaurant Manager obj instance
         restaurantManager.setRestaurants(restaurantList);
 
-        //Updating DB list as well
-        clearDB();
-        addRestaurantsToDB();
 
     }
 
@@ -434,11 +425,7 @@ public class RestaurantListActivity extends AppCompatActivity {
     public void onDestroy() {
         android.os.Process.killProcess(android.os.Process.myPid());
         super.onDestroy();
-        closeDB();
-    }
 
-    private void closeDB(){
-        dbAdapter.close();
     }
 
     private void populateRestaurantIcons() {
@@ -480,22 +467,19 @@ public class RestaurantListActivity extends AppCompatActivity {
         registerClickCallback();
     }
 
-    //TODO: Change the size of db based on search result
     private void populateListView() {
-        if (search_mode){
-            int size_of_db = 30;    //Dummy value for testing
-            restaurants = new ArrayList<>();
-            for (int i = 0;i<size_of_db;i++){
-                restaurants.add(getRestaurantFromDB(i));
-            }
-            System.out.println("size of restaurants fetched from DB: "+restaurants.size());
-        }else
-            restaurants = restaurantManager.getRestaurants();
+        restaurants = restaurantManager.getRestaurants();
         ArrayAdapter<Restaurant> adapter = new MyListAdapter();
         ListView list = (ListView) findViewById(R.id.restaurantsListView);
         list.setAdapter(adapter);
     }
 
+    private void refreshListView(List<Restaurant> restaurantList){
+        restaurants = restaurantList;
+        ArrayAdapter<Restaurant> adapter = new MyListAdapter();
+        ListView list = (ListView) findViewById(R.id.restaurantsListView);
+        list.setAdapter(adapter);
+    }
 
     private void registerClickCallback() {
         ListView list = (ListView) findViewById(R.id.restaurantsListView);
@@ -503,10 +487,10 @@ public class RestaurantListActivity extends AppCompatActivity {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View viewClicked, int position, long id) {
-//                Restaurant clickedRestaurant = restaurantManager.getRestaurantByID(position);
-                Restaurant clickedRestaurant = getRestaurantFromDB(position);
+                Restaurant clickedRestaurant = restaurants.get(position);
+//                Restaurant clickedRestaurant = getRestaurantFromDB(position);
                 // pass clicked restaurant's position to SingleRestaurantActivity
-                Intent intent = SingleRestaurantActivity.makeIntent(RestaurantListActivity.this, position, false);
+                Intent intent = SingleRestaurantActivity.makeIntent(RestaurantListActivity.this, position, false,clickedRestaurant.getTrackNumber());
                 startActivity(intent);
             }
         });
@@ -528,8 +512,8 @@ public class RestaurantListActivity extends AppCompatActivity {
             }
 
 //            System.out.println("position: "+position);
-//            Restaurant currentRestaurant = restaurantManager.getRestaurantByID(position);
-            Restaurant currentRestaurant = getRestaurantFromDB(position);
+            Restaurant currentRestaurant = restaurants.get(position);
+//            Restaurant currentRestaurant = getRestaurantFromDB(position);
 
             // Fill restaurant image
             ImageView resImageView = (ImageView) restaurantView.findViewById(R.id.restaurant_icon);
