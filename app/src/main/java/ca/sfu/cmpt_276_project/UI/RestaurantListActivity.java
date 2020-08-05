@@ -64,7 +64,7 @@ import ca.sfu.cmpt_276_project.WebScraper.DataManager;
 public class RestaurantListActivity extends AppCompatActivity {
 
     private RestaurantManager restaurantManager;
-    private List<Restaurant> restaurants;
+    private List<Restaurant> restaurants = new ArrayList<>();
     private int[] restaurantIcons;
     private DBAdapter dbAdapter;
     private Gson gson = new Gson();
@@ -93,7 +93,7 @@ public class RestaurantListActivity extends AppCompatActivity {
 
 
         restaurantManager = RestaurantManager.getInstance();
-        initializeRestaurantList();//method necessary to initialize instance
+//        initializeRestaurantList();//method necessary to initialize instance
 //        Restaurant dummyRestaurant = new Restaurant();
 //        dummyRestaurant = getRestaurantFromDB(1430);
 //        dummyRestaurant.Display();
@@ -120,7 +120,7 @@ public class RestaurantListActivity extends AppCompatActivity {
                     continue;
                 }
                 if (restaurantList.get(i).getInspectionDataList().isEmpty()){
-                    if (hazard_check.equals("NONE")){
+                    if (!hazard_check.equals("NONE")){
                         restaurantList.remove(i);
                     }
                 }else if (!hazard_check.equals("NONE")){
@@ -146,6 +146,7 @@ public class RestaurantListActivity extends AppCompatActivity {
         }
         return restaurantList;
     }
+
     private void setUpSearchWindow() {
         ImageButton srchButton = (ImageButton) findViewById(R.id.srchBtn);
         SharedPreferences savePreferences = this.getSharedPreferences("SavePrefs",
@@ -283,6 +284,8 @@ public class RestaurantListActivity extends AppCompatActivity {
                         RadioButton checked = (RadioButton) mView.findViewById(i);
                         editor.putString("Hazard Check Change", String.valueOf(checked.getText()));
                         editor.apply();
+                        //TODO: Fix bug where checked is not changed
+                        Log.d("TAG", "onClick: "+savedHazardChecked);
                         List<Restaurant> temp_restaurant_list = restaurantSearcher(savedSearch,savedMinCritIssuesInput,savedMaxCritIssuesInput,savedHazardChecked,getFavouritesCheck);
                         restaurants = temp_restaurant_list;
                         refreshListView(temp_restaurant_list);
@@ -444,8 +447,6 @@ public class RestaurantListActivity extends AppCompatActivity {
 
         //Update existing Restaurant Manager obj instance
         restaurantManager.setRestaurants(restaurantList);
-
-
     }
 
     @Override
@@ -461,7 +462,6 @@ public class RestaurantListActivity extends AppCompatActivity {
     public void onDestroy() {
         android.os.Process.killProcess(android.os.Process.myPid());
         super.onDestroy();
-
     }
 
     private void populateRestaurantIcons() {
@@ -473,7 +473,6 @@ public class RestaurantListActivity extends AppCompatActivity {
         restaurantIcons[4] = R.drawable.icon_pizza;
         restaurantIcons[5] = R.drawable.icon_pizza;
         restaurantIcons[6] = R.drawable.icon_chicken;
-
     }
 
     // start Maps activity
@@ -499,11 +498,26 @@ public class RestaurantListActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        restaurantManager = RestaurantManager.getInstance();
+        if (RestaurantManager.getInstance().getRestaurants().isEmpty()){
+            initializeRestaurantList();
+            restaurantManager = RestaurantManager.getInstance();
+        }
         populateListView();
+        String savedSearch = getSearchName(this);
+        int savedMinCritIssuesInput = getMinCritIssuesInput(this);
+        int savedMaxCritIssuesInput = getMaxCritIssuesInput(this);
+        String savedHazardChecked = getHazardLevelChecked(this);
+        boolean getFavouritesCheck = getFavouritesChecked(this);
+        if (!savedSearch.equals("")){
+            List<Restaurant> dummy_restaurant = restaurantSearcher(savedSearch,savedMinCritIssuesInput,savedMaxCritIssuesInput,savedHazardChecked,getFavouritesCheck);
+            refreshListView(dummy_restaurant);
+        }
         registerClickCallback();
     }
 
     private void populateListView() {
+        restaurantManager = RestaurantManager.getInstance();
         restaurants = restaurantManager.getRestaurants();
         ArrayAdapter<Restaurant> adapter = new MyListAdapter();
         ListView list = (ListView) findViewById(R.id.restaurantsListView);
@@ -583,14 +597,13 @@ public class RestaurantListActivity extends AppCompatActivity {
             resImageView.setImageResource(currentRestaurant.getIcon());
 
             ImageView favIconView = (ImageView) restaurantView.findViewById(R.id.favouriteIcon);
-            if(currentRestaurant.getFavourite() == false){
+            if(!currentRestaurant.getFavourite()){
                 favIconView.setVisibility(View.INVISIBLE);
             }
 
             // Fill hazard icon
             ImageView hazardIconView = (ImageView) restaurantView.findViewById(
                     R.id.restaurant_hazardicon);
-
 
             //Fill hazard level with color
             TextView hazardLevelView = (TextView) restaurantView.findViewById(R.id.hazard_level);

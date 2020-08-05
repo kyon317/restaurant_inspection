@@ -14,8 +14,8 @@ public class RestaurantManager {
     /**
      * Singleton code
      */
-    private static RestaurantManager instance;
-    private List<Restaurant> restaurants;
+    private static volatile RestaurantManager instance;
+    private static volatile List<Restaurant> restaurants;
 
     private RestaurantManager() {
         this.restaurants = new ArrayList<>();

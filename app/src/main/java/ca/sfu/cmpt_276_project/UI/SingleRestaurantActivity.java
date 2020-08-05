@@ -90,16 +90,13 @@ public class SingleRestaurantActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
-        if(fromMap == false){
+        if(!fromMap){
             Intent intent = RestaurantListActivity.makeIntent(SingleRestaurantActivity.this);
             startActivity(intent);
         }
-        else if(fromMap == true){
+        else {
             Intent intent = MapsActivity.makeIntent(SingleRestaurantActivity.this);
             startActivity(intent);
-        }
-        else {
-            finish(); // close this activity and return to preview activity (if there is any)
         }
         return super.onOptionsItemSelected(item);
     }
