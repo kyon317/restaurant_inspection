@@ -123,9 +123,11 @@ public class RestaurantListActivity extends AppCompatActivity {
 ////                restaurantList.add(getRestaurantFromDB(i));
 ////            }
 //            dbAdapter.close();
-        }else {
+        }
+        else {
             restaurantList = findRestaurantByNames(savedSearch);
         }
+
             for (int i = 0;i<restaurantList.size();i++) {
 //                Log.d("TAG", "restaurantSearcher: size of list: "+restaurantList.size()
 //                +"i: "+i);
@@ -136,11 +138,11 @@ public class RestaurantListActivity extends AppCompatActivity {
                     continue;
                 }
                 if (restaurantList.get(i).getInspectionDataList().isEmpty()){
-                    if (!savedHazardChecked.equals("NONE")){
+                    if (!savedHazardChecked.equals("None")){
                         restaurantList.remove(restaurantList.get(i));
                         i--;
                     }
-                }else if (!savedHazardChecked.equals("NONE")){
+                }else if (!savedHazardChecked.equals("None")){
                     Hazard this_hazard = restaurantList.get(i).getInspectionDataList().get(0).getHazard();
 //                    System.out.println("this_hazard: "+this_hazard);
 //                    System.out.println("hazard_check: "+savedHazardChecked);
@@ -234,17 +236,14 @@ public class RestaurantListActivity extends AppCompatActivity {
                     @Override
                     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                         //TODO: Limit min smaller than max
-                        if (!charSequence.equals("")) {
-                             String minvalue = String.valueOf(charSequence);
+                        if (!charSequence.toString().equals("")) {
+                            String minvalue = String.valueOf(charSequence);
                             editor.putInt("Minimum Issues Input", Integer.parseInt(minvalue));
                             editor.apply();
                             List<Restaurant> temp_restaurant_list = restaurantSearcher();
                             restaurants = temp_restaurant_list;
                             refreshListView(temp_restaurant_list);
 
-                        }
-                        else{
-                            System.out.println("Damn its empty!");
                         }
                     }
 
@@ -270,12 +269,14 @@ public class RestaurantListActivity extends AppCompatActivity {
                     @Override
                     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                         //TODO: Limit max larger than min
-                        String maxValue = String.valueOf(charSequence);
-                        editor.putInt("Maximum Issues Input", Integer.parseInt(maxValue));
-                        editor.apply();
-                        List<Restaurant> temp_restaurant_list = restaurantSearcher();
-                        restaurants = temp_restaurant_list;
-                        refreshListView(temp_restaurant_list);
+                        if (!charSequence.toString().equals("")){
+                            String maxValue = String.valueOf(charSequence);
+                            editor.putInt("Maximum Issues Input", Integer.parseInt(maxValue));
+                            editor.apply();
+                            List<Restaurant> temp_restaurant_list = restaurantSearcher();
+                            restaurants = temp_restaurant_list;
+                            refreshListView(temp_restaurant_list);
+                        }
                     }
 
                     @Override
@@ -286,7 +287,7 @@ public class RestaurantListActivity extends AppCompatActivity {
 
                 RadioGroup hazardLevelGroup = (RadioGroup) mView.findViewById(
                         R.id.search_hazard_group);
-                if(savedHazardChecked.contains("NONE")){
+                if(savedHazardChecked.contains("None")){
                     RadioButton noneRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonNone);
                     noneRadioButton.setChecked(true);
                 }
@@ -313,7 +314,7 @@ public class RestaurantListActivity extends AppCompatActivity {
                         editor.putString("Hazard Check Change", String.valueOf(checked.getText()));
                         editor.apply();
 //                        Log.d("TAG", "onClick: "+savedHazardChecked);
-//                        Log.d("TAG", "onClick: "+checked.getText().toString());
+                        Log.d("TAG", "onClick: "+checked.getText().toString());
                         List<Restaurant> temp_restaurant_list = restaurantSearcher();
                         restaurants = temp_restaurant_list;
 //                        Log.d("radio btn clicked", "onCheckedChanged restaurant size: "+restaurants.size());
