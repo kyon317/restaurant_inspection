@@ -57,4 +57,6 @@
     <string name="max_crit_issues_hint">Enter Maximum Critical Issues</string>
     <string name="none">NONE</string>
     <string name="favourite">favourite</string>
+    <string name="opens_search_window_on_click">opens search window on click</string>
+    <string name="reset">Reset</string>
 </resources>

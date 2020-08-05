@@ -45,11 +45,13 @@ public class SingleRestaurantActivity extends AppCompatActivity {
     private RestaurantManager restaurantManager;
 
     private int restaurantPosition;
+    private String trackNum;
     private Restaurant restaurant;
     private Boolean fromMap;
 
     private static final String EXTRA_RES_NUM = "ca.sfu.cmpt_276_project.UI.extraResNum";
     private static final String EXTRA_BOOL_FROM = "ca.sfu.cmpt_276_project.UI.exraBoolFrom";
+    private static final String EXTRA_RES_TRACK_NUM = "extraTrackNum";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,10 +75,11 @@ public class SingleRestaurantActivity extends AppCompatActivity {
         fromMap = intent.getBooleanExtra(EXTRA_BOOL_FROM, true);
 
         restaurantPosition = intent.getIntExtra(EXTRA_RES_NUM, 0);
+        trackNum = intent.getStringExtra(EXTRA_RES_TRACK_NUM);
 
         //give the view the restaurant info
         restaurantManager = RestaurantManager.getInstance();
-        restaurant = restaurantManager.getRestaurantByID(restaurantPosition);
+        restaurant = restaurantManager.getRestaurantByTrackingNumber(trackNum);
         inspections = restaurant.getInspectionDataList();
 
         populatateView();
@@ -87,16 +90,13 @@ public class SingleRestaurantActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
-        if(fromMap == false){
+        if(!fromMap){
             Intent intent = RestaurantListActivity.makeIntent(SingleRestaurantActivity.this);
             startActivity(intent);
         }
-        else if(fromMap == true){
+        else {
             Intent intent = MapsActivity.makeIntent(SingleRestaurantActivity.this);
             startActivity(intent);
-        }
-        else {
-            finish(); // close this activity and return to preview activity (if there is any)
         }
         return super.onOptionsItemSelected(item);
     }
@@ -172,10 +172,11 @@ public class SingleRestaurantActivity extends AppCompatActivity {
     }
 
     //allows SingleRestaurantActivity to be accessed.
-    public static Intent makeIntent(Context context, int restaurantPosition, boolean fromMap) {
+    public static Intent makeIntent(Context context, int restaurantPosition, boolean fromMap,String trackNum) {
         Intent intent =  new Intent(context, SingleRestaurantActivity.class);
         intent.putExtra(EXTRA_RES_NUM, restaurantPosition);
         intent.putExtra(EXTRA_BOOL_FROM, fromMap);
+        intent.putExtra(EXTRA_RES_TRACK_NUM,trackNum);
         return intent;
     }
 

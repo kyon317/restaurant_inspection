@@ -22,7 +22,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -32,6 +31,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
@@ -63,7 +63,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
@@ -74,13 +73,11 @@ import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
 import ca.sfu.cmpt_276_project.DBAdapter;
 import ca.sfu.cmpt_276_project.Model.Hazard;
-import ca.sfu.cmpt_276_project.Model.InspectionData;
 import ca.sfu.cmpt_276_project.Model.PegItem;
 import ca.sfu.cmpt_276_project.Model.Restaurant;
 import ca.sfu.cmpt_276_project.Model.RestaurantManager;
@@ -108,6 +105,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Boolean mLocationPermissionGranted = false;
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private RestaurantManager restaurantManager;
+
+    List<Restaurant> filteredRestaurants = new ArrayList<>();
+
     private int[] restaurantIcons;
     private Location currentLocation;
     private ClusterManager<PegItem> mClusterManager;
@@ -149,11 +149,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     }
                 }).check();
 
-        //opening database
-        openDB();
-        addRestaurantsToDB();
-        printDB();
-
 
     }
 
@@ -167,78 +162,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         intent.putExtra(EXTRA_BOOL, fromRestaurant);
         return intent;
     }
-
-    /**
-     * DATABASE FUNCTIONS
-     */
-    //TODO: move the database functions into a separate class
-    private void openDB(){
-        dbAdapter = new DBAdapter(this);
-        dbAdapter.open();
-    }
-
-    private void closeDB(){
-        dbAdapter.close();
-    }
-    private void addRestaurantsToDB(){
-        //TODO: Look over the methods outlined, understand what they do
-
-        int i = 0;
-        for(Restaurant restaurant: restaurantManager.getRestaurants()){
-            if(i >= 5){
-                break;
-            }
-            String inspectionJSON = gson.toJson(restaurant.getInspectionDataList());
-
-            //THIS PROCESS ADDS ITEM TO THE DM
-            long newID = dbAdapter.insertRow(restaurant.getTrackNumber(),
-                    restaurant.getRestaurantName(), restaurant.getPhysicalAddress(),
-                    restaurant.getPhysicalCity(), restaurant.getFacType(),
-                    restaurant.getLatitude(), restaurant.getLongitude(), restaurant.getIcon(),
-                    inspectionJSON);
-            i++;
-
-        }
-    }
-
-    private void printDB(){
-        Cursor cursor = dbAdapter.getAllRows();
-
-        if(cursor.moveToFirst()){
-            do{
-                //THIS PAIR OF LINES ARE USED TO DESERIALIZE THE JSON STRING EXTRACTED FROM DB
-                Type type = new TypeToken<ArrayList<InspectionData>>() {}.getType();
-                List<InspectionData> tempList = gson.fromJson(cursor.getString(DBAdapter.COL_INSPECTION), type);
-
-                //Printer test to check injection
-                System.out.println("Injected: \n"
-                        + "\tDB-ID#: " + cursor.getInt(DBAdapter.COL_ROWID) + "\n"
-                        + "\tTrack#: " + cursor.getString(DBAdapter.COL_TRACK_NUM) + "\n"
-                        + "\tName: " + cursor.getString(DBAdapter.COL_RES_NAME) + "\n"
-                        + "\tAddr: " + cursor.getString(DBAdapter.COL_ADDRESS) + "\n"
-                        + "\tCity: " + cursor.getString(DBAdapter.COL_CITY) + "\n"
-                        + "\tFacType: " + cursor.getString(DBAdapter.COL_FAC_TYPE) + "\n"
-                        + "\tLatitude: " + cursor.getDouble(DBAdapter.COL_LATITUDE) + "\n"
-                        + "\tLongitude: " + cursor.getDouble(DBAdapter.COL_LONGITUDE) + "\n"
-                        + "---------------------------------------------------------------------\n");
-               /* if(!tempList.isEmpty()) {
-                    System.out.println("\tInspection Details: ");
-                    for(InspectionData inspectionData: tempList)
-                        inspectionData.Display();
-                }uncomment if you want to see inspections */
-            }while (cursor.moveToNext());
-        }
-        cursor.close();
-    }
-
-    public void clearDB() {
-        System.out.println("Wiped DB clean");
-        dbAdapter.deleteAll();
-    }
-    /**
-     * ENDOF DATABASE FUNCTIONS
-     */
-
 
     public static MapsActivity getInstance() {
         return instance;
@@ -299,6 +222,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         //todo change map display
                         editor.putString("Search Name Input", String.valueOf(charSequence));
                         editor.apply();
+
+                        restaurantManager.setSearchTerm(getSearchName(MapsActivity.this));
+                        showRestaurants();
+
                     }
 
                     @Override
@@ -322,8 +249,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                         //todo update display
                         String minvalue = String.valueOf(charSequence);
-                        editor.putInt("Minimum Issues Input", Integer.valueOf(minvalue));
+                        editor.putInt("Minimum Issues Input", Integer.parseInt(minvalue));
                         editor.apply();
+
+                        restaurantManager.setMinimumCritical(getMinCritIssuesInput(MapsActivity.this));
+                        showRestaurants();
                     }
 
                     @Override
@@ -347,8 +277,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                         //todo update display
                         String maxValue = String.valueOf(charSequence);
-                        editor.putInt("Maximum Issues Input", Integer.valueOf(maxValue));
+                        editor.putInt("Maximum Issues Input", Integer.parseInt(maxValue));
                         editor.apply();
+
+                        restaurantManager.setMaximumCritical(getMaxCritIssuesInput(MapsActivity.this));
+                        showRestaurants();
                     }
 
                     @Override
@@ -385,21 +318,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         RadioButton checked = (RadioButton) mView.findViewById(i);
                         editor.putString("Hazard Check Change", String.valueOf(checked.getText()));
                         editor.apply();
+
+                        restaurantManager.setHazardLevelFilter(getHazardLevelChecked(MapsActivity.this));
+                        showRestaurants();
                     }
                 });
-/*
-                RadioButton lowRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonLow);
-                RadioButton mediumRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonMedium);
-                RadioButton highRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonHigh);
-                RadioButton noneRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonNone);
 
-                if(hazardLevelGroup.getParent() == null){
-                    hazardLevelGroup.addView(noneRadioButton);
-                    hazardLevelGroup.addView(lowRadioButton);
-                    hazardLevelGroup.addView(mediumRadioButton);
-                    hazardLevelGroup.addView(highRadioButton);
-                }
-*/
                 Switch favouritesSwitch = (Switch) mView.findViewById(R.id.favouritesSwitch);
                 if(getFavouritesCheck){
                     favouritesSwitch.setChecked(true);
@@ -412,13 +336,39 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             //Todo: only display favourites
                             editor.putBoolean("Display Favourites", true);
                             editor.apply();
+
+                            restaurantManager.setFavouriteOnly(getFavouritesChecked(MapsActivity.this));
+                            showRestaurants();
                         }
                         else{
                             //favourites not checked
                             //todo: display all
                             editor.putBoolean("Display Favourites", false);
                             editor.apply();
+
+                            restaurantManager.setFavouriteOnly(getFavouritesChecked(MapsActivity.this));
+                            showRestaurants();
+
                         }
+
+                    }
+                });
+                Button resetBtn = (Button) mView.findViewById(R.id.resetBtn);
+                resetBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        searchInput.setText(null);
+                        editor.putString("Search Name Input", null);
+                        minCritIssues.setText(null);
+                        editor.putInt("Minimum Issues Input", 0);
+                        maxCritIssues.setText(null);
+                        editor.putInt("Maximum Issues Input", 99);
+                        RadioButton noneRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonNone);
+                        noneRadioButton.setChecked(true);
+                        editor.putString("Hazard Check Change", String.valueOf(R.string.none));
+                        favouritesSwitch.setChecked(false);
+                        editor.putBoolean("Display Favourites", false);
+                        editor.apply();
                     }
                 });
                 //Todo: make the search layout change what pegs are displayed
@@ -526,8 +476,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onDestroy() {
         android.os.Process.killProcess(android.os.Process.myPid());
         super.onDestroy();
-        clearDB();
-        closeDB();
     }
 
 
@@ -625,15 +573,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void showRestaurants() {
+        mMap.clear();
+        //get filtered restaurants
+        filteredRestaurants = restaurantManager.getFilteredRestaurants();
 
         for (int i = 0; i < restaurantManager.getRestaurants().size(); i++) {
 
             Restaurant currentRestaurant = restaurantManager.getRestaurantByID(i);
-            BitmapDescriptor hazardIcon = null;
-
-            // remember restaurant position in list view
+            // remember restaurant position in restaurants list view
             currentRestaurant.setId(i);
-
+            /*
+            BitmapDescriptor hazardIcon = null;
             if (currentRestaurant.getInspectionDataList().isEmpty() == false) {
 
                 Hazard hazard = currentRestaurant.getInspectionDataList().get(0).getHazard();
@@ -652,6 +602,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             PegItem newItem = new PegItem(currentRestaurant.getLatitude(),
                     currentRestaurant.getLongitude(),
                     currentRestaurant.getRestaurantName(),
+                    hazardIcon);
+
+            mClusterManager.addItem(newItem);
+            */
+        }
+
+        int i = 0;
+        BitmapDescriptor hazardIcon = null;
+        for (Restaurant currentFilteredRestaurant : filteredRestaurants) {
+
+            if (currentFilteredRestaurant.getInspectionDataList().isEmpty() == false) {
+
+                Hazard hazard = currentFilteredRestaurant.getInspectionDataList().get(0).getHazard();
+                if (hazard == Hazard.HIGH) {
+                    hazardIcon = bitmapDescriptorFromVector(getApplicationContext(),
+                            R.drawable.icon_map_high);
+                } else if (hazard == Hazard.MEDIUM) {
+                    hazardIcon = bitmapDescriptorFromVector(getApplicationContext(),
+                            R.drawable.icon_map_medium);
+                } else {
+                    hazardIcon = bitmapDescriptorFromVector(getApplicationContext(),
+                            R.drawable.icon_map_low);
+                }
+            }
+
+            PegItem newItem = new PegItem(currentFilteredRestaurant.getLatitude(),
+                    currentFilteredRestaurant.getLongitude(),
+                    currentFilteredRestaurant.getRestaurantName(),
                     hazardIcon);
 
             mClusterManager.addItem(newItem);
@@ -682,7 +660,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             int restaurantPosition = restaurant.getId();
             Intent intent = SingleRestaurantActivity.makeIntent(MapsActivity.this,
                     restaurantPosition,
-                    true);
+                    true,restaurant.getTrackNumber());
             startActivity(intent);
         });
 

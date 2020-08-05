@@ -10,24 +10,37 @@
 package ca.sfu.cmpt_276_project.UI;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.Switch;
 import android.widget.TextView;
 
+import androidx.annotation.FontRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.gson.Gson;
@@ -55,12 +68,11 @@ import ca.sfu.cmpt_276_project.WebScraper.DataManager;
 public class RestaurantListActivity extends AppCompatActivity {
 
     private RestaurantManager restaurantManager;
-    private List<Restaurant> restaurants;
+    private List<Restaurant> restaurants = new ArrayList<>();
     private int[] restaurantIcons;
+    //TODO: SET UP DB ACCESS
     private DBAdapter dbAdapter;
     private Gson gson = new Gson();
-    //TODO: Change it to true in search function, will enable customized listview
-    private boolean search_mode = false;    //Search mode will change how list view be populated
     // allows MainActivity to be accessed
     public static Intent makeIntent(Context context) {
         Intent intent = new Intent(context, RestaurantListActivity.class);
@@ -84,9 +96,7 @@ public class RestaurantListActivity extends AppCompatActivity {
 
 
         restaurantManager = RestaurantManager.getInstance();
-        testOpenDB();
-        initializeRestaurantList();//method necessary to initialize instance
-        System.out.println("after injection: "+dbAdapter.getAllRows().getCount());
+//        initializeRestaurantList();//method necessary to initialize instance
 //        Restaurant dummyRestaurant = new Restaurant();
 //        dummyRestaurant = getRestaurantFromDB(1430);
 //        dummyRestaurant.Display();
@@ -94,76 +104,339 @@ public class RestaurantListActivity extends AppCompatActivity {
         populateRestaurantIcons();
         populateListView();
         registerClickCallback();
+        setUpSearchWindow();
 
         init();
 
     }
 
-    /**
-     * EXPORTED METHODS FROM MAPS_ACTIVITY
-     */
-    public void testOpenDB(){
-        dbAdapter = new DBAdapter(this);
-        dbAdapter.open();
-        Log.d("TAG", "testOpenDB: "+dbAdapter.getAllRows().getCount());
-    }
-
-    private void addRestaurantsToDB(){
-        for(Restaurant restaurant: restaurantManager.getRestaurants()){
-
-            String inspectionJSON = gson.toJson(restaurant.getInspectionDataList());
-
-            //THIS PROCESS ADDS ITEM TO THE DM
-            long newID = dbAdapter.insertRow(restaurant.getTrackNumber(),
-                    restaurant.getRestaurantName(), restaurant.getPhysicalAddress(),
-                    restaurant.getPhysicalCity(), restaurant.getFacType(),
-                    restaurant.getLatitude(), restaurant.getLongitude(), restaurant.getIcon(),
-                    inspectionJSON);
+    private List<Restaurant> restaurantSearcher(){
+        String savedSearch = getSearchName(this);
+        int savedMinCritIssuesInput = getMinCritIssuesInput(this);
+        int savedMaxCritIssuesInput = getMaxCritIssuesInput(this);
+        String savedHazardChecked = getHazardLevelChecked(this);
+        boolean getFavouritesCheck = getFavouritesChecked(this);
+//        Log.d("General", "restaurantSearcher: "
+//                +"saved search: "+savedSearch
+//                +"saved Min: "+savedMinCritIssuesInput
+//                +"saved Max: "+savedMaxCritIssuesInput
+//                +"saved Hazard: "+savedHazardChecked
+//                +"favoriteCheck: "+getFavouritesCheck);
+        List<Restaurant> restaurantList = new ArrayList<>();
+        if (getFavouritesCheck){
+            //TODO: Waiting for DB data, once DB is provided, uncomment this block will finish favourite btn behaviour
+//            dbAdapter = new DBAdapter(this);
+//            dbAdapter.open();
+//            int size = dbAdapter.getAllRows().getCount();
+//            Log.d("TAG", "restaurantSearcher: "+size);
+////            for (int i = 0;i<size;i++){
+////                restaurantList.add(getRestaurantFromDB(i));
+////            }
+//            dbAdapter.close();
+        }else {
+            restaurantList = findRestaurantByNames(savedSearch);
         }
+            for (int i = 0;i<restaurantList.size();i++) {
+//                Log.d("TAG", "restaurantSearcher: size of list: "+restaurantList.size()
+//                +"i: "+i);
+                if (restaurantList.get(i).getInspectionDataList().size()<savedMinCritIssuesInput||
+                        restaurantList.get(i).getInspectionDataList().size()>savedMaxCritIssuesInput){
+                    restaurantList.remove(restaurantList.get(i));
+                    i--;
+                    continue;
+                }
+                if (restaurantList.get(i).getInspectionDataList().isEmpty()){
+                    if (!savedHazardChecked.equals("NONE")){
+                        restaurantList.remove(restaurantList.get(i));
+                        i--;
+                    }
+                }else if (!savedHazardChecked.equals("NONE")){
+                    Hazard this_hazard = restaurantList.get(i).getInspectionDataList().get(0).getHazard();
+//                    System.out.println("this_hazard: "+this_hazard);
+//                    System.out.println("hazard_check: "+savedHazardChecked);
+                    if (!this_hazard.toString().equals(savedHazardChecked)){
+                        restaurantList.remove(restaurantList.get(i));
+                        i--;
+//                        Log.d("TAG", "restaurantSearcher: removed list based on hazard lvl");
+                    }
+                }
+            }
+
+        return restaurantList;
     }
 
-    private void printDB(){
-        Cursor cursor = dbAdapter.getAllRows();
-
-        if(cursor.moveToFirst()){
-            do{
-                //THIS PAIR OF LINES ARE USED TO DESERIALIZE THE JSON STRING EXTRACTED FROM DB
-                Type type = new TypeToken<ArrayList<InspectionData>>() {}.getType();
-                List<InspectionData> tempList = gson.fromJson(cursor.getString(DBAdapter.COL_INSPECTION), type);
-
-                //Printer test to check injection
-                System.out.println("Injected: \n"
-                        + "\tDB-ID#: " + cursor.getInt(DBAdapter.COL_ROWID) + "\n"
-                        + "\tTrack#: " + cursor.getString(DBAdapter.COL_TRACK_NUM) + "\n"
-                        + "\tName: " + cursor.getString(DBAdapter.COL_RES_NAME) + "\n"
-                        + "\tAddr: " + cursor.getString(DBAdapter.COL_ADDRESS) + "\n"
-                        + "\tCity: " + cursor.getString(DBAdapter.COL_CITY) + "\n"
-                        + "\tFacType: " + cursor.getString(DBAdapter.COL_FAC_TYPE) + "\n"
-                        + "\tLatitude: " + cursor.getDouble(DBAdapter.COL_LATITUDE) + "\n"
-                        + "\tLongitude: " + cursor.getDouble(DBAdapter.COL_LONGITUDE) + "\n"
-                        + "---------------------------------------------------------------------\n");
-                /*if(!tempList.isEmpty()) {
-                    System.out.println("\tInspection Details: ");
-                    for(InspectionData inspectionData: tempList)
-                        inspectionData.Display();
-                }uncomment to see inspections(takes a long time to list)*/
-            }while (cursor.moveToNext());
+    private List<Restaurant> findRestaurantByNames(String search_name) {
+        List<Restaurant> restaurantList = new ArrayList<>();
+        for (Restaurant res: restaurantManager.getRestaurants()) {
+            if (res.getRestaurantName().toLowerCase().contains(search_name.toLowerCase())) {
+                restaurantList.add(res);
+            }
         }
-        cursor.close();
+        return restaurantList;
+    }
+
+    private void setUpSearchWindow() {
+        ImageButton srchButton = (ImageButton) findViewById(R.id.srchBtn);
+        SharedPreferences savePreferences = this.getSharedPreferences("SavePrefs",
+                MODE_PRIVATE);
+        SharedPreferences.Editor editor = savePreferences.edit();
+        srchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder mBuilder = new AlertDialog.Builder(
+                        RestaurantListActivity.this);
+                View mView = getLayoutInflater().inflate(R.layout.search_window, null);
+                EditText searchInput = (EditText) mView.findViewById(R.id.searchInput);
+                String savedSearch = getSearchName(RestaurantListActivity.this);
+                int savedMinCritIssuesInput = getMinCritIssuesInput(RestaurantListActivity.this);
+                int savedMaxCritIssuesInput = getMaxCritIssuesInput(RestaurantListActivity.this);
+                String savedHazardChecked = getHazardLevelChecked(RestaurantListActivity.this);
+                boolean getFavouritesCheck = getFavouritesChecked(RestaurantListActivity.this);
+
+                if(!savedSearch.equals("")){
+                    searchInput.setText(savedSearch, TextView.BufferType.EDITABLE);
+                }
+                searchInput.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                        List<Restaurant> temp_restaurant_list = restaurantSearcher();
+                        restaurants = temp_restaurant_list;
+                        refreshListView(temp_restaurant_list);
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                        editor.putString("Search Name Input", String.valueOf(charSequence));
+                        editor.apply();
+                        List<Restaurant> temp_restaurant_list = restaurantSearcher();
+//                        for (int j =0; j<5;j++){
+//                            temp_restaurant_list.get(j).Display();
+//                        }
+                        System.out.println("result size: "+temp_restaurant_list.size());
+                        restaurants = temp_restaurant_list;
+                        refreshListView(temp_restaurant_list);
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable editable) {
+//                        String result = editable.toString();
+//                        System.out.println("result: "+ result);
+
+                    }
+                });
+
+                EditText minCritIssues = (EditText) mView.findViewById(R.id.minCritInput);
+                if(savedMinCritIssuesInput != 0){
+                    String intString = Integer.toString(savedMinCritIssuesInput) ;
+                    minCritIssues.setText(intString, TextView.BufferType.EDITABLE);
+                }
+
+                minCritIssues.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                        List<Restaurant> temp_restaurant_list = restaurantSearcher();
+                        restaurants = temp_restaurant_list;
+                        refreshListView(temp_restaurant_list);
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                        //TODO: Limit min smaller than max
+                        String minvalue = String.valueOf(charSequence);
+                        editor.putInt("Minimum Issues Input", Integer.parseInt(minvalue));
+                        editor.apply();
+                        List<Restaurant> temp_restaurant_list = restaurantSearcher();
+                        restaurants = temp_restaurant_list;
+                        refreshListView(temp_restaurant_list);
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable editable) {
+
+                    }
+                });
+
+                EditText maxCritIssues = (EditText) mView.findViewById(R.id.maxCritInput);
+                if(savedMaxCritIssuesInput != 50000){
+                    String intString = Integer.toString(savedMaxCritIssuesInput) ;
+                    maxCritIssues.setText(intString, TextView.BufferType.EDITABLE);
+                }
+                maxCritIssues.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                        List<Restaurant> temp_restaurant_list = restaurantSearcher();
+                        restaurants = temp_restaurant_list;
+                        refreshListView(temp_restaurant_list);
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                        //TODO: Limit max larger than min
+                        String maxValue = String.valueOf(charSequence);
+                        editor.putInt("Maximum Issues Input", Integer.parseInt(maxValue));
+                        editor.apply();
+                        List<Restaurant> temp_restaurant_list = restaurantSearcher();
+                        restaurants = temp_restaurant_list;
+                        refreshListView(temp_restaurant_list);
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable editable) {
+
+                    }
+                });
+
+                RadioGroup hazardLevelGroup = (RadioGroup) mView.findViewById(
+                        R.id.search_hazard_group);
+                if(savedHazardChecked.contains("NONE")){
+                    RadioButton noneRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonNone);
+                    noneRadioButton.setChecked(true);
+                }
+                else if(savedHazardChecked.contains("LOW")){
+                    RadioButton lowRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonLow);
+                    lowRadioButton.setChecked(true);
+                }
+                else if(savedHazardChecked.contains("MEDIUM")){
+                    RadioButton mediumRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonMedium);
+                    mediumRadioButton.setChecked(true);
+                }
+                else if(savedHazardChecked.contains("HIGH")){
+                    RadioButton highRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonHigh);
+                    highRadioButton.setChecked(true);
+                }
+                else{
+                    System.out.println(savedHazardChecked);
+                }
+
+                hazardLevelGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                        RadioButton checked = (RadioButton) mView.findViewById(i);
+                        editor.putString("Hazard Check Change", String.valueOf(checked.getText()));
+                        editor.apply();
+//                        Log.d("TAG", "onClick: "+savedHazardChecked);
+//                        Log.d("TAG", "onClick: "+checked.getText().toString());
+                        List<Restaurant> temp_restaurant_list = restaurantSearcher();
+                        restaurants = temp_restaurant_list;
+//                        Log.d("radio btn clicked", "onCheckedChanged restaurant size: "+restaurants.size());
+                        refreshListView(temp_restaurant_list);
+                    }
+                });
+
+                Switch favouritesSwitch = (Switch) mView.findViewById(R.id.favouritesSwitch);
+                if(getFavouritesCheck){
+                    favouritesSwitch.setChecked(true);
+                }
+                favouritesSwitch.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if(favouritesSwitch.isChecked()){
+                            //favourites has been checked
+                            //Todo: only display favourites ... waiting for DB
+                            editor.putBoolean("Display Favourites", true);
+                            editor.apply();
+                            List<Restaurant> temp_restaurant_list = restaurantSearcher();
+                            restaurants = temp_restaurant_list;
+                            refreshListView(temp_restaurant_list);
+                        }
+                        else{
+                            //favourites not checked
+                            //Todo: display all ... waiting for DB
+                            editor.putBoolean("Display Favourites", false);
+                            editor.apply();
+                            List<Restaurant> temp_restaurant_list = restaurantSearcher();
+                            restaurants = temp_restaurant_list;
+                            refreshListView(temp_restaurant_list);
+                        }
+                    }
+                });
+
+                Button resetBtn = (Button) mView.findViewById(R.id.resetBtn);
+                resetBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        searchInput.setText(null);
+                        editor.putString("Search Name Input", null);
+                        minCritIssues.setText(String.valueOf(0));
+                        editor.putInt("Minimum Issues Input", 0);
+                        maxCritIssues.setText(String.valueOf(99));
+                        editor.putInt("Maximum Issues Input", 99);
+                        RadioButton noneRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonNone);
+                        noneRadioButton.setChecked(true);
+                        editor.putString("Hazard Check Change", String.valueOf(R.string.none));
+                        favouritesSwitch.setChecked(false);
+                        editor.putBoolean("Display Favourites", false);
+                        editor.apply();
+                        List<Restaurant> temp_restaurant_list = restaurantSearcher();
+                        restaurants = temp_restaurant_list;
+                        refreshListView(temp_restaurant_list);
+                    }
+                });
+                mBuilder.setView(mView);
+
+                //Dialog part, preserve search criteria at UI
+                AlertDialog dialog = mBuilder.create();
+                dialog.show();
+                dialog.setCanceledOnTouchOutside(true);
+                dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        Log.d("TAG", "onCancel: ");
+                        String savedSearch = getSearchName(RestaurantListActivity.this);
+                        int savedMinCritIssuesInput = getMinCritIssuesInput(RestaurantListActivity.this);
+                        int savedMaxCritIssuesInput = getMaxCritIssuesInput(RestaurantListActivity.this);
+                        String savedHazardChecked = getHazardLevelChecked(RestaurantListActivity.this);
+                        boolean getFavouritesCheck = getFavouritesChecked(RestaurantListActivity.this);
+                        editor.putString("Search Name Input", savedSearch);
+                        editor.putInt("Minimum Issues Input", savedMinCritIssuesInput);
+                        editor.putInt("Maximum Issues Input", savedMaxCritIssuesInput);
+                        editor.putString("Hazard Check Change", savedHazardChecked);
+                        editor.putBoolean("Display Favourites", getFavouritesCheck);
+                        editor.apply();
+                        List<Restaurant> temp_list = restaurantSearcher();
+                        refreshListView(temp_list);
+                    }
+                });
+            }
+
+        });
+
+    }
+
+    public static String getSearchName(Context context){
+        SharedPreferences searchPrefs = context.getSharedPreferences("SavePrefs",
+                MODE_PRIVATE);
+        return searchPrefs.getString("Search Name Input", "");
+    }
+
+    public static  int getMinCritIssuesInput(Context context){
+        SharedPreferences searchPrefs = context.getSharedPreferences("SavePrefs",
+                MODE_PRIVATE);
+        return searchPrefs.getInt("Minimum Issues Input", 0);
+    }
+
+    public static int getMaxCritIssuesInput(Context context){
+        SharedPreferences searchPrefs = context.getSharedPreferences("SavePrefs",
+                MODE_PRIVATE);
+        return searchPrefs.getInt("Maximum Issues Input", 50000);
+    }
+
+    public static String getHazardLevelChecked(Context context){
+        SharedPreferences searchPrefs = context.getSharedPreferences("SavePrefs",
+                MODE_PRIVATE);
+        return searchPrefs.getString("Hazard Check Change", "NONE");
+    }
+
+    public static boolean getFavouritesChecked(Context context){
+        SharedPreferences searchPrefs = context.getSharedPreferences("SavePrefs",
+                MODE_PRIVATE);
+        return searchPrefs.getBoolean("Display Favourites", false);
+
     }
 
 
-
-    public void clearDB() {
-        System.out.println("Wiped DB clean");
-        dbAdapter.deleteAll();
-    }
     /**
-     * ENDOF EXPORTED METHODS FROM MAPS_ACTIVITY
-     */
-
-    /**
-     * Get restaurant from DB by ROw_ID
+     * Get restaurant obj from DB by ROW_ID
      * */
     private Restaurant getRestaurantFromDB(int ROW_ID){
         Cursor cursor = dbAdapter.getAllRows();
@@ -171,7 +444,6 @@ public class RestaurantListActivity extends AppCompatActivity {
         if (cursor.move(ROW_ID)){
             Type type = new TypeToken<ArrayList<InspectionData>>() {}.getType();
             List<InspectionData> tempList = gson.fromJson(cursor.getString(DBAdapter.COL_INSPECTION), type);
-
             restaurant.setTrackNumber(cursor.getString(DBAdapter.COL_TRACK_NUM));
             restaurant.setRestaurantName(cursor.getString(DBAdapter.COL_RES_NAME));
             restaurant.setPhysicalAddress(cursor.getString(DBAdapter.COL_ADDRESS));
@@ -223,11 +495,6 @@ public class RestaurantListActivity extends AppCompatActivity {
 
         //Update existing Restaurant Manager obj instance
         restaurantManager.setRestaurants(restaurantList);
-
-        //Updating DB list as well
-        clearDB();
-        addRestaurantsToDB();
-
     }
 
     @Override
@@ -243,11 +510,6 @@ public class RestaurantListActivity extends AppCompatActivity {
     public void onDestroy() {
         android.os.Process.killProcess(android.os.Process.myPid());
         super.onDestroy();
-        closeDB();
-    }
-
-    private void closeDB(){
-        dbAdapter.close();
     }
 
     private void populateRestaurantIcons() {
@@ -259,7 +521,6 @@ public class RestaurantListActivity extends AppCompatActivity {
         restaurantIcons[4] = R.drawable.icon_pizza;
         restaurantIcons[5] = R.drawable.icon_pizza;
         restaurantIcons[6] = R.drawable.icon_chicken;
-
     }
 
     // start Maps activity
@@ -285,26 +546,35 @@ public class RestaurantListActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        restaurantManager = RestaurantManager.getInstance();
+        if (RestaurantManager.getInstance().getRestaurants().isEmpty()){
+            initializeRestaurantList();
+            restaurantManager = RestaurantManager.getInstance();
+        }
         populateListView();
+        String savedSearch = getSearchName(this);
+
+        if (!savedSearch.equals("")){
+            List<Restaurant> dummy_restaurant = restaurantSearcher();
+            refreshListView(dummy_restaurant);
+        }
         registerClickCallback();
     }
 
-    //TODO: Change the size of db based on search result
     private void populateListView() {
-        if (search_mode){
-            int size_of_db = 30;    //Dummy value for testing
-            restaurants = new ArrayList<>();
-            for (int i = 0;i<size_of_db;i++){
-                restaurants.add(getRestaurantFromDB(i));
-            }
-            System.out.println("size of restaurants fetched from DB: "+restaurants.size());
-        }else
-            restaurants = restaurantManager.getRestaurants();
+        restaurantManager = RestaurantManager.getInstance();
+        restaurants = restaurantManager.getRestaurants();
         ArrayAdapter<Restaurant> adapter = new MyListAdapter();
         ListView list = (ListView) findViewById(R.id.restaurantsListView);
         list.setAdapter(adapter);
     }
 
+    private void refreshListView(List<Restaurant> restaurantList){
+        restaurants = restaurantList;
+        ArrayAdapter<Restaurant> adapter = new MyListAdapter();
+        ListView list = (ListView) findViewById(R.id.restaurantsListView);
+        list.setAdapter(adapter);
+    }
 
     private void registerClickCallback() {
         ListView list = (ListView) findViewById(R.id.restaurantsListView);
@@ -312,10 +582,10 @@ public class RestaurantListActivity extends AppCompatActivity {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View viewClicked, int position, long id) {
-//                Restaurant clickedRestaurant = restaurantManager.getRestaurantByID(position);
-                Restaurant clickedRestaurant = getRestaurantFromDB(position);
+                Restaurant clickedRestaurant = restaurants.get(position);
+//                Restaurant clickedRestaurant = getRestaurantFromDB(position);
                 // pass clicked restaurant's position to SingleRestaurantActivity
-                Intent intent = SingleRestaurantActivity.makeIntent(RestaurantListActivity.this, position, false);
+                Intent intent = SingleRestaurantActivity.makeIntent(RestaurantListActivity.this, position, false,clickedRestaurant.getTrackNumber());
                 startActivity(intent);
             }
         });
@@ -337,8 +607,8 @@ public class RestaurantListActivity extends AppCompatActivity {
             }
 
 //            System.out.println("position: "+position);
-//            Restaurant currentRestaurant = restaurantManager.getRestaurantByID(position);
-            Restaurant currentRestaurant = getRestaurantFromDB(position);
+            Restaurant currentRestaurant = restaurants.get(position);
+//            Restaurant currentRestaurant = getRestaurantFromDB(position);
 
             // Fill restaurant image
             ImageView resImageView = (ImageView) restaurantView.findViewById(R.id.restaurant_icon);
@@ -372,14 +642,13 @@ public class RestaurantListActivity extends AppCompatActivity {
             resImageView.setImageResource(currentRestaurant.getIcon());
 
             ImageView favIconView = (ImageView) restaurantView.findViewById(R.id.favouriteIcon);
-            if(currentRestaurant.getFavourite() == false){
+            if(!currentRestaurant.getFavourite()){
                 favIconView.setVisibility(View.INVISIBLE);
             }
 
             // Fill hazard icon
             ImageView hazardIconView = (ImageView) restaurantView.findViewById(
                     R.id.restaurant_hazardicon);
-
 
             //Fill hazard level with color
             TextView hazardLevelView = (TextView) restaurantView.findViewById(R.id.hazard_level);
