@@ -330,7 +330,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     @Override
                     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                        //todo change map display
                         editor.putString("Search Name Input", String.valueOf(charSequence));
                         editor.apply();
                         List<Restaurant> temp_restaurant_list = restaurantSearcher(savedSearch,savedMinCritIssuesInput,savedMaxCritIssuesInput,savedHazardChecked,getFavouritesCheck);
@@ -356,7 +355,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     @Override
                     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                        //todo update display
                         String minvalue = String.valueOf(charSequence);
                         editor.putInt("Minimum Issues Input", Integer.valueOf(minvalue));
                         editor.apply();
@@ -383,7 +381,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     @Override
                     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                        //todo update display
                         String maxValue = String.valueOf(charSequence);
                         editor.putInt("Maximum Issues Input", Integer.valueOf(maxValue));
                         editor.apply();
@@ -459,7 +456,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         }
                         else{
                             //favourites not checked
-                            //todo: display all
                             editor.putBoolean("Display Favourites", false);
                             editor.apply();
                             List<Restaurant> temp_restaurant_list = restaurantSearcher(savedSearch,savedMinCritIssuesInput,savedMaxCritIssuesInput,savedHazardChecked,getFavouritesCheck);
@@ -493,7 +489,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     }
                 });
-                //Todo: make the search layout change what pegs are displayed
                 mBuilder.setView(mView);
                 AlertDialog dialog = mBuilder.create();
                 dialog.show();
