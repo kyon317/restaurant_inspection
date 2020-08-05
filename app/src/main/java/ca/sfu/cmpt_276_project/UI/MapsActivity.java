@@ -62,7 +62,6 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.gson.Gson;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
@@ -76,7 +75,6 @@ import com.karumi.dexter.listener.single.PermissionListener;
 import java.util.ArrayList;
 import java.util.List;
 
-import ca.sfu.cmpt_276_project.DBAdapter;
 import ca.sfu.cmpt_276_project.Model.Hazard;
 import ca.sfu.cmpt_276_project.Model.PegItem;
 import ca.sfu.cmpt_276_project.Model.Restaurant;
@@ -164,15 +162,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * DATABASE FUNCTIONS
      */
     //TODO: move the database functions into a separate class
-    private void openDB(){
+  /*  private void openDB(){
         dbAdapter = new DBAdapter(this);
         dbAdapter.open();
-    }
+    }*/
 
-    private void closeDB(){
+   /* private void closeDB(){
         dbAdapter.close();
-    }
-    private void addRestaurantsToDB(){
+    }*/
+    /*private void addRestaurantsToDB(){
         //TODO: Look over the methods outlined, understand what they do
 
         int i = 0;
@@ -217,7 +215,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     System.out.println("\tInspection Details: ");
                     for(InspectionData inspectionData: tempList)
                         inspectionData.Display();
-                }uncomment if you want to see inspections */
+                }uncomment if you want to see inspections
             }while (cursor.moveToNext());
         }
         cursor.close();
