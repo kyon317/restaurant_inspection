@@ -123,6 +123,28 @@ public class DBAdapter {
         myDBHelper.close();
     }
 
+    public Restaurant getRestaurant(int rowNum){
+        int rowCount = 0;
+        Restaurant restaurant = new Restaurant();
+        Cursor cursor = getAllRows();
+        if(cursor.moveToFirst()){
+            //search for row to add restaurant
+            while(rowCount < rowNum){
+                rowCount++;
+                cursor.moveToNext();
+            }
+            restaurant.setTrackNumber(cursor.getString(DBAdapter.COL_TRACK_NUM));
+            restaurant.setRestaurantName(cursor.getString(DBAdapter.COL_RES_NAME));
+            restaurant.setPhysicalAddress(cursor.getString(DBAdapter.COL_ADDRESS));
+            restaurant.setPhysicalCity(cursor.getString(DBAdapter.COL_CITY));
+            restaurant.setFacType(cursor.getString(DBAdapter.COL_FAC_TYPE));
+            restaurant.setLatitude(cursor.getDouble(DBAdapter.COL_LATITUDE));
+            restaurant.setLongitude(cursor.getDouble(DBAdapter.COL_LONGITUDE));
+        }
+        cursor.close();
+        return restaurant;
+    }
+
     public void addRestaurant(Restaurant restaurant, int arrListNum){
 
         String inspectionJSON = gson.toJson(restaurant.getInspectionDataList());

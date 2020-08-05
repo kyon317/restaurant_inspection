@@ -51,6 +51,7 @@ import java.util.Random;
 
 import ca.sfu.cmpt_276_project.CsvIngester.InspectionDataCSVIngester;
 import ca.sfu.cmpt_276_project.CsvIngester.RestaurantCSVIngester;
+import ca.sfu.cmpt_276_project.DBAdapter;
 import ca.sfu.cmpt_276_project.Model.Hazard;
 import ca.sfu.cmpt_276_project.Model.Restaurant;
 import ca.sfu.cmpt_276_project.Model.RestaurantManager;
@@ -63,6 +64,8 @@ public class RestaurantListActivity extends AppCompatActivity {
     private List<Restaurant> restaurants = new ArrayList<>();
     private int[] restaurantIcons;
     private Gson gson = new Gson();
+    private DBAdapter dbAdapter;
+
     // allows MainActivity to be accessed
     public static Intent makeIntent(Context context) {
         Intent intent = new Intent(context, RestaurantListActivity.class);
@@ -115,14 +118,14 @@ public class RestaurantListActivity extends AppCompatActivity {
         List<Restaurant> restaurantList = new ArrayList<>();
         if (getFavouritesCheck){
             //TODO: Waiting for DB data, once DB is provided, uncomment this block will finish favourite btn behaviour
-//            dbAdapter = new DBAdapter(this);
-//            dbAdapter.open();
-//            int size = dbAdapter.getAllRows().getCount();
-//            Log.d("TAG", "restaurantSearcher: "+size);
-////            for (int i = 0;i<size;i++){
-////                restaurantList.add(getRestaurantFromDB(i));
-////            }
-//            dbAdapter.close();
+            dbAdapter = new DBAdapter(this);
+            dbAdapter.open();
+            int size = dbAdapter.getAllRows().getCount();
+            Log.d("TAG", "restaurantSearcher: "+size);
+            for (int i = 0;i<size;i++){
+                restaurantList.add(dbAdapter.getRestaurant(i));
+            }
+            dbAdapter.close();
         }
         else {
             restaurantList = findRestaurantByNames(savedSearch);
@@ -156,6 +159,7 @@ public class RestaurantListActivity extends AppCompatActivity {
 
         return restaurantList;
     }
+
 
     private List<Restaurant> findRestaurantByNames(String search_name) {
         List<Restaurant> restaurantList = new ArrayList<>();
