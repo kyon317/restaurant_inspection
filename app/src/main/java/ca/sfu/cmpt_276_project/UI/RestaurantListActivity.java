@@ -70,8 +70,6 @@ public class RestaurantListActivity extends AppCompatActivity {
     private RestaurantManager restaurantManager;
     private List<Restaurant> restaurants = new ArrayList<>();
     private int[] restaurantIcons;
-    //TODO: SET UP DB ACCESS
-    private DBAdapter dbAdapter;
     private Gson gson = new Gson();
     // allows MainActivity to be accessed
     public static Intent makeIntent(Context context) {
@@ -438,26 +436,27 @@ public class RestaurantListActivity extends AppCompatActivity {
     /**
      * Get restaurant obj from DB by ROW_ID
      * */
-    private Restaurant getRestaurantFromDB(int ROW_ID){
-        Cursor cursor = dbAdapter.getAllRows();
-        Restaurant restaurant = new Restaurant();
-        if (cursor.move(ROW_ID)){
-            Type type = new TypeToken<ArrayList<InspectionData>>() {}.getType();
-            List<InspectionData> tempList = gson.fromJson(cursor.getString(DBAdapter.COL_INSPECTION), type);
-            restaurant.setTrackNumber(cursor.getString(DBAdapter.COL_TRACK_NUM));
-            restaurant.setRestaurantName(cursor.getString(DBAdapter.COL_RES_NAME));
-            restaurant.setPhysicalAddress(cursor.getString(DBAdapter.COL_ADDRESS));
-            restaurant.setPhysicalCity(cursor.getString(DBAdapter.COL_CITY));
-            restaurant.setFacType(cursor.getString(DBAdapter.COL_FAC_TYPE));
-            restaurant.setLatitude(cursor.getDouble(DBAdapter.COL_LATITUDE));
-            restaurant.setLongitude(cursor.getDouble(DBAdapter.COL_LONGITUDE));
-            if(!tempList.isEmpty()) {
-                restaurant.setInspectionDataList(tempList);
-            }
-        }
-        cursor.close();
-        return restaurant;
-    }
+//    private Restaurant getRestaurantFromDB(int ROW_ID){
+//        Cursor cursor = dbAdapter.getAllRows();
+//        Restaurant restaurant = new Restaurant();
+//        if (cursor.move(ROW_ID)){
+//            Type type = new TypeToken<ArrayList<InspectionData>>() {}.getType();
+//            List<InspectionData> tempList = gson.fromJson(cursor.getString(DBAdapter.COL_INSPECTION), type);
+//
+//            restaurant.setTrackNumber(cursor.getString(DBAdapter.COL_TRACK_NUM));
+//            restaurant.setRestaurantName(cursor.getString(DBAdapter.COL_RES_NAME));
+//            restaurant.setPhysicalAddress(cursor.getString(DBAdapter.COL_ADDRESS));
+//            restaurant.setPhysicalCity(cursor.getString(DBAdapter.COL_CITY));
+//            restaurant.setFacType(cursor.getString(DBAdapter.COL_FAC_TYPE));
+//            restaurant.setLatitude(cursor.getDouble(DBAdapter.COL_LATITUDE));
+//            restaurant.setLongitude(cursor.getDouble(DBAdapter.COL_LONGITUDE));
+//            if(!tempList.isEmpty()) {
+//                restaurant.setInspectionDataList(tempList);
+//            }
+//        }
+//        cursor.close();
+//        return restaurant;
+//    }
 
     public void initializeRestaurantList() {
         //get Restaurants from CSV
@@ -510,7 +509,10 @@ public class RestaurantListActivity extends AppCompatActivity {
     public void onDestroy() {
         android.os.Process.killProcess(android.os.Process.myPid());
         super.onDestroy();
+
     }
+
+
 
     private void populateRestaurantIcons() {
         restaurantIcons = new int[8];

@@ -32,6 +32,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import ca.sfu.cmpt_276_project.DBAdapter;
 import ca.sfu.cmpt_276_project.Model.Hazard;
 import ca.sfu.cmpt_276_project.Model.InspectionData;
 import ca.sfu.cmpt_276_project.Model.Restaurant;
@@ -48,6 +49,7 @@ public class SingleRestaurantActivity extends AppCompatActivity {
     private String trackNum;
     private Restaurant restaurant;
     private Boolean fromMap;
+    private DBAdapter dbAdapter;
 
     private static final String EXTRA_RES_NUM = "ca.sfu.cmpt_276_project.UI.extraResNum";
     private static final String EXTRA_BOOL_FROM = "ca.sfu.cmpt_276_project.UI.exraBoolFrom";
@@ -81,6 +83,8 @@ public class SingleRestaurantActivity extends AppCompatActivity {
         restaurantManager = RestaurantManager.getInstance();
         restaurant = restaurantManager.getRestaurantByTrackingNumber(trackNum);
         inspections = restaurant.getInspectionDataList();
+        dbAdapter = new DBAdapter(this);
+        dbAdapter.open();
 
         populatateView();
         populateInspectionsList();
@@ -111,10 +115,14 @@ public class SingleRestaurantActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if(restaurant.getFavourite()){
+                    dbAdapter.addRestaurant(restaurant, restaurantPosition);
+                    dbAdapter.print();
                     restaurant.setFavourite(false);
                     favouriteText.setText("Unfavourite");
                 }
                 else {
+                    dbAdapter.deleteRestaurant(restaurantPosition);
+                    dbAdapter.print();
                     restaurant.setFavourite(true);
                     favouriteText.setText("Favourite");
                 }

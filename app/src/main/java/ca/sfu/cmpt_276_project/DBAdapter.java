@@ -7,6 +7,17 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
+
+import ca.sfu.cmpt_276_project.Model.InspectionData;
+import ca.sfu.cmpt_276_project.Model.Restaurant;
+import ca.sfu.cmpt_276_project.Model.RestaurantManager;
+
 
 // TO USE:
 // Change the package (at top) to match your project.
@@ -33,7 +44,8 @@ public class DBAdapter {
     public static final String KEY_LATITUDE = "latitude";
     public static final String KEY_LONGITUDE = "longitude";
     public static final String KEY_ICON = "icon";
-    public static final String KEY_INSPECTION = "icon";
+    public static final String KEY_INSPECTION = "inspection";
+    public static final String KEY_ARRLIST_NUM = "arrlistNumber";
 
     // TODO: Setup your field numbers here (0 = KEY_ROWID, 1=...)
     public static final int COL_TRACK_NUM = 1;
@@ -44,16 +56,19 @@ public class DBAdapter {
     public static final int COL_LATITUDE = 6;
     public static final int COL_LONGITUDE = 7;
     public static final int COL_ICON = 8;
-    public static final int COL_INSPECTION = 8;
+    public static final int COL_INSPECTION = 9;
+    public static final int COL_ARRLIST_NUM = 10;
 
     public static final String[] ALL_KEYS = new String[] {KEY_ROWID, KEY_TRACK_NUM, KEY_RES_NAME,
-            KEY_ADDRESS, KEY_CITY, KEY_FAC_TYPE, KEY_LATITUDE, KEY_LONGITUDE, KEY_ICON, KEY_INSPECTION};
+            KEY_ADDRESS, KEY_CITY, KEY_FAC_TYPE, KEY_LATITUDE, KEY_LONGITUDE, KEY_ICON,
+            KEY_INSPECTION, KEY_ARRLIST_NUM};
 
     // DB info: it's name, and the table we are using (just one).
     public static final String DATABASE_NAME = "MyDb";
     public static final String DATABASE_TABLE = "mainTable";
     // Track DB version if a new version of your app changes the format.
-    public static final int DATABASE_VERSION = 2;
+    public static final int DATABASE_VERSION = 3;
+    Gson gson = new Gson();
 
     private static final String DATABASE_CREATE_SQL =
             "create table " + DATABASE_TABLE
@@ -76,8 +91,9 @@ public class DBAdapter {
                     + KEY_FAC_TYPE + " text not null, "
                     + KEY_LATITUDE + " real not null, "
                     + KEY_LONGITUDE + " real not null, "
-//                    + KEY_ICON + " integer not null,"
-                    + KEY_INSPECTION + " text not null"
+                    + KEY_ICON + " integer not null,"
+                    + KEY_INSPECTION + " text not null, "
+                    + KEY_ARRLIST_NUM + " text not null"
 
                     // Rest  of creation:
                     + ");";
@@ -108,6 +124,74 @@ public class DBAdapter {
         myDBHelper.close();
     }
 
+    public void addRestaurant(Restaurant restaurant, int arrListNum){
+
+        String inspectionJSON = gson.toJson(restaurant.getInspectionDataList());
+
+        //THIS PROCESS ADDS ITEM TO THE DM
+        long newID =
+                this.insertRow(restaurant.getTrackNumber(),
+                        restaurant.getRestaurantName(),
+                        restaurant.getPhysicalAddress(),
+                        restaurant.getPhysicalCity(),
+                        restaurant.getFacType(),
+                        restaurant.getLatitude(),
+                        restaurant.getLongitude(),
+                        0,
+                        inspectionJSON,
+                        arrListNum);
+
+    }
+
+    public void deleteRestaurant(int arrListNum){
+
+        Cursor cursor = getAllRows();
+        if(cursor.moveToFirst()){
+            //search for row to delete
+            do{
+                if(cursor.getInt(DBAdapter.COL_ARRLIST_NUM) == arrListNum);
+                long rowToDelete = cursor.getInt(DBAdapter.COL_ROWID);
+                this.deleteRow(rowToDelete);
+                cursor.close();
+                return;
+            }while (cursor.moveToNext());
+        }
+        cursor.close();
+    }
+
+    public void print(){
+        Cursor cursor = getAllRows();
+
+        if(cursor.moveToFirst()){
+            do{
+                System.out.println(cursor.getString(DBAdapter.COL_INSPECTION));
+                //THIS PAIR OF LINES ARE USED TO DESERIALIZE THE JSON STRING EXTRACTED FROM DB
+                Type type = new TypeToken<ArrayList<InspectionData>>() {}.getType();
+                List<InspectionData> tempList = gson.fromJson(cursor.getString(DBAdapter.COL_INSPECTION), type);
+
+                //Printer test to check injection
+                System.out.println("Injected: \n"
+                        + "\tDB-ID#: " + cursor.getInt(DBAdapter.COL_ROWID) + "\n"
+                        + "\tTrack#: " + cursor.getString(DBAdapter.COL_TRACK_NUM) + "\n"
+                        + "\tName: " + cursor.getString(DBAdapter.COL_RES_NAME) + "\n"
+                        + "\tAddr: " + cursor.getString(DBAdapter.COL_ADDRESS) + "\n"
+                        + "\tCity: " + cursor.getString(DBAdapter.COL_CITY) + "\n"
+                        + "\tFacType: " + cursor.getString(DBAdapter.COL_FAC_TYPE) + "\n"
+                        + "\tLatitude: " + cursor.getDouble(DBAdapter.COL_LATITUDE) + "\n"
+                        + "\tLongitude: " + cursor.getDouble(DBAdapter.COL_LONGITUDE) + "\n"
+                        + "\tArrList#: " + cursor.getDouble(DBAdapter.COL_ARRLIST_NUM) + "\n"
+                        + "---------------------------------------------------------------------\n");
+
+                /*if(!tempList.isEmpty()) {
+                    System.out.println("\tInspection Details: ");
+                    for(InspectionData inspectionData: tempList)
+                        inspectionData.Display();
+                }*/
+            }while (cursor.moveToNext());
+        }
+        cursor.close();
+    }
+
     // Add a new set of values to the database.
     public long insertRow(String trackNumber,
             String restaurantName,
@@ -116,7 +200,7 @@ public class DBAdapter {
             String facType,
             double latitude,
             double longitude,
-            int icon, String inspectionJSON) {
+            int icon, String inspectionJSON, int arrListNum) {
         /*
          * CHANGE 3:
          */
@@ -131,8 +215,9 @@ public class DBAdapter {
         initialValues.put(KEY_FAC_TYPE, facType);
         initialValues.put(KEY_LATITUDE, latitude);
         initialValues.put(KEY_LONGITUDE, longitude);
-//        initialValues.put(KEY_ICON, icon);
+        initialValues.put(KEY_ICON, icon);
         initialValues.put(KEY_INSPECTION, inspectionJSON);
+        initialValues.put(KEY_ARRLIST_NUM, arrListNum);
 
         // Insert it into the database.
         return db.insert(DATABASE_TABLE, null, initialValues);
@@ -162,6 +247,7 @@ public class DBAdapter {
         //Resets ID sequence to 0
         db.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME = '" + DATABASE_TABLE + "'");
         db.execSQL("UPDATE SQLITE_SEQUENCE SET SEQ = 0 WHERE NAME = '" + DATABASE_TABLE + "'");
+        System.out.println("Wiped DB clean");
     }
 
     // Return all data in the database.
@@ -187,14 +273,17 @@ public class DBAdapter {
     }
 
     // Change an existing row to be equal to new data.
-    public boolean updateRow(long rowId, String trackNumber,
+    public boolean updateRow(long rowId,
+                             String trackNumber,
                              String restaurantName,
                              String physicalAddress,
                              String physicalCity,
                              String facType,
                              double latitude,
                              double longitude,
-                             int icon, String inspectionJSON) {
+                             int icon,
+                             String inspectionJSON,
+                             int arrListNum) {
         String where = KEY_ROWID + "=" + rowId;
 
         /*
@@ -211,8 +300,9 @@ public class DBAdapter {
         newValues.put(KEY_FAC_TYPE, facType);
         newValues.put(KEY_LATITUDE, latitude);
         newValues.put(KEY_LONGITUDE, longitude);
-//        newValues.put(KEY_ICON, icon);
+        newValues.put(KEY_ICON, icon);
         newValues.put(KEY_INSPECTION, inspectionJSON);
+        newValues.put(KEY_ARRLIST_NUM, arrListNum);
 
         // Insert it into the database.
         return db.update(DATABASE_TABLE, newValues, where, null) != 0;

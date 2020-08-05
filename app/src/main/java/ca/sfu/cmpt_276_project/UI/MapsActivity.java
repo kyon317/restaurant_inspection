@@ -111,8 +111,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private int[] restaurantIcons;
     private Location currentLocation;
     private ClusterManager<PegItem> mClusterManager;
-    private DBAdapter dbAdapter;
-    private Gson gson = new Gson();//necessary to convert Array list
     private ConstraintLayout searchLayout;
 
     @Override
@@ -148,7 +146,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     }
                 }).check();
-
 
     }
 
