@@ -386,8 +386,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     @Override
                     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                         String minvalue = String.valueOf(charSequence);
-                        if(minvalue != ""){
-                            editor.putInt("Minimum Issues Input", Integer.valueOf(minvalue));
+                        if(!minvalue.equals("")){
+                            editor.putInt("Minimum Issues Input", Integer.parseInt(minvalue));
                             editor.apply();
                             List<Restaurant> temp_restaurant_list = restaurantSearcher();
                             refreshMapView(temp_restaurant_list);
@@ -415,8 +415,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                         String maxValue = String.valueOf(charSequence);
 
-                        if(maxValue != ""){
-                            editor.putInt("Maximum Issues Input", Integer.valueOf(maxValue));
+                        if(!maxValue.equals("")){
+                            editor.putInt("Maximum Issues Input", Integer.parseInt(maxValue));
                             editor.apply();
                             List<Restaurant> temp_restaurant_list = restaurantSearcher();
                             refreshMapView(temp_restaurant_list);
