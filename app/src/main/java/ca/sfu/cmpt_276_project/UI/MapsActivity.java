@@ -215,7 +215,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 List<InspectionData> tempList = gson.fromJson(cursor.getString(DBAdapter.COL_INSPECTION), type);
 
                 //Printer test to check injection
-                System.out.println("Injected: \n"
+                /* System.out.println("Injected: \n"
                         + "\tDB-ID#: " + cursor.getInt(DBAdapter.COL_ROWID) + "\n"
                         + "\tTrack#: " + cursor.getString(DBAdapter.COL_TRACK_NUM) + "\n"
                         + "\tName: " + cursor.getString(DBAdapter.COL_RES_NAME) + "\n"
@@ -225,7 +225,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         + "\tLatitude: " + cursor.getDouble(DBAdapter.COL_LATITUDE) + "\n"
                         + "\tLongitude: " + cursor.getDouble(DBAdapter.COL_LONGITUDE) + "\n"
                         + "---------------------------------------------------------------------\n");
-               /* if(!tempList.isEmpty()) {
+               if(!tempList.isEmpty()) {
                     System.out.println("\tInspection Details: ");
                     for(InspectionData inspectionData: tempList)
                         inspectionData.Display();
@@ -243,6 +243,36 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * ENDOF DATABASE FUNCTIONS
      */
 
+
+    private List<Restaurant> restaurantSearcher(String search_name,int minCrit,int maxCrit,String hazard_check,boolean is_favourited){
+        if (is_favourited){
+            // TODO: Fetch data from DB
+        }else{
+            List<Restaurant> restaurantList = findRestaurantByNames(search_name);
+            System.out.println("result base number: "+restaurantList.size());
+            for (int i = 0;i<restaurantList.size();i++) {
+                if (restaurantList.get(i).getInspectionDataList().size()<minCrit||
+                        restaurantList.get(i).getInspectionDataList().size()>maxCrit)
+                    restaurantList.remove(i);
+                if (restaurantList.get(i).getInspectionDataList().size()>0){
+                    if (!restaurantList.get(i).getInspectionDataList().get(0).getHazard().toString().contains(hazard_check))
+                        restaurantList.remove(i);
+                }
+            }
+            return restaurantList;
+        }
+        return null;
+    }
+
+    private List<Restaurant> findRestaurantByNames(String search_name) {
+        List<Restaurant> restaurantList = new ArrayList<>();
+        for (Restaurant res: restaurantManager.getRestaurants()) {
+            if (res.getRestaurantName().toLowerCase().contains(search_name.toLowerCase())) {
+                restaurantList.add(res);
+            }
+        }
+        return restaurantList;
+    }
 
     public static MapsActivity getInstance() {
         return instance;
@@ -303,10 +333,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         //todo change map display
                         editor.putString("Search Name Input", String.valueOf(charSequence));
                         editor.apply();
-
-                        restaurantManager.setSearchTerm(getSearchName(MapsActivity.this));
-                        showRestaurants();
-
+                        List<Restaurant> temp_restaurant_list = restaurantSearcher(savedSearch,savedMinCritIssuesInput,savedMaxCritIssuesInput,savedHazardChecked,getFavouritesCheck);
+                        refreshMapView(temp_restaurant_list);
                     }
 
                     @Override
@@ -332,9 +360,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         String minvalue = String.valueOf(charSequence);
                         editor.putInt("Minimum Issues Input", Integer.valueOf(minvalue));
                         editor.apply();
-
-                        restaurantManager.setMinimumCritical(getMinCritIssuesInput(MapsActivity.this));
-                        showRestaurants();
+                        List<Restaurant> temp_restaurant_list = restaurantSearcher(savedSearch,savedMinCritIssuesInput,savedMaxCritIssuesInput,savedHazardChecked,getFavouritesCheck);
+                        refreshMapView(temp_restaurant_list);
                     }
 
                     @Override
@@ -360,9 +387,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         String maxValue = String.valueOf(charSequence);
                         editor.putInt("Maximum Issues Input", Integer.valueOf(maxValue));
                         editor.apply();
-
-                        restaurantManager.setMaximumCritical(getMaxCritIssuesInput(MapsActivity.this));
-                        showRestaurants();
+                        List<Restaurant> temp_restaurant_list = restaurantSearcher(savedSearch,savedMinCritIssuesInput,savedMaxCritIssuesInput,savedHazardChecked,getFavouritesCheck);
+                        refreshMapView(temp_restaurant_list);
                     }
 
                     @Override
@@ -399,9 +425,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         RadioButton checked = (RadioButton) mView.findViewById(i);
                         editor.putString("Hazard Check Change", String.valueOf(checked.getText()));
                         editor.apply();
-
-                        restaurantManager.setHazardLevelFilter(getHazardLevelChecked(MapsActivity.this));
-                        showRestaurants();
+                        List<Restaurant> temp_restaurant_list = restaurantSearcher(savedSearch,savedMinCritIssuesInput,savedMaxCritIssuesInput,savedHazardChecked,getFavouritesCheck);
+                        refreshMapView(temp_restaurant_list);
                     }
                 });
 /*
@@ -429,19 +454,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             //Todo: only display favourites
                             editor.putBoolean("Display Favourites", true);
                             editor.apply();
-
-                            restaurantManager.setFavouriteOnly(getFavouritesChecked(MapsActivity.this));
-                            showRestaurants();
+                            List<Restaurant> temp_restaurant_list = restaurantSearcher(savedSearch,savedMinCritIssuesInput,savedMaxCritIssuesInput,savedHazardChecked,getFavouritesCheck);
+                            refreshMapView(temp_restaurant_list);
                         }
                         else{
                             //favourites not checked
                             //todo: display all
                             editor.putBoolean("Display Favourites", false);
                             editor.apply();
-
-                            restaurantManager.setFavouriteOnly(getFavouritesChecked(MapsActivity.this));
-                            showRestaurants();
-
+                            List<Restaurant> temp_restaurant_list = restaurantSearcher(savedSearch,savedMinCritIssuesInput,savedMaxCritIssuesInput,savedHazardChecked,getFavouritesCheck);
+                            refreshMapView(temp_restaurant_list);
                         }
 
                     }
@@ -462,6 +484,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         favouritesSwitch.setChecked(false);
                         editor.putBoolean("Display Favourites", false);
                         editor.apply();
+                        List<Restaurant> temp_restaurant_list = restaurantSearcher(getSearchName(MapsActivity.this),
+                                getMinCritIssuesInput(MapsActivity.this),
+                                getMaxCritIssuesInput(MapsActivity.this),
+                                getHazardLevelChecked(MapsActivity.this),
+                                getFavouritesChecked(MapsActivity.this));
+                        refreshMapView(temp_restaurant_list);
+
                     }
                 });
                 //Todo: make the search layout change what pegs are displayed
@@ -471,7 +500,42 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             }
         });
+    }
 
+    public void refreshMapView(List<Restaurant> restaurants){
+        mClusterManager.clearItems();
+        mMap.clear();
+
+        for (int i = 0; i < restaurants.size(); i++) {
+
+            Restaurant currentRestaurant = restaurants.get(i);
+
+            BitmapDescriptor hazardIcon = null;
+            if (currentRestaurant.getInspectionDataList().isEmpty() == false) {
+
+                Hazard hazard = currentRestaurant.getInspectionDataList().get(0).getHazard();
+                if (hazard == Hazard.HIGH) {
+                    hazardIcon = bitmapDescriptorFromVector(getApplicationContext(),
+                            R.drawable.icon_map_high);
+                } else if (hazard == Hazard.MEDIUM) {
+                    hazardIcon = bitmapDescriptorFromVector(getApplicationContext(),
+                            R.drawable.icon_map_medium);
+                } else {
+                    hazardIcon = bitmapDescriptorFromVector(getApplicationContext(),
+                            R.drawable.icon_map_low);
+                }
+            }
+
+            restaurantName = currentRestaurant.getRestaurantName();
+            restaurantLat = currentRestaurant.getLatitude();
+            restaurantLng = currentRestaurant.getLongitude();
+
+                MarkerOptions options = new MarkerOptions().title(restaurantName).
+                        position(new LatLng(restaurantLat, restaurantLng));
+
+                mMarker = mMap.addMarker(options);
+
+        }
     }
 
     public static String getSearchName(Context context){
@@ -668,17 +732,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void showRestaurants() {
-        mMap.clear();
-        //get filtered restaurants
-        filteredRestaurants = restaurantManager.getFilteredRestaurants();
 
         for (int i = 0; i < restaurantManager.getRestaurants().size(); i++) {
 
             Restaurant currentRestaurant = restaurantManager.getRestaurantByID(i);
-            // remember restaurant position in restaurants list view
-            currentRestaurant.setId(i);
-            /*
             BitmapDescriptor hazardIcon = null;
+
+            // remember restaurant position in list view
+            currentRestaurant.setId(i);
+
             if (currentRestaurant.getInspectionDataList().isEmpty() == false) {
 
                 Hazard hazard = currentRestaurant.getInspectionDataList().get(0).getHazard();
@@ -700,35 +762,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     hazardIcon);
 
             mClusterManager.addItem(newItem);
-            */
         }
 
-        int i = 0;
-        BitmapDescriptor hazardIcon = null;
-        for (Restaurant currentFilteredRestaurant : filteredRestaurants) {
-
-            if (currentFilteredRestaurant.getInspectionDataList().isEmpty() == false) {
-
-                Hazard hazard = currentFilteredRestaurant.getInspectionDataList().get(0).getHazard();
-                if (hazard == Hazard.HIGH) {
-                    hazardIcon = bitmapDescriptorFromVector(getApplicationContext(),
-                            R.drawable.icon_map_high);
-                } else if (hazard == Hazard.MEDIUM) {
-                    hazardIcon = bitmapDescriptorFromVector(getApplicationContext(),
-                            R.drawable.icon_map_medium);
-                } else {
-                    hazardIcon = bitmapDescriptorFromVector(getApplicationContext(),
-                            R.drawable.icon_map_low);
-                }
-            }
-
-            PegItem newItem = new PegItem(currentFilteredRestaurant.getLatitude(),
-                    currentFilteredRestaurant.getLongitude(),
-                    currentFilteredRestaurant.getRestaurantName(),
-                    hazardIcon);
-
-            mClusterManager.addItem(newItem);
-        }
 
     }
 
