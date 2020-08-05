@@ -16,7 +16,6 @@ import java.util.List;
 
 import ca.sfu.cmpt_276_project.Model.InspectionData;
 import ca.sfu.cmpt_276_project.Model.Restaurant;
-import ca.sfu.cmpt_276_project.Model.RestaurantManager;
 
 
 // TO USE:
@@ -159,7 +158,26 @@ public class DBAdapter {
         cursor.close();
     }
 
+    public boolean checkRestaurant(int arrListNum){
+
+        Cursor cursor = getAllRows();
+        if(cursor.moveToFirst()){
+            //search for row to delete
+            do{
+                if(cursor.getInt(DBAdapter.COL_ARRLIST_NUM) == arrListNum);
+                cursor.close();
+                return true;
+            }while (cursor.moveToNext());
+        }
+        cursor.close();
+        return false;
+    }
+
     public void print(){
+        if(this.getAllRows().getCount() < 1){
+            System.out.println("Empty db!`````````````````````````````");
+        }
+
         Cursor cursor = getAllRows();
 
         if(cursor.moveToFirst()){
@@ -189,6 +207,7 @@ public class DBAdapter {
                 }*/
             }while (cursor.moveToNext());
         }
+
         cursor.close();
     }
 

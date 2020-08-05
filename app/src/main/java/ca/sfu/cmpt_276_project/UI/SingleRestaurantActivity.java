@@ -107,7 +107,7 @@ public class SingleRestaurantActivity extends AppCompatActivity {
 
     private void populatateView() {
         TextView favouriteText = findViewById(R.id.btnAddFav);
-        if(restaurant.getFavourite()){
+        if(dbAdapter.checkRestaurant(restaurantPosition)){
             favouriteText.setText("Unfavourite");
         }
         Button favBtn = (Button) findViewById(R.id.btnAddFav);
