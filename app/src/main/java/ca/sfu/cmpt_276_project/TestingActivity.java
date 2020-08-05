@@ -106,7 +106,7 @@ public class TestingActivity extends AppCompatActivity {
     public void DownloadTest() {
         CSVDownloader csvDownloader = new CSVDownloader("iter2.csv", this);
         csvDownloader.setFilename("iter2.csv");
-        csvDownloader.setPdialog(this);
+        //csvDownloader.setPdialog(this);
         csvDownloader.execute("https://data.surrey.ca/dataset/3c8cb648-0e80-4659-9078-ef4917b90ffb/resource/0e5d04a2-be9b-40fe-8de2-e88362ea916b/download/restaurants.csv");
     }
     public void GeneralAccessTest() throws IOException, ParseException {

@@ -31,6 +31,7 @@ import java.util.concurrent.ExecutionException;
 
 import ca.sfu.cmpt_276_project.CsvIngester.InspectionDataCSVIngester;
 import ca.sfu.cmpt_276_project.CsvIngester.RestaurantCSVIngester;
+import ca.sfu.cmpt_276_project.DBAdapter;
 import ca.sfu.cmpt_276_project.Model.Restaurant;
 import ca.sfu.cmpt_276_project.Model.RestaurantManager;
 import ca.sfu.cmpt_276_project.R;
@@ -47,8 +48,10 @@ public class LoadingActivity extends AppCompatActivity {
     private DataStatus dataStatus;
     private RunMode runMode;
     private RestaurantManager restaurantManager;
+    private DBAdapter dbAdapter;
     private boolean alertVisible = false;
     private static final String TAG = "LoadingActivity";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,6 +75,15 @@ public class LoadingActivity extends AppCompatActivity {
 //        System.out.println("after first loop: "+test);
 //        test();
 //        System.out.println("second loop: "+test);
+
+        //Initializing new DB for use
+        dbAdapter = new DBAdapter(this);
+        dbAdapter.open();
+        Log.d("TAG", "testOpenDB: "+dbAdapter.getAllRows().getCount());
+
+        if(dbAdapter.getAllRows().getCount()>1430)//no one must know lmaooooo
+            dbAdapter.deleteAll();
+
         dataManager = new DataManager();
         try {
             dataStatus = dataManager.checkForUpdates();
@@ -91,6 +103,13 @@ public class LoadingActivity extends AppCompatActivity {
         }else{
             startMapActivity();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        dbAdapter.close();
+        System.out.println("DB closed");
     }
 
     public void selectRunMode() throws InterruptedException {
