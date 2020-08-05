@@ -66,10 +66,9 @@ public class RestaurantListActivity extends AppCompatActivity {
     private RestaurantManager restaurantManager;
     private List<Restaurant> restaurants = new ArrayList<>();
     private int[] restaurantIcons;
+    //TODO: SET UP DB ACCESS
     private DBAdapter dbAdapter;
     private Gson gson = new Gson();
-    //TODO: Change it to true in search function, will enable customized listview
-    private boolean search_mode = false;    //Search mode will change how list view be populated
     // allows MainActivity to be accessed
     public static Intent makeIntent(Context context) {
         Intent intent = new Intent(context, RestaurantListActivity.class);
@@ -107,28 +106,45 @@ public class RestaurantListActivity extends AppCompatActivity {
 
     }
 
-    private List<Restaurant> restaurantSearcher(String search_name,int minCrit,int maxCrit,String hazard_check,boolean is_favourited){
-        if (is_favourited){
+    private List<Restaurant> restaurantSearcher(){
+        String savedSearch = getSearchName(this);
+        int savedMinCritIssuesInput = getMinCritIssuesInput(this);
+        int savedMaxCritIssuesInput = getMaxCritIssuesInput(this);
+        String savedHazardChecked = getHazardLevelChecked(this);
+        boolean getFavouritesCheck = getFavouritesChecked(this);
+        Log.d("General", "restaurantSearcher: "
+                +"saved search: "+savedSearch
+                +"saved Min: "+savedMinCritIssuesInput
+                +"saved Max: "+savedMaxCritIssuesInput
+                +"saved Hazard: "+savedHazardChecked
+                +"favoriteCheck: "+getFavouritesCheck);
+        if (getFavouritesCheck){
             // TODO: Fetch data from DB
         }else{
-            List<Restaurant> restaurantList = findRestaurantByNames(search_name);
+            List<Restaurant> restaurantList = findRestaurantByNames(savedSearch);
             System.out.println("result base number: "+restaurantList.size());
             for (int i = 0;i<restaurantList.size();i++) {
-                if (restaurantList.get(i).getInspectionDataList().size()<minCrit||
-                        restaurantList.get(i).getInspectionDataList().size()>maxCrit){
-                    restaurantList.remove(i);
+                Log.d("TAG", "restaurantSearcher: size of list: "+restaurantList.size()
+                +"i: "+i);
+                if (restaurantList.get(i).getInspectionDataList().size()<savedMinCritIssuesInput||
+                        restaurantList.get(i).getInspectionDataList().size()>savedMaxCritIssuesInput){
+                    restaurantList.remove(restaurantList.get(i));
+                    i--;
                     continue;
                 }
                 if (restaurantList.get(i).getInspectionDataList().isEmpty()){
-                    if (!hazard_check.equals("NONE")){
-                        restaurantList.remove(i);
+                    if (!savedHazardChecked.equals("NONE")){
+                        restaurantList.remove(restaurantList.get(i));
+                        i--;
                     }
-                }else if (!hazard_check.equals("NONE")){
+                }else if (!savedHazardChecked.equals("NONE")){
                     Hazard this_hazard = restaurantList.get(i).getInspectionDataList().get(0).getHazard();
                     System.out.println("this_hazard: "+this_hazard);
-                    System.out.println("hazard_check: "+hazard_check);
-                    if (!(restaurantList.get(i).getInspectionDataList().get(0).getHazard().toString().equals(hazard_check))){
-                        restaurantList.remove(i);
+                    System.out.println("hazard_check: "+savedHazardChecked);
+                    if (!this_hazard.toString().equals(savedHazardChecked)){
+                        restaurantList.remove(restaurantList.get(i));
+                        i--;
+                        Log.d("TAG", "restaurantSearcher: removed list based on hazard lvl");
                     }
                 }
             }
@@ -175,14 +191,13 @@ public class RestaurantListActivity extends AppCompatActivity {
 
                     @Override
                     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                        //todo change map display
                         editor.putString("Search Name Input", String.valueOf(charSequence));
                         editor.apply();
                         System.out.println("minCrit: "+savedMinCritIssuesInput);
                         System.out.println("maxCrit: "+savedMaxCritIssuesInput);
                         System.out.println("savedHazardChecked: "+savedHazardChecked);
                         System.out.println("getFavouritesCheck: "+getFavouritesCheck);
-                        List<Restaurant> temp_restaurant_list = restaurantSearcher(charSequence.toString(),savedMinCritIssuesInput,savedMaxCritIssuesInput,savedHazardChecked,false);
+                        List<Restaurant> temp_restaurant_list = restaurantSearcher();
 //                        for (int j =0; j<5;j++){
 //                            temp_restaurant_list.get(j).Display();
 //                        }
@@ -217,7 +232,7 @@ public class RestaurantListActivity extends AppCompatActivity {
                         String minvalue = String.valueOf(charSequence);
                         editor.putInt("Minimum Issues Input", Integer.parseInt(minvalue));
                         editor.apply();
-                        List<Restaurant> temp_restaurant_list = restaurantSearcher(savedSearch,Integer.parseInt(minvalue),savedMaxCritIssuesInput,savedHazardChecked,getFavouritesCheck);
+                        List<Restaurant> temp_restaurant_list = restaurantSearcher();
                         restaurants = temp_restaurant_list;
                         refreshListView(temp_restaurant_list);
                     }
@@ -245,7 +260,7 @@ public class RestaurantListActivity extends AppCompatActivity {
                         String maxValue = String.valueOf(charSequence);
                         editor.putInt("Maximum Issues Input", Integer.parseInt(maxValue));
                         editor.apply();
-                        List<Restaurant> temp_restaurant_list = restaurantSearcher(savedSearch,savedMinCritIssuesInput,Integer.parseInt(maxValue),savedHazardChecked,getFavouritesCheck);
+                        List<Restaurant> temp_restaurant_list = restaurantSearcher();
                         restaurants = temp_restaurant_list;
                         refreshListView(temp_restaurant_list);
                     }
@@ -284,10 +299,11 @@ public class RestaurantListActivity extends AppCompatActivity {
                         RadioButton checked = (RadioButton) mView.findViewById(i);
                         editor.putString("Hazard Check Change", String.valueOf(checked.getText()));
                         editor.apply();
-                        //TODO: Fix bug where checked is not changed
                         Log.d("TAG", "onClick: "+savedHazardChecked);
-                        List<Restaurant> temp_restaurant_list = restaurantSearcher(savedSearch,savedMinCritIssuesInput,savedMaxCritIssuesInput,savedHazardChecked,getFavouritesCheck);
+                        Log.d("TAG", "onClick: "+checked.getText().toString());
+                        List<Restaurant> temp_restaurant_list = restaurantSearcher();
                         restaurants = temp_restaurant_list;
+                        Log.d("radio btn clicked", "onCheckedChanged restaurant size: "+restaurants.size());
                         refreshListView(temp_restaurant_list);
                     }
                 });
@@ -302,10 +318,9 @@ public class RestaurantListActivity extends AppCompatActivity {
                         if(favouritesSwitch.isChecked()){
                             //favourites has been checked
                             //Todo: only display favourites ... waiting for DB
-
                             editor.putBoolean("Display Favourites", true);
                             editor.apply();
-                            List<Restaurant> temp_restaurant_list = restaurantSearcher(savedSearch,savedMinCritIssuesInput,savedMaxCritIssuesInput,savedHazardChecked,getFavouritesCheck);
+                            List<Restaurant> temp_restaurant_list = restaurantSearcher();
                             restaurants = temp_restaurant_list;
                             refreshListView(temp_restaurant_list);
                         }
@@ -314,7 +329,7 @@ public class RestaurantListActivity extends AppCompatActivity {
                             //Todo: display all ... waiting for DB
                             editor.putBoolean("Display Favourites", false);
                             editor.apply();
-                            List<Restaurant> temp_restaurant_list = restaurantSearcher(savedSearch,savedMinCritIssuesInput,savedMaxCritIssuesInput,savedHazardChecked,getFavouritesCheck);
+                            List<Restaurant> temp_restaurant_list = restaurantSearcher();
                             restaurants = temp_restaurant_list;
                             refreshListView(temp_restaurant_list);
                         }
@@ -337,16 +352,11 @@ public class RestaurantListActivity extends AppCompatActivity {
                         favouritesSwitch.setChecked(false);
                         editor.putBoolean("Display Favourites", false);
                         editor.apply();
-                        List<Restaurant> temp_restaurant_list = restaurantSearcher(getSearchName(RestaurantListActivity.this),
-                                getMinCritIssuesInput(RestaurantListActivity.this),
-                                getMaxCritIssuesInput(RestaurantListActivity.this),
-                                getHazardLevelChecked(RestaurantListActivity.this),
-                                getFavouritesChecked(RestaurantListActivity.this));
+                        List<Restaurant> temp_restaurant_list = restaurantSearcher();
                         restaurants = temp_restaurant_list;
                         refreshListView(temp_restaurant_list);
                     }
                 });
-                //Todo: make the search layout change what pegs are displayed
                 mBuilder.setView(mView);
                 AlertDialog dialog = mBuilder.create();
                 dialog.show();
@@ -505,12 +515,9 @@ public class RestaurantListActivity extends AppCompatActivity {
         }
         populateListView();
         String savedSearch = getSearchName(this);
-        int savedMinCritIssuesInput = getMinCritIssuesInput(this);
-        int savedMaxCritIssuesInput = getMaxCritIssuesInput(this);
-        String savedHazardChecked = getHazardLevelChecked(this);
-        boolean getFavouritesCheck = getFavouritesChecked(this);
+
         if (!savedSearch.equals("")){
-            List<Restaurant> dummy_restaurant = restaurantSearcher(savedSearch,savedMinCritIssuesInput,savedMaxCritIssuesInput,savedHazardChecked,getFavouritesCheck);
+            List<Restaurant> dummy_restaurant = restaurantSearcher();
             refreshListView(dummy_restaurant);
         }
         registerClickCallback();
