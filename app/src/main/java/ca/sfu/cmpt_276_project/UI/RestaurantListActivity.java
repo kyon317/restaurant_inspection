@@ -119,15 +119,17 @@ public class RestaurantListActivity extends AppCompatActivity {
                     restaurantList.remove(i);
                     continue;
                 }
-                if (!restaurantList.get(i).getInspectionDataList().isEmpty()){
+                if (restaurantList.get(i).getInspectionDataList().isEmpty()){
+                    if (hazard_check.equals("NONE")){
+                        restaurantList.remove(i);
+                    }
+                }else if (!hazard_check.equals("NONE")){
                     Hazard this_hazard = restaurantList.get(i).getInspectionDataList().get(0).getHazard();
-                    System.out.println(this_hazard);
-                    System.out.println(hazard_check);
+                    System.out.println("this_hazard: "+this_hazard);
+                    System.out.println("hazard_check: "+hazard_check);
                     if (!(restaurantList.get(i).getInspectionDataList().get(0).getHazard().toString().equals(hazard_check))){
                         restaurantList.remove(i);
                     }
-                }else if (hazard_check.equals("NONE")){
-                    restaurantList.remove(i);
                 }
             }
             return restaurantList;
@@ -190,8 +192,8 @@ public class RestaurantListActivity extends AppCompatActivity {
 
                     @Override
                     public void afterTextChanged(Editable editable) {
-                        String result = editable.toString();
-                        System.out.println("result: "+ result);
+//                        String result = editable.toString();
+//                        System.out.println("result: "+ result);
 
                     }
                 });
@@ -297,7 +299,6 @@ public class RestaurantListActivity extends AppCompatActivity {
                         if(favouritesSwitch.isChecked()){
                             //favourites has been checked
                             //Todo: only display favourites ... waiting for DB
-
                             editor.putBoolean("Display Favourites", true);
                             editor.apply();
                             List<Restaurant> temp_restaurant_list = restaurantSearcher(savedSearch,savedMinCritIssuesInput,savedMaxCritIssuesInput,savedHazardChecked,getFavouritesCheck);
