@@ -299,6 +299,7 @@ public class RestaurantListActivity extends AppCompatActivity {
                         if(favouritesSwitch.isChecked()){
                             //favourites has been checked
                             //Todo: only display favourites ... waiting for DB
+
                             editor.putBoolean("Display Favourites", true);
                             editor.apply();
                             List<Restaurant> temp_restaurant_list = restaurantSearcher(savedSearch,savedMinCritIssuesInput,savedMaxCritIssuesInput,savedHazardChecked,getFavouritesCheck);
@@ -314,6 +315,32 @@ public class RestaurantListActivity extends AppCompatActivity {
                             restaurants = temp_restaurant_list;
                             refreshListView(temp_restaurant_list);
                         }
+                    }
+                });
+
+                Button resetBtn = (Button) mView.findViewById(R.id.resetBtn);
+                resetBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        searchInput.setText(null);
+                        editor.putString("Search Name Input", null);
+                        minCritIssues.setText(String.valueOf(0));
+                        editor.putInt("Minimum Issues Input", 0);
+                        maxCritIssues.setText(String.valueOf(99));
+                        editor.putInt("Maximum Issues Input", 99);
+                        RadioButton noneRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonNone);
+                        noneRadioButton.setChecked(true);
+                        editor.putString("Hazard Check Change", String.valueOf(R.string.none));
+                        favouritesSwitch.setChecked(false);
+                        editor.putBoolean("Display Favourites", false);
+                        editor.apply();
+                        List<Restaurant> temp_restaurant_list = restaurantSearcher(getSearchName(RestaurantListActivity.this),
+                                getMinCritIssuesInput(RestaurantListActivity.this),
+                                getMaxCritIssuesInput(RestaurantListActivity.this),
+                                getHazardLevelChecked(RestaurantListActivity.this),
+                                getFavouritesChecked(RestaurantListActivity.this));
+                        restaurants = temp_restaurant_list;
+                        refreshListView(temp_restaurant_list);
                     }
                 });
                 //Todo: make the search layout change what pegs are displayed
