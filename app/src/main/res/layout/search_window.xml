@@ -67,7 +67,7 @@
             android:id="@+id/radioButtonNone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/none" />
+            android:text="@string/all" />
 
         <RadioButton
             android:id="@+id/radioButtonLow"

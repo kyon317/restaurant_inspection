@@ -50,7 +50,7 @@
     <string name="done_download">DONE Downloading</string>
     <string name="progress">Progress: </string>
 
-    <string name="none">None</string>
+    <string name="all">All</string>
     <string name="low">Low</string>
     <string name="medium">Medium</string>
     <string name="high">High</string>

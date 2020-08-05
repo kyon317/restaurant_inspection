@@ -141,11 +141,11 @@ public class RestaurantListActivity extends AppCompatActivity {
                     continue;
                 }
                 if (restaurantList.get(i).getInspectionDataList().isEmpty()){
-                    if (!savedHazardChecked.equals("None")){
+                    if (!savedHazardChecked.equals(String.valueOf(R.string.all))){
                         restaurantList.remove(restaurantList.get(i));
                         i--;
                     }
-                }else if (!savedHazardChecked.equals("None")){
+                }else if (!savedHazardChecked.equals(String.valueOf(R.string.all))){
                     Hazard this_hazard = restaurantList.get(i).getInspectionDataList().get(0).getHazard();
 //                    System.out.println("this_hazard: "+this_hazard);
 //                    System.out.println("hazard_check: "+savedHazardChecked);
@@ -291,19 +291,23 @@ public class RestaurantListActivity extends AppCompatActivity {
 
                 RadioGroup hazardLevelGroup = (RadioGroup) mView.findViewById(
                         R.id.search_hazard_group);
-                if(savedHazardChecked.contains("None")){
+                String allText = String.valueOf(R.string.all);
+                String lowText = String.valueOf(R.string.low);
+                String mediumText = String.valueOf(R.string.medium);
+                String highText = String.valueOf(R.string.high);
+                if(savedHazardChecked.contains(allText)){
                     RadioButton noneRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonNone);
                     noneRadioButton.setChecked(true);
                 }
-                else if(savedHazardChecked.contains("LOW")){
+                else if(savedHazardChecked.contains(lowText)){
                     RadioButton lowRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonLow);
                     lowRadioButton.setChecked(true);
                 }
-                else if(savedHazardChecked.contains("MEDIUM")){
+                else if(savedHazardChecked.contains(mediumText)){
                     RadioButton mediumRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonMedium);
                     mediumRadioButton.setChecked(true);
                 }
-                else if(savedHazardChecked.contains("HIGH")){
+                else if(savedHazardChecked.contains(highText)){
                     RadioButton highRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonHigh);
                     highRadioButton.setChecked(true);
                 }
@@ -366,7 +370,7 @@ public class RestaurantListActivity extends AppCompatActivity {
                         editor.putInt("Maximum Issues Input", 99);
                         RadioButton noneRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonNone);
                         noneRadioButton.setChecked(true);
-                        editor.putString("Hazard Check Change", String.valueOf(R.string.none));
+                        editor.putString("Hazard Check Change", String.valueOf(R.string.all));
                         favouritesSwitch.setChecked(false);
                         editor.putBoolean("Display Favourites", false);
                         editor.apply();
@@ -660,7 +664,7 @@ public class RestaurantListActivity extends AppCompatActivity {
             //Fill hazard level with color
             TextView hazardLevelView = (TextView) restaurantView.findViewById(R.id.hazard_level);
             if (currentRestaurant.getInspectionDataList().isEmpty()) {
-                hazardLevelView.setText(R.string.none);
+                hazardLevelView.setText(R.string.all);
             } else {
                 Hazard hazard = currentRestaurant.getInspectionDataList().get(0).getHazard();
                 if (hazard == Hazard.LOW) {

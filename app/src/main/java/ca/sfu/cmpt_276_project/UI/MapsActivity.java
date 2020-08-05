@@ -280,13 +280,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         String restaurantName = currentRestaurant.getRestaurantName().toLowerCase();
         String hazardLevel;
         if (currentRestaurant.getInspectionDataList().isEmpty()){
-            hazardLevel= "NONE";
+            hazardLevel= String.valueOf(R.string.all);
         }else{
             hazardLevel = currentRestaurant.getInspectionDataList().get(0).getHazard().toString();
         }
 
         if(  (restaurantName.isEmpty() || restaurantName.contains(savedSearch.toLowerCase())) &&
-                (savedHazardCheck.equalsIgnoreCase("NONE") || hazardLevel.equalsIgnoreCase(savedHazardCheck)) &&
+                (savedHazardCheck.equalsIgnoreCase(String.valueOf(R.string.all)) || hazardLevel.equalsIgnoreCase(savedHazardCheck)) &&
                 withinAYear(savedMin,savedMax,currentRestaurant)
                 // && favourite
                 ){
@@ -357,11 +357,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SharedPreferences savePreferences = this.getSharedPreferences("SavePrefs",
                 MODE_PRIVATE);
         SharedPreferences.Editor editor = savePreferences.edit();
-        String savedSearch = getSearchName(this);
-        int savedMinCritIssuesInput = getMinCritIssuesInput(this);
-        int savedMaxCritIssuesInput = getMaxCritIssuesInput(this);
-        String savedHazardChecked = getHazardLevelChecked(this);
-        boolean getFavouritesCheck = getFavouritesChecked(this);
+
 
         ImageButton srchBtn = (ImageButton) findViewById(R.id.searchBtn);
         srchBtn.setOnClickListener(new View.OnClickListener() {
@@ -370,6 +366,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 //show search layout
 
                 AlertDialog.Builder mBuilder = new AlertDialog.Builder(MapsActivity.this);
+
+                String savedSearch = getSearchName(MapsActivity.this);
+                int savedMinCritIssuesInput = getMinCritIssuesInput(MapsActivity.this);
+                int savedMaxCritIssuesInput = getMaxCritIssuesInput(MapsActivity.this);
+                String savedHazardChecked = getHazardLevelChecked(MapsActivity.this);
+                boolean getFavouritesCheck = getFavouritesChecked(MapsActivity.this);
+
                 View mView = getLayoutInflater().inflate(R.layout.search_window, null);
                 EditText searchInput = (EditText) mView.findViewById(R.id.searchInput);
                 if(savedSearch != ""){
@@ -458,19 +461,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 RadioGroup hazardLevelGroup = (RadioGroup) mView.findViewById(
                         R.id.search_hazard_group);
-                if(savedHazardChecked.contains("NONE")){
+                if(savedHazardChecked.contains(String.valueOf(R.string.all))){
                     RadioButton noneRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonNone);
                     noneRadioButton.setChecked(true);
                 }
-                else if(savedHazardChecked.contains("LOW")){
+                else if(savedHazardChecked.contains(String.valueOf(R.string.low))){
                     RadioButton lowRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonLow);
                     lowRadioButton.setChecked(true);
                 }
-                else if(savedHazardChecked.contains("MEDIUM")){
+                else if(savedHazardChecked.contains(String.valueOf(R.string.medium))){
                     RadioButton mediumRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonMedium);
                     mediumRadioButton.setChecked(true);
                 }
-                else if(savedHazardChecked.contains("HIGH")){
+                else if(savedHazardChecked.contains(String.valueOf(R.string.high))){
                     RadioButton highRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonHigh);
                     highRadioButton.setChecked(true);
                 }
@@ -525,7 +528,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         editor.putInt("Maximum Issues Input", 99);
                         RadioButton noneRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonNone);
                         noneRadioButton.setChecked(true);
-                        editor.putString("Hazard Check Change", String.valueOf(R.string.none));
+                        editor.putString("Hazard Check Change", String.valueOf(R.string.all));
                         favouritesSwitch.setChecked(false);
                         editor.putBoolean("Display Favourites", false);
                         editor.apply();
@@ -571,11 +574,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     R.drawable.icon_map_low);
                         }
                     }
-
-                    MarkerOptions options = new MarkerOptions().title(restaurantName).
-                            position(new LatLng(restaurantLat, restaurantLng));
-
-                    mMarker = mMap.addMarker(options);
 
                     PegItem newItem = new PegItem(currentRestaurant.getLatitude(),
                             currentRestaurant.getLongitude(),
@@ -962,7 +960,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             TextView restaurantLevel = itemView.findViewById(R.id.info_restaurant_level);
             if (restaurant.getInspectionDataList().isEmpty()) {
-                restaurantLevel.setText(R.string.none);
+                restaurantLevel.setText(R.string.all);
             } else {
                 Hazard hazard = restaurant.getInspectionDataList().get(0).getHazard();
                 if (hazard == Hazard.LOW) {

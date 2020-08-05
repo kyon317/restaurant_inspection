@@ -50,7 +50,7 @@
     <string name="done_download">Téléchargement terminé</string>
     <string name="progress">Le progrès: </string>
 
-    <string name="none">Aucune</string>
+    <string name="all">Toutes</string>
     <string name="low">Faible</string>
     <string name="medium">Moyen</string>
     <string name="high">Haute</string>

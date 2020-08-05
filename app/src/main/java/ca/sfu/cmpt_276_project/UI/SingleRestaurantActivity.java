@@ -118,7 +118,7 @@ public class SingleRestaurantActivity extends AppCompatActivity {
                     dbAdapter.addRestaurant(restaurant, restaurantPosition);
                     dbAdapter.print();
                     restaurant.setFavourite(false);
-                    favouriteText.setText(R.string.unfavourite);
+                    favouriteText.setText(R.string.favourite);
                 }
                 else {
                     dbAdapter.deleteRestaurant(restaurantPosition);
