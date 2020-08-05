@@ -243,25 +243,69 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * ENDOF DATABASE FUNCTIONS
      */
 
+    private List<Restaurant> restaurantSearcher(){
+        String savedSearch = getSearchName(this);
+        int savedMinCritIssuesInput = getMinCritIssuesInput(this);
+        int savedMaxCritIssuesInput = getMaxCritIssuesInput(this);
+        String savedHazardChecked = getHazardLevelChecked(this);
+        boolean getFavouritesCheck = getFavouritesChecked(this);
 
-    private List<Restaurant> restaurantSearcher(String search_name,int minCrit,int maxCrit,String hazard_check,boolean is_favourited){
-        if (is_favourited){
+        if (getFavouritesCheck){
             // TODO: Fetch data from DB
         }else{
-            List<Restaurant> restaurantList = findRestaurantByNames(search_name);
-            System.out.println("result base number: "+restaurantList.size());
+            List<Restaurant> restaurantList = findRestaurantByNames(savedSearch);
             for (int i = 0;i<restaurantList.size();i++) {
-                if (restaurantList.get(i).getInspectionDataList().size()<minCrit||
-                        restaurantList.get(i).getInspectionDataList().size()>maxCrit)
-                    restaurantList.remove(i);
-                if (restaurantList.get(i).getInspectionDataList().size()>0){
-                    if (!restaurantList.get(i).getInspectionDataList().get(0).getHazard().toString().contains(hazard_check))
-                        restaurantList.remove(i);
+
+                if (!inRange(savedMinCritIssuesInput,savedMaxCritIssuesInput,restaurantList.get(i))){
+                    restaurantList.remove(restaurantList.get(i));
+                    i--;
+                    continue;
+                }
+                if (restaurantList.get(i).getInspectionDataList().isEmpty()){
+                    if (!savedHazardChecked.equals("NONE")){
+                        restaurantList.remove(restaurantList.get(i));
+                        i--;
+                    }
+                }else if (!savedHazardChecked.equals("NONE")){
+                    Hazard this_hazard = restaurantList.get(i).getInspectionDataList().get(0).getHazard();
+
+                    if (!this_hazard.toString().equals(savedHazardChecked)){
+                        restaurantList.remove(restaurantList.get(i));
+                        i--;
+                    }
                 }
             }
             return restaurantList;
         }
         return null;
+    }
+
+    private boolean inRange(int savedMin, int savedMax, Restaurant currentRestaurant){
+
+        int count = 0;
+        if (currentRestaurant.getInspectionDataList().isEmpty()) {
+            if(savedMin == 0 && savedMax == 0){
+                return true;
+            }
+            else{
+                return false;
+            }
+        } else {
+
+            for(int i=0; i<currentRestaurant.getInspectionDataList().size(); i++){
+                int numCritical = currentRestaurant.getInspectionDataList().get(i).getCriticalViolations();
+                long date = currentRestaurant.getInspectionDataList().get(i).timeSinceInspection();
+                if (date < 365) {
+                    count += numCritical;
+                }
+            }
+            if(count >= savedMin && count <= savedMax){
+                return true;
+            }
+            else{
+                return false;
+            }
+        }
     }
 
     private List<Restaurant> findRestaurantByNames(String search_name) {
@@ -332,7 +376,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                         editor.putString("Search Name Input", String.valueOf(charSequence));
                         editor.apply();
-                        List<Restaurant> temp_restaurant_list = restaurantSearcher(savedSearch,savedMinCritIssuesInput,savedMaxCritIssuesInput,savedHazardChecked,getFavouritesCheck);
+                        List<Restaurant> temp_restaurant_list = restaurantSearcher();
                         refreshMapView(temp_restaurant_list);
                     }
 
@@ -356,10 +400,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     @Override
                     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                         String minvalue = String.valueOf(charSequence);
-                        editor.putInt("Minimum Issues Input", Integer.valueOf(minvalue));
-                        editor.apply();
-                        List<Restaurant> temp_restaurant_list = restaurantSearcher(savedSearch,savedMinCritIssuesInput,savedMaxCritIssuesInput,savedHazardChecked,getFavouritesCheck);
-                        refreshMapView(temp_restaurant_list);
+                        if(minvalue != ""){
+                            editor.putInt("Minimum Issues Input", Integer.valueOf(minvalue));
+                            editor.apply();
+                            List<Restaurant> temp_restaurant_list = restaurantSearcher();
+                            refreshMapView(temp_restaurant_list);
+                        }
                     }
 
                     @Override
@@ -382,10 +428,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     @Override
                     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                         String maxValue = String.valueOf(charSequence);
-                        editor.putInt("Maximum Issues Input", Integer.valueOf(maxValue));
-                        editor.apply();
-                        List<Restaurant> temp_restaurant_list = restaurantSearcher(savedSearch,savedMinCritIssuesInput,savedMaxCritIssuesInput,savedHazardChecked,getFavouritesCheck);
-                        refreshMapView(temp_restaurant_list);
+
+                        if(maxValue != ""){
+                            editor.putInt("Maximum Issues Input", Integer.valueOf(maxValue));
+                            editor.apply();
+                            List<Restaurant> temp_restaurant_list = restaurantSearcher();
+                            refreshMapView(temp_restaurant_list);
+                        }
+
                     }
 
                     @Override
@@ -422,7 +472,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         RadioButton checked = (RadioButton) mView.findViewById(i);
                         editor.putString("Hazard Check Change", String.valueOf(checked.getText()));
                         editor.apply();
-                        List<Restaurant> temp_restaurant_list = restaurantSearcher(savedSearch,savedMinCritIssuesInput,savedMaxCritIssuesInput,savedHazardChecked,getFavouritesCheck);
+                        List<Restaurant> temp_restaurant_list = restaurantSearcher();
                         refreshMapView(temp_restaurant_list);
                     }
                 });
@@ -451,14 +501,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             //Todo: only display favourites
                             editor.putBoolean("Display Favourites", true);
                             editor.apply();
-                            List<Restaurant> temp_restaurant_list = restaurantSearcher(savedSearch,savedMinCritIssuesInput,savedMaxCritIssuesInput,savedHazardChecked,getFavouritesCheck);
+                            List<Restaurant> temp_restaurant_list = restaurantSearcher();
                             refreshMapView(temp_restaurant_list);
                         }
                         else{
                             //favourites not checked
                             editor.putBoolean("Display Favourites", false);
                             editor.apply();
-                            List<Restaurant> temp_restaurant_list = restaurantSearcher(savedSearch,savedMinCritIssuesInput,savedMaxCritIssuesInput,savedHazardChecked,getFavouritesCheck);
+                            List<Restaurant> temp_restaurant_list = restaurantSearcher();
                             refreshMapView(temp_restaurant_list);
                         }
 
@@ -480,11 +530,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         favouritesSwitch.setChecked(false);
                         editor.putBoolean("Display Favourites", false);
                         editor.apply();
-                        List<Restaurant> temp_restaurant_list = restaurantSearcher(getSearchName(MapsActivity.this),
-                                getMinCritIssuesInput(MapsActivity.this),
-                                getMaxCritIssuesInput(MapsActivity.this),
-                                getHazardLevelChecked(MapsActivity.this),
-                                getFavouritesChecked(MapsActivity.this));
+                        List<Restaurant> temp_restaurant_list = restaurantSearcher();
                         refreshMapView(temp_restaurant_list);
 
                     }
