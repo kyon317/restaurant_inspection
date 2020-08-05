@@ -92,4 +92,5 @@
     <string name="favourite">favourite</string>
     <string name="opens_search_window_on_click">opens search window on click</string>
     <string name="reset">Reset</string>
+    <string name="unfavourite">Unfavourite</string>
 </resources>

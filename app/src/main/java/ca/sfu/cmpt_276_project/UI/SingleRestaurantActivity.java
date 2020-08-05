@@ -108,7 +108,7 @@ public class SingleRestaurantActivity extends AppCompatActivity {
     private void populatateView() {
         TextView favouriteText = findViewById(R.id.btnAddFav);
         if(dbAdapter.checkRestaurant(restaurantPosition)){
-            favouriteText.setText("Unfavourite");
+            favouriteText.setText(R.string.unfavourite);
         }
         Button favBtn = (Button) findViewById(R.id.btnAddFav);
         favBtn.setOnClickListener(new View.OnClickListener() {
@@ -118,13 +118,13 @@ public class SingleRestaurantActivity extends AppCompatActivity {
                     dbAdapter.addRestaurant(restaurant, restaurantPosition);
                     dbAdapter.print();
                     restaurant.setFavourite(false);
-                    favouriteText.setText("Unfavourite");
+                    favouriteText.setText(R.string.unfavourite);
                 }
                 else {
                     dbAdapter.deleteRestaurant(restaurantPosition);
                     dbAdapter.print();
                     restaurant.setFavourite(true);
-                    favouriteText.setText("Favourite");
+                    favouriteText.setText(R.string.unfavourite);
                 }
             }
         });

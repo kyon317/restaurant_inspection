@@ -39,7 +39,7 @@
     <string name="issues"># problèmes</string>
     <string name="txtname">txtName</string>
     <string name="h_level">h_level</string>
-    <string name="maps">Plans</string>
+    <string name="maps">Carte</string>
     <string name="title_activity_maps">Carte</string>
     <string name="more_info">Plus d\'informations</string>
 
@@ -76,6 +76,21 @@
     <string name="address">Adresse:</string>
     <string name="most_recent_inspection_level">Niveau d\'inspection le plus récent:</string>
     <string name="Unable_location">Impossible d\'obtenir la position actuelle</string>
-    <string name="launches_search_criterea">"Ouvre "</string>
+    <string name="launches_search_criterea">Ouvre critères de recherche</string>
+    <string name="searchHint">Nom du restaurant</string>
+    <string name="hazard_level_options_text">Niveau de Hazard</string>
+    <string name="low_button_text">BAS</string>
+    <string name="medium_btn_text">MOYEN</string>
+    <string name="high_btn_text">HAUT</string>
+    <string name="minimum_critical_inspections">Min. # d\'inspections Critiques</string>
+    <string name="numInspectionsHint">0</string>
+    <string name="maximum_critical_issues">Max. # d\'inspections Critiques</string>
+    <string name="favourites_switch_text">Préféré</string>
+    <string name="min_crit_issues_hint">" Entrez # problèmes critiques min."</string>
+    <string name="max_crit_issues_hint">" Entrez # problèmes critiques min."</string>
+    <string name="favourite">Préféré</string>
+    <string name="opens_search_window_on_click">" ouvre la fenêtre de recherche en cliquant"</string>
+    <string name="reset">" Réinitialiser"</string>
+    <string name="unfavourite">défavoriser</string>
 
 </resources>
