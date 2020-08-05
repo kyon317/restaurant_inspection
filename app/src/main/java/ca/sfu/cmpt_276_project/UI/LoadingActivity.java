@@ -68,7 +68,7 @@ public class LoadingActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 1);
         }
         setContentView(R.layout.activity_loading);
-        getSupportActionBar().setTitle("Surrey Restaurant Inspections");
+        getSupportActionBar().setTitle(R.string.surreyTitle);
 
 //        System.out.println("initial test: "+test);
 //        test();
@@ -114,7 +114,7 @@ public class LoadingActivity extends AppCompatActivity {
 
     public void selectRunMode() throws InterruptedException {
         if (!checkNetwork()){
-            Toast.makeText(this,"No Network Connection, loading from local directory",
+            Toast.makeText(this,R.string.noNetwork,
                     Toast.LENGTH_LONG).show();
 
             if (dataManager.checkFileExistence(dataManager.getRestaurant_filename()) &&
@@ -276,10 +276,10 @@ public class LoadingActivity extends AppCompatActivity {
     public void showDialog(){
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(this)
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .setTitle("A NEW UPDATE FOUND")
+                .setTitle(R.string.newUpdate)
                 .setCancelable(false)
-                .setMessage("Download Update?")
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                .setMessage(R.string.downloadUpdate)
+                .setPositiveButton(R.string.Yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         CSVDownloader res_downloader = new CSVDownloader(dataManager.getRestaurant_filename(),LoadingActivity.this);

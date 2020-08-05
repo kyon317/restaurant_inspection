@@ -60,7 +60,7 @@ public class SingleRestaurantActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_single_restaurant);
 
-        getSupportActionBar().setTitle("Surrey Restaurant Inspections");
+        getSupportActionBar().setTitle(R.string.surreyTitle);
 
         // Define ColorDrawable object and parse color
         // using parseColor method

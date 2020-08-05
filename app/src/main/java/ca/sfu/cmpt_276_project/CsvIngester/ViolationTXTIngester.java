@@ -22,6 +22,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import ca.sfu.cmpt_276_project.Model.Violation;
 import ca.sfu.cmpt_276_project.R;
@@ -32,7 +33,10 @@ public class ViolationTXTIngester {
     public void readViolationData(Context context) throws IOException, ParseException {
         InputStream restaurantDataInput = context.getResources().openRawResource
                 (R.raw.all_violations);
-
+        if (Locale.getDefault().getLanguage().equals("fr")){
+            restaurantDataInput = context.getResources().openRawResource
+                    (R.raw.all_violations_fr);
+        }
         BufferedReader reader = new BufferedReader(new InputStreamReader(restaurantDataInput,
                 StandardCharsets.UTF_8));
         String inputLine = "";
@@ -47,7 +51,7 @@ public class ViolationTXTIngester {
                 String[] tokens = inputLine.split(",");
                 Violation tempData = new Violation();
                 tempData.setViolationNumber(tokens[0]);
-                if (tokens[1].equals("Critical")) {
+                if (tokens[1].equals("Critical")|| tokens[1].equals("Critique")) {
                     tempData.setCritical(true);
                 }
                 tempData.setDescription(tokens[2]);

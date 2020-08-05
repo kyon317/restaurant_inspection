@@ -1,0 +1,38 @@
+Toutes les violations de l'ensemble de données de Surrey:
+
+101,Pas critique,Plans / construction / modifications non conformes au règlement [art. 3; s. 4],ne pas répéter
+102,Pas critique,Exploitation d'un établissement alimentaire non approuvé [art. 6 (1)],ne pas répéter
+103,Pas critique,Défaut de détenir un permis valide lors de l'exploitation d'un établissement de restauration [art. 8 (1)],ne pas répéter
+104,Pas critique,Permis non affiché dans un endroit bien en vue [art. 8 (7)],ne pas répéter
+201,Critique,Aliments contaminés ou impropres à la consommation humaine [art. 13],ne pas répéter
+202,Critique,Aliments non transformés de manière à les rendre sûrs à manger [art. 14 (1)],ne pas répéter
+203,Critique,Aliments non refroidis d'une manière acceptable [art. 12 (a)],ne pas répéter
+204,Critique,Aliments non cuits ou réchauffés de manière à être consommés sans danger [art. 14 (1)],ne pas répéter
+205,Critique,Cold Food potentiellement dangereux stocké / affiché au-dessus de 4 ° C. [s. 14 (2)],ne pas répéter
+206,Critique,Aliments chauds potentiellement dangereux stockés / affichés en dessous de 60 ° C. [s. 14 (2)],ne pas répéter
+208,non critique,aliments obtenus de sources non approuvées [art. 11],ne pas répéter
+209,non critique,aliments non protégés contre la contamination [art. 12 (a)],ne pas répéter
+210,Pas critique,Aliments non décongelés d'une manière acceptable [art. 14 (2)],ne pas répéter
+211,non critique,aliments potentiellement dangereux congelés stockés / affichés au-dessus de -18 ° C. [s. 14 (3)],ne pas répéter
+212,non critique,l'exploitant n'a pas fourni de procédures écrites acceptables de manipulation des aliments [art. 23],ne pas répéter
+301,Critique,Équipement / ustensiles / surfaces en contact avec les aliments non maintenues dans des conditions sanitaires [art. 17 (1)],ne pas répéter
+302,Critique,Équipement / ustensiles / surfaces en contact avec les aliments mal lavés et désinfectés [art. 17 (2)],ne pas répéter
+303,Critique,équipement / installations / eau chaude et froide pour l'entretien sanitaire insuffisant [art. 17 (3); s. 4 (1) (f)],pas de répétition
+304,non critique,locaux non exempts de parasites [art. 26 (a)],ne pas répéter
+305,Non critique,Conditions observées qui peuvent permettre l'entrée / l'hébergement / la reproduction d'organismes nuisibles [art. 26 (b) (c)],pas de répétition
+306,Pas critique,Locaux alimentaires non maintenus dans un état sanitaire [art. 17 (1)],ne pas répéter
+307,Non critique,L'équipement / les ustensiles / les surfaces en contact avec les aliments ne sont pas de conception / matériau approprié [art. 16; s. 19],ne pas répéter
+308,non critique,l'équipement / les ustensiles / les surfaces en contact avec les aliments ne sont pas en bon état de fonctionnement [art. 16 (b)],ne pas répéter
+309,Non critique,Nettoyants chimiques et agents similaires stockés ou étiquetés de manière incorrecte [art. 27],ne pas répéter
+310,non critique,les récipients et ustensiles à usage unique sont utilisés plus d'une fois [art. 20],ne pas répéter
+311,non critique,locaux non entretenus conformément aux plans approuvés [art. 6 (1) (b)],ne pas répéter
+312,non critique,les articles non requis pour l'exploitation des locaux destinés aux aliments sont entreposés sur les lieux [art. 18],ne pas répéter
+313,non critique,animal vivant sur les lieux,à l'exclusion des animaux-guides dans les zones approuvées [art. 25 (1)],ne pas répéter
+314,Pas critique,l'exploitant n'a pas fourni de procédures d'assainissement écrites acceptables [art. 24],pas de répétition
+315,Pas critique,les unités de réfrigération et les équipements de maintien au chaud manquent de thermomètres précis [art. 19 (2)],ne pas répéter
+401,Stations de lavage des mains essentielles et adéquates non disponibles pour les employés [art. 21 (4)],ne pas répéter
+402,Critique,l'employé ne se lave pas les mains correctement ou à une fréquence adéquate [art. 21 (3)],ne pas répéter
+403,non critique,l'employé n'a pas de bonnes hygiène personnelle,des vêtements propres et un contrôle capillaire [art. 21 (1)],ne pas répéter
+404,Pas critique,les employés fument dans les zones de préparation / transformation / stockage des aliments [art. 21 (2)],ne pas répéter
+501,non critique,l'exploitant n'a pas le niveau FOODSAFE 1 ou l'équivalent [s. 10 (1)],ne pas répéter
+502,pas critique,en l’absence de l’exploitant,aucun membre du personnel de service n’a le niveau 1 de SÉCURITÉ ALIMENTAIRE ou l’équivalent [art. 10 (2)],ne pas répéter
