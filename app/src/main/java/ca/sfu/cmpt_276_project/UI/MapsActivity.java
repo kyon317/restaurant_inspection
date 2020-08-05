@@ -22,7 +22,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -64,7 +63,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 import com.google.maps.android.clustering.view.DefaultClusterRenderer;
@@ -75,13 +73,11 @@ import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
 import ca.sfu.cmpt_276_project.DBAdapter;
 import ca.sfu.cmpt_276_project.Model.Hazard;
-import ca.sfu.cmpt_276_project.Model.InspectionData;
 import ca.sfu.cmpt_276_project.Model.PegItem;
 import ca.sfu.cmpt_276_project.Model.Restaurant;
 import ca.sfu.cmpt_276_project.Model.RestaurantManager;
@@ -151,10 +147,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     }
                 }).check();
 
-        //opening database
-        openDB();
-        addRestaurantsToDB();
-        printDB();
 
 
     }
@@ -173,6 +165,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     /**
      * DATABASE FUNCTIONS
      */
+    /*
     //TODO: move the database functions into a separate class
     private void openDB(){
         dbAdapter = new DBAdapter(this);
@@ -193,7 +186,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             String inspectionJSON = gson.toJson(restaurant.getInspectionDataList());
 
             //THIS PROCESS ADDS ITEM TO THE DM
-            long newID = dbAdapter.insertRow(restaurant.getTrackNumber(),
+            long newID = dbAdapter.insertRow( restaurant.getTrackNumber(),
                     restaurant.getRestaurantName(), restaurant.getPhysicalAddress(),
                     restaurant.getPhysicalCity(), restaurant.getFacType(),
                     restaurant.getLatitude(), restaurant.getLongitude(), restaurant.getIcon(),
@@ -227,7 +220,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     System.out.println("\tInspection Details: ");
                     for(InspectionData inspectionData: tempList)
                         inspectionData.Display();
-                }uncomment if you want to see inspections */
+                }uncomment if you want to see inspections
             }while (cursor.moveToNext());
         }
         cursor.close();
@@ -237,6 +230,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         System.out.println("Wiped DB clean");
         dbAdapter.deleteAll();
     }
+    */
     /**
      * ENDOF DATABASE FUNCTIONS
      */
@@ -247,47 +241,93 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         int savedMaxCritIssuesInput = getMaxCritIssuesInput(this);
         String savedHazardChecked = getHazardLevelChecked(this);
         boolean getFavouritesCheck = getFavouritesChecked(this);
+//        Log.d("General", "restaurantSearcher: "
+//                +"saved search: "+savedSearch
+//                +"saved Min: "+savedMinCritIssuesInput
+//                +"saved Max: "+savedMaxCritIssuesInput
+//                +"saved Hazard: "+savedHazardChecked
+//                +"favoriteCheck: "+getFavouritesCheck);
+        List<Restaurant> restaurantList = new ArrayList<>();
 
+        for (Restaurant res: restaurantManager.getRestaurants()) {
+            if (qualifiedRestaurant(savedMinCritIssuesInput,savedMaxCritIssuesInput,
+                    savedSearch,savedHazardChecked,getFavouritesCheck,res)) {
+                restaurantList.add(res);
+            }
+        }
+
+        /*
         if (getFavouritesCheck){
-            // TODO: Fetch data from DB
-        }else{
-            List<Restaurant> restaurantList = findRestaurantByNames(savedSearch);
-            for (int i = 0;i<restaurantList.size();i++) {
-
-                if (!withinAYear(savedMinCritIssuesInput,savedMaxCritIssuesInput,restaurantList.get(i))){
+            //TODO: Waiting for DB data, once DB is provided, uncomment this block will finish favourite btn behaviour
+//            dbAdapter = new DBAdapter(this);
+//            dbAdapter.open();
+//            int size = dbAdapter.getAllRows().getCount();
+//            Log.d("TAG", "restaurantSearcher: "+size);
+////            for (int i = 0;i<size;i++){
+////                restaurantList.add(getRestaurantFromDB(i));
+////            }
+//            dbAdapter.close();
+        }else {
+            restaurantList = findRestaurantByNames(savedSearch);
+        }
+        for (int i = 0;i<restaurantList.size();i++) {
+//                Log.d("TAG", "restaurantSearcher: size of list: "+restaurantList.size()
+//                +"i: "+i);
+            if (!withinAYear(savedMinCritIssuesInput,savedMaxCritIssuesInput,restaurantList.get(i))){
+                restaurantList.remove(restaurantList.get(i));
+                i--;
+                continue;
+            }
+            if (restaurantList.get(i).getInspectionDataList().isEmpty()){
+                if (!savedHazardChecked.equals("NONE")){
                     restaurantList.remove(restaurantList.get(i));
                     i--;
-                    continue;
                 }
-
-                if (restaurantList.get(i).getInspectionDataList().isEmpty()){
-                    if (!savedHazardChecked.equals("NONE")){
-                        restaurantList.remove(restaurantList.get(i));
-                        i--;
-                    }
-                }else if (!savedHazardChecked.equals("NONE")){
-                    Hazard this_hazard = restaurantList.get(i).getInspectionDataList().get(0).getHazard();
-
-                    if (!this_hazard.toString().equals(savedHazardChecked)){
-                        restaurantList.remove(restaurantList.get(i));
-                        i--;
-                    }
-                }
-                else{
+            }else if (!savedHazardChecked.equals("NONE")){
+                Hazard this_hazard = restaurantList.get(i).getInspectionDataList().get(0).getHazard();
+//                    System.out.println("this_hazard: "+this_hazard);
+//                    System.out.println("hazard_check: "+savedHazardChecked);
+                if (!this_hazard.toString().equals(savedHazardChecked)){
                     restaurantList.remove(restaurantList.get(i));
                     i--;
+//                        Log.d("TAG", "restaurantSearcher: removed list based on hazard lvl");
                 }
             }
-            return restaurantList;
         }
-        return null;
+
+         */
+
+        return restaurantList;
+    }
+
+    private boolean qualifiedRestaurant (int savedMin, int savedMax,
+                                         String savedSearch, String savedHazardCheck,
+                                         boolean getFavourite, Restaurant currentRestaurant){
+        String restaurantName = currentRestaurant.getRestaurantName().toLowerCase();
+        String hazardLevel;
+        if (currentRestaurant.getInspectionDataList().isEmpty()){
+            hazardLevel= "NONE";
+        }else{
+            hazardLevel = currentRestaurant.getInspectionDataList().get(0).getHazard().toString();
+        }
+
+        if(  (restaurantName.isEmpty() || restaurantName.contains(savedSearch.toLowerCase())) &&
+                (hazardLevel.equalsIgnoreCase(savedHazardCheck)) &&
+                withinAYear(savedMin,savedMax,currentRestaurant)
+                // && favourite
+                ){
+            return true;
+        }
+        else{
+            return false;
+        }
     }
 
     private boolean withinAYear(int savedMin, int savedMax, Restaurant currentRestaurant){
 
         int count = 0;
         if (currentRestaurant.getInspectionDataList().isEmpty()) {
-            if(savedMin == 0 && savedMax == 0){
+            if(savedMin == 0 || savedMax == 0){
                 return true;
             }
             else{
@@ -310,7 +350,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         }
     }
-
+/*
     private List<Restaurant> findRestaurantByNames(String search_name) {
         List<Restaurant> restaurantList = new ArrayList<>();
         for (Restaurant res: restaurantManager.getRestaurants()) {
@@ -321,9 +361,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return restaurantList;
     }
 
+ */
+
     public static MapsActivity getInstance() {
         return instance;
     }
+
+
 
     // allows MapsActivity to be accessed
     public static Intent makeIntent(Context context) {
@@ -403,8 +447,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     @Override
                     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                         String minvalue = String.valueOf(charSequence);
-                        if(minvalue != ""){
-                            editor.putInt("Minimum Issues Input", Integer.valueOf(minvalue));
+                        if(!(minvalue.equals(""))){
+                            editor.putInt("Minimum Issues Input", Integer.parseInt(minvalue));
                             editor.apply();
                             List<Restaurant> temp_restaurant_list = restaurantSearcher();
                             refreshMapView(temp_restaurant_list);
@@ -432,8 +476,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                         String maxValue = String.valueOf(charSequence);
 
-                        if(maxValue != ""){
-                            editor.putInt("Maximum Issues Input", Integer.valueOf(maxValue));
+                        if(!maxValue.equals("")){
+                            editor.putInt("Maximum Issues Input", Integer.parseInt(maxValue));
                             editor.apply();
                             List<Restaurant> temp_restaurant_list = restaurantSearcher();
                             refreshMapView(temp_restaurant_list);
@@ -523,9 +567,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     public void onClick(View view) {
                         searchInput.setText(null);
                         editor.putString("Search Name Input", null);
-                        minCritIssues.setText(null);
+                        minCritIssues.setText(String.valueOf(0));
                         editor.putInt("Minimum Issues Input", 0);
-                        maxCritIssues.setText(null);
+                        maxCritIssues.setText(String.valueOf(99));
                         editor.putInt("Maximum Issues Input", 99);
                         RadioButton noneRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonNone);
                         noneRadioButton.setChecked(true);
@@ -554,22 +598,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         for (int i = 0; i < restaurants.size(); i++) {
 
             Restaurant currentRestaurant = restaurants.get(i);
-
-            BitmapDescriptor hazardIcon = null;
-            if (currentRestaurant.getInspectionDataList().isEmpty() == false) {
-
-                Hazard hazard = currentRestaurant.getInspectionDataList().get(0).getHazard();
-                if (hazard == Hazard.HIGH) {
-                    hazardIcon = bitmapDescriptorFromVector(getApplicationContext(),
-                            R.drawable.icon_map_high);
-                } else if (hazard == Hazard.MEDIUM) {
-                    hazardIcon = bitmapDescriptorFromVector(getApplicationContext(),
-                            R.drawable.icon_map_medium);
-                } else {
-                    hazardIcon = bitmapDescriptorFromVector(getApplicationContext(),
-                            R.drawable.icon_map_low);
-                }
-            }
 
             restaurantName = currentRestaurant.getRestaurantName();
             restaurantLat = currentRestaurant.getLatitude();
@@ -678,8 +706,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onDestroy() {
         android.os.Process.killProcess(android.os.Process.myPid());
         super.onDestroy();
-        clearDB();
-        closeDB();
+
     }
 
 
@@ -834,7 +861,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             int restaurantPosition = restaurant.getId();
             Intent intent = SingleRestaurantActivity.makeIntent(MapsActivity.this,
                     restaurantPosition,
-                    true);
+                    true,restaurant.getTrackNumber());
             startActivity(intent);
         });
 

@@ -13,7 +13,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -21,10 +20,8 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -37,17 +34,14 @@ import android.widget.RadioGroup;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import androidx.annotation.FontRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -57,9 +51,7 @@ import java.util.Random;
 
 import ca.sfu.cmpt_276_project.CsvIngester.InspectionDataCSVIngester;
 import ca.sfu.cmpt_276_project.CsvIngester.RestaurantCSVIngester;
-import ca.sfu.cmpt_276_project.DBAdapter;
 import ca.sfu.cmpt_276_project.Model.Hazard;
-import ca.sfu.cmpt_276_project.Model.InspectionData;
 import ca.sfu.cmpt_276_project.Model.Restaurant;
 import ca.sfu.cmpt_276_project.Model.RestaurantManager;
 import ca.sfu.cmpt_276_project.R;
@@ -240,6 +232,7 @@ public class RestaurantListActivity extends AppCompatActivity {
                     @Override
                     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                         //TODO: Limit min smaller than max
+
                         String minvalue = String.valueOf(charSequence);
                         editor.putInt("Minimum Issues Input", Integer.parseInt(minvalue));
                         editor.apply();
