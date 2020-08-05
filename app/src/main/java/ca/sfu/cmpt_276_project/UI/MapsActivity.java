@@ -571,6 +571,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     R.drawable.icon_map_low);
                         }
                     }
+                    
+                    MarkerOptions options = new MarkerOptions().title(restaurantName).
+                            position(new LatLng(restaurantLat, restaurantLng));
+
+                    mMarker = mMap.addMarker(options);
 
                     PegItem newItem = new PegItem(currentRestaurant.getLatitude(),
                             currentRestaurant.getLongitude(),
