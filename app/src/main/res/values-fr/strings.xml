@@ -76,5 +76,6 @@
     <string name="address">Adresse:</string>
     <string name="most_recent_inspection_level">Niveau d\'inspection le plus récent:</string>
     <string name="Unable_location">Impossible d\'obtenir la position actuelle</string>
+    <string name="launches_search_criterea">"Ouvre "</string>
 
 </resources>
