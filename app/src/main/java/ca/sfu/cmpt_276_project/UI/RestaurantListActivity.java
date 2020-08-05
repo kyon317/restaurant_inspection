@@ -10,6 +10,7 @@
 package ca.sfu.cmpt_276_project.UI;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -20,8 +21,10 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -34,6 +37,7 @@ import android.widget.RadioGroup;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import androidx.annotation.FontRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -112,16 +116,25 @@ public class RestaurantListActivity extends AppCompatActivity {
         int savedMaxCritIssuesInput = getMaxCritIssuesInput(this);
         String savedHazardChecked = getHazardLevelChecked(this);
         boolean getFavouritesCheck = getFavouritesChecked(this);
-        Log.d("General", "restaurantSearcher: "
-                +"saved search: "+savedSearch
-                +"saved Min: "+savedMinCritIssuesInput
-                +"saved Max: "+savedMaxCritIssuesInput
-                +"saved Hazard: "+savedHazardChecked
-                +"favoriteCheck: "+getFavouritesCheck);
+//        Log.d("General", "restaurantSearcher: "
+//                +"saved search: "+savedSearch
+//                +"saved Min: "+savedMinCritIssuesInput
+//                +"saved Max: "+savedMaxCritIssuesInput
+//                +"saved Hazard: "+savedHazardChecked
+//                +"favoriteCheck: "+getFavouritesCheck);
+        List<Restaurant> restaurantList = new ArrayList<>();
         if (getFavouritesCheck){
-            // TODO: Fetch data from DB
+            //TODO: Waiting for DB data
+//            dbAdapter = new DBAdapter(this);
+//            dbAdapter.open();
+//            int size = dbAdapter.getAllRows().getCount();
+//            Log.d("TAG", "restaurantSearcher: "+size);
+////            for (int i = 0;i<size;i++){
+////                restaurantList.add(getRestaurantFromDB(i));
+////            }
+//            dbAdapter.close();
         }else{
-            List<Restaurant> restaurantList = findRestaurantByNames(savedSearch);
+            restaurantList = findRestaurantByNames(savedSearch);
             System.out.println("result base number: "+restaurantList.size());
             for (int i = 0;i<restaurantList.size();i++) {
                 Log.d("TAG", "restaurantSearcher: size of list: "+restaurantList.size()
@@ -150,7 +163,7 @@ public class RestaurantListActivity extends AppCompatActivity {
             }
             return restaurantList;
         }
-        return null;
+        return restaurantList;
     }
 
     private List<Restaurant> findRestaurantByNames(String search_name) {
@@ -168,11 +181,6 @@ public class RestaurantListActivity extends AppCompatActivity {
         SharedPreferences savePreferences = this.getSharedPreferences("SavePrefs",
                 MODE_PRIVATE);
         SharedPreferences.Editor editor = savePreferences.edit();
-        String savedSearch = getSearchName(this);
-        int savedMinCritIssuesInput = getMinCritIssuesInput(this);
-        int savedMaxCritIssuesInput = getMaxCritIssuesInput(this);
-        String savedHazardChecked = getHazardLevelChecked(this);
-        boolean getFavouritesCheck = getFavouritesChecked(this);
         srchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -180,7 +188,13 @@ public class RestaurantListActivity extends AppCompatActivity {
                         RestaurantListActivity.this);
                 View mView = getLayoutInflater().inflate(R.layout.search_window, null);
                 EditText searchInput = (EditText) mView.findViewById(R.id.searchInput);
-                if(savedSearch != ""){
+                String savedSearch = getSearchName(RestaurantListActivity.this);
+                int savedMinCritIssuesInput = getMinCritIssuesInput(RestaurantListActivity.this);
+                int savedMaxCritIssuesInput = getMaxCritIssuesInput(RestaurantListActivity.this);
+                String savedHazardChecked = getHazardLevelChecked(RestaurantListActivity.this);
+                boolean getFavouritesCheck = getFavouritesChecked(RestaurantListActivity.this);
+
+                if(!savedSearch.equals("")){
                     searchInput.setText(savedSearch, TextView.BufferType.EDITABLE);
                 }
                 searchInput.addTextChangedListener(new TextWatcher() {
@@ -360,10 +374,34 @@ public class RestaurantListActivity extends AppCompatActivity {
                     }
                 });
                 mBuilder.setView(mView);
+
+                //Dialog part, preserve search criteria at UI
                 AlertDialog dialog = mBuilder.create();
                 dialog.show();
+                dialog.setCanceledOnTouchOutside(true);
+                dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        Log.d("TAG", "onCancel: ");
+                        String savedSearch = getSearchName(RestaurantListActivity.this);
+                        int savedMinCritIssuesInput = getMinCritIssuesInput(RestaurantListActivity.this);
+                        int savedMaxCritIssuesInput = getMaxCritIssuesInput(RestaurantListActivity.this);
+                        String savedHazardChecked = getHazardLevelChecked(RestaurantListActivity.this);
+                        boolean getFavouritesCheck = getFavouritesChecked(RestaurantListActivity.this);
+                        editor.putString("Search Name Input", savedSearch);
+                        editor.putInt("Minimum Issues Input", savedMinCritIssuesInput);
+                        editor.putInt("Maximum Issues Input", savedMaxCritIssuesInput);
+                        editor.putString("Hazard Check Change", savedHazardChecked);
+                        editor.putBoolean("Display Favourites", getFavouritesCheck);
+                        editor.apply();
+                        List<Restaurant> temp_list = restaurantSearcher();
+                        refreshListView(temp_list);
+                    }
+                });
             }
+
         });
+
     }
 
     public static String getSearchName(Context context){
@@ -398,30 +436,29 @@ public class RestaurantListActivity extends AppCompatActivity {
     }
 
 
-//    /**
-//     * Get restaurant from DB by ROw_ID
-//     * */
-//    private Restaurant getRestaurantFromDB(int ROW_ID){
-//        Cursor cursor = dbAdapter.getAllRows();
-//        Restaurant restaurant = new Restaurant();
-//        if (cursor.move(ROW_ID)){
-//            Type type = new TypeToken<ArrayList<InspectionData>>() {}.getType();
-//            List<InspectionData> tempList = gson.fromJson(cursor.getString(DBAdapter.COL_INSPECTION), type);
-//
-//            restaurant.setTrackNumber(cursor.getString(DBAdapter.COL_TRACK_NUM));
-//            restaurant.setRestaurantName(cursor.getString(DBAdapter.COL_RES_NAME));
-//            restaurant.setPhysicalAddress(cursor.getString(DBAdapter.COL_ADDRESS));
-//            restaurant.setPhysicalCity(cursor.getString(DBAdapter.COL_CITY));
-//            restaurant.setFacType(cursor.getString(DBAdapter.COL_FAC_TYPE));
-//            restaurant.setLatitude(cursor.getDouble(DBAdapter.COL_LATITUDE));
-//            restaurant.setLongitude(cursor.getDouble(DBAdapter.COL_LONGITUDE));
-//            if(!tempList.isEmpty()) {
-//                restaurant.setInspectionDataList(tempList);
-//            }
-//        }
-//        cursor.close();
-//        return restaurant;
-//    }
+    /**
+     * Get restaurant obj from DB by ROW_ID
+     * */
+    private Restaurant getRestaurantFromDB(int ROW_ID){
+        Cursor cursor = dbAdapter.getAllRows();
+        Restaurant restaurant = new Restaurant();
+        if (cursor.move(ROW_ID)){
+            Type type = new TypeToken<ArrayList<InspectionData>>() {}.getType();
+            List<InspectionData> tempList = gson.fromJson(cursor.getString(DBAdapter.COL_INSPECTION), type);
+            restaurant.setTrackNumber(cursor.getString(DBAdapter.COL_TRACK_NUM));
+            restaurant.setRestaurantName(cursor.getString(DBAdapter.COL_RES_NAME));
+            restaurant.setPhysicalAddress(cursor.getString(DBAdapter.COL_ADDRESS));
+            restaurant.setPhysicalCity(cursor.getString(DBAdapter.COL_CITY));
+            restaurant.setFacType(cursor.getString(DBAdapter.COL_FAC_TYPE));
+            restaurant.setLatitude(cursor.getDouble(DBAdapter.COL_LATITUDE));
+            restaurant.setLongitude(cursor.getDouble(DBAdapter.COL_LONGITUDE));
+            if(!tempList.isEmpty()) {
+                restaurant.setInspectionDataList(tempList);
+            }
+        }
+        cursor.close();
+        return restaurant;
+    }
 
     public void initializeRestaurantList() {
         //get Restaurants from CSV
