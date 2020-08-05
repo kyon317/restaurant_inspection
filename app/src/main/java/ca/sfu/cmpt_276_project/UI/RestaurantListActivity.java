@@ -186,17 +186,15 @@ public class RestaurantListActivity extends AppCompatActivity {
                 searchInput.addTextChangedListener(new TextWatcher() {
                     @Override
                     public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
+                        List<Restaurant> temp_restaurant_list = restaurantSearcher();
+                        restaurants = temp_restaurant_list;
+                        refreshListView(temp_restaurant_list);
                     }
 
                     @Override
                     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                         editor.putString("Search Name Input", String.valueOf(charSequence));
                         editor.apply();
-                        System.out.println("minCrit: "+savedMinCritIssuesInput);
-                        System.out.println("maxCrit: "+savedMaxCritIssuesInput);
-                        System.out.println("savedHazardChecked: "+savedHazardChecked);
-                        System.out.println("getFavouritesCheck: "+getFavouritesCheck);
                         List<Restaurant> temp_restaurant_list = restaurantSearcher();
 //                        for (int j =0; j<5;j++){
 //                            temp_restaurant_list.get(j).Display();
@@ -223,7 +221,9 @@ public class RestaurantListActivity extends AppCompatActivity {
                 minCritIssues.addTextChangedListener(new TextWatcher() {
                     @Override
                     public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
+                        List<Restaurant> temp_restaurant_list = restaurantSearcher();
+                        restaurants = temp_restaurant_list;
+                        refreshListView(temp_restaurant_list);
                     }
 
                     @Override
@@ -251,7 +251,9 @@ public class RestaurantListActivity extends AppCompatActivity {
                 maxCritIssues.addTextChangedListener(new TextWatcher() {
                     @Override
                     public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
+                        List<Restaurant> temp_restaurant_list = restaurantSearcher();
+                        restaurants = temp_restaurant_list;
+                        refreshListView(temp_restaurant_list);
                     }
 
                     @Override
@@ -299,11 +301,11 @@ public class RestaurantListActivity extends AppCompatActivity {
                         RadioButton checked = (RadioButton) mView.findViewById(i);
                         editor.putString("Hazard Check Change", String.valueOf(checked.getText()));
                         editor.apply();
-                        Log.d("TAG", "onClick: "+savedHazardChecked);
-                        Log.d("TAG", "onClick: "+checked.getText().toString());
+//                        Log.d("TAG", "onClick: "+savedHazardChecked);
+//                        Log.d("TAG", "onClick: "+checked.getText().toString());
                         List<Restaurant> temp_restaurant_list = restaurantSearcher();
                         restaurants = temp_restaurant_list;
-                        Log.d("radio btn clicked", "onCheckedChanged restaurant size: "+restaurants.size());
+//                        Log.d("radio btn clicked", "onCheckedChanged restaurant size: "+restaurants.size());
                         refreshListView(temp_restaurant_list);
                     }
                 });
