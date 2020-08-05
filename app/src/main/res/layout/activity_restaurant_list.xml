@@ -26,8 +26,8 @@
 
     <ListView
         android:id="@+id/restaurantsListView"
-        android:layout_width="407dp"
-        android:layout_height="522dp"
+        android:layout_width="393dp"
+        android:layout_height="455dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -49,11 +49,26 @@
         android:layout_width="94dp"
         android:layout_height="53dp"
         android:layout_marginStart="300dp"
+        android:layout_marginEnd="4dp"
         android:text="@string/maps"
         app:layout_constraintBottom_toTopOf="@+id/restaurantsListView"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.882"
         app:layout_constraintStart_toStartOf="@+id/menu_format"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.571" />
+        app:layout_constraintVertical_bias="0.275" />
+
+    <ImageButton
+        android:id="@+id/srchBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginTop="13dp"
+        android:layout_marginEnd="28dp"
+        android:layout_marginBottom="13dp"
+        android:contentDescription="@string/opens_search_window_on_click"
+        app:layout_constraintBottom_toTopOf="@+id/restaurantsListView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnMaps"
+        app:srcCompat="@drawable/icon_search" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

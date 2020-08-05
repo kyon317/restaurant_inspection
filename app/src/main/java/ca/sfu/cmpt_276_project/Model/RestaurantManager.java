@@ -14,8 +14,8 @@ public class RestaurantManager {
     /**
      * Singleton code
      */
-    private static RestaurantManager instance;
-    private List<Restaurant> restaurants;
+    private static volatile RestaurantManager instance;
+    private static volatile List<Restaurant> restaurants;
 
     private RestaurantManager() {
         this.restaurants = new ArrayList<>();
@@ -29,6 +29,85 @@ public class RestaurantManager {
 
     public List<Restaurant> getRestaurants() {
         return this.restaurants;
+    }
+
+    // Modified for filtering restaurant based on search window
+    private String searchTerm = "";
+
+    public void setMinimumCritical(int minimumCritical) {
+        this.minimumCritical = minimumCritical;
+    }
+
+    public void setMaximumCritical(int maximumCritical) {
+        this.maximumCritical = maximumCritical;
+    }
+
+    public void setFavouriteOnly(boolean favouriteOnly) {
+        this.favouriteOnly = favouriteOnly;
+    }
+
+    public void setHazardLevelFilter(String hazardLevelFilter) {
+        this.hazardLevelFilter = hazardLevelFilter;
+    }
+
+    private int minimumCritical = 0;
+    private int maximumCritical = 99;
+    private boolean favouriteOnly = false;
+    private String hazardLevelFilter = "Low";
+
+    public void setSearchTerm(String searchTerm) { this.searchTerm = searchTerm; }
+
+
+    public List<Restaurant> getFilteredRestaurants() {
+        searchTerm = searchTerm.trim();
+        if (searchTerm == "" /*&& hazardLevelFilter.equalsIgnoreCase("Low")
+            && !favouriteOnly && minimumCritical == 0 && maximumCritical == 99
+           */) {
+
+            return restaurants; // O(1) when search term is empty.
+        }
+
+        List<Restaurant> filteredRestaurants = new ArrayList<>();
+        for (Restaurant restaurant : restaurants) {
+            if (qualifies(restaurant)) {
+                filteredRestaurants.add(restaurant);
+            }
+        }
+        return filteredRestaurants;
+    }
+
+    boolean inRange (int criticalViolationCount, int minimumCritical, int maximumCritical, Restaurant restaurant){
+
+        if(criticalViolationCount <= maximumCritical
+         && criticalViolationCount >= minimumCritical){
+            return true;
+        }
+        return false;
+    }
+
+    private boolean qualifies(Restaurant restaurant) {
+        String restaurantName = restaurant.getRestaurantName();
+        restaurantName = restaurantName.toLowerCase();
+        String hazardLevel = restaurant.getInspectionDataList().get(0).
+                getHazard().toString();
+
+        // number of critical violations of the last inspection
+        int criticalViolationCount = restaurant.getInspectionDataList().
+                get(0).getCriticalViolations();
+
+        if (restaurantName.toLowerCase().contains(searchTerm.toLowerCase())
+            && ((hazardLevelFilter.equalsIgnoreCase("All")) ||
+                (hazardLevel.equalsIgnoreCase(hazardLevelFilter)))
+            && inRange(criticalViolationCount,minimumCritical,maximumCritical,restaurant)
+            && (!favouriteOnly || restaurant.getFavourite())) {
+
+            return true;
+
+        } else {
+
+            return false;
+        }
+
     }
 
     /**
@@ -64,6 +143,7 @@ public class RestaurantManager {
         }
         return null;
     }
+
 
     //THIS IS FOR RETRIEVING RESTAURANTS USING ARRAYLIST INDEXING
     public Restaurant getRestaurantByID(int ID) throws IndexOutOfBoundsException {
