@@ -124,7 +124,7 @@ public class RestaurantListActivity extends AppCompatActivity {
 //                +"favoriteCheck: "+getFavouritesCheck);
         List<Restaurant> restaurantList = new ArrayList<>();
         if (getFavouritesCheck){
-            //TODO: Waiting for DB data
+            //TODO: Waiting for DB data, once DB is provided, uncomment this block will finish favourite btn behaviour
 //            dbAdapter = new DBAdapter(this);
 //            dbAdapter.open();
 //            int size = dbAdapter.getAllRows().getCount();
@@ -133,9 +133,9 @@ public class RestaurantListActivity extends AppCompatActivity {
 ////                restaurantList.add(getRestaurantFromDB(i));
 ////            }
 //            dbAdapter.close();
-        }else{
+        }else {
             restaurantList = findRestaurantByNames(savedSearch);
-
+        }
             for (int i = 0;i<restaurantList.size();i++) {
 //                Log.d("TAG", "restaurantSearcher: size of list: "+restaurantList.size()
 //                +"i: "+i);
@@ -161,8 +161,7 @@ public class RestaurantListActivity extends AppCompatActivity {
                     }
                 }
             }
-            return restaurantList;
-        }
+
         return restaurantList;
     }
 
