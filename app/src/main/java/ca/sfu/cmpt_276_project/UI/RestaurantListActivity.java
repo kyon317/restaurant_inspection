@@ -135,10 +135,10 @@ public class RestaurantListActivity extends AppCompatActivity {
 //            dbAdapter.close();
         }else{
             restaurantList = findRestaurantByNames(savedSearch);
-            System.out.println("result base number: "+restaurantList.size());
+
             for (int i = 0;i<restaurantList.size();i++) {
-                Log.d("TAG", "restaurantSearcher: size of list: "+restaurantList.size()
-                +"i: "+i);
+//                Log.d("TAG", "restaurantSearcher: size of list: "+restaurantList.size()
+//                +"i: "+i);
                 if (restaurantList.get(i).getInspectionDataList().size()<savedMinCritIssuesInput||
                         restaurantList.get(i).getInspectionDataList().size()>savedMaxCritIssuesInput){
                     restaurantList.remove(restaurantList.get(i));
@@ -152,12 +152,12 @@ public class RestaurantListActivity extends AppCompatActivity {
                     }
                 }else if (!savedHazardChecked.equals("NONE")){
                     Hazard this_hazard = restaurantList.get(i).getInspectionDataList().get(0).getHazard();
-                    System.out.println("this_hazard: "+this_hazard);
-                    System.out.println("hazard_check: "+savedHazardChecked);
+//                    System.out.println("this_hazard: "+this_hazard);
+//                    System.out.println("hazard_check: "+savedHazardChecked);
                     if (!this_hazard.toString().equals(savedHazardChecked)){
                         restaurantList.remove(restaurantList.get(i));
                         i--;
-                        Log.d("TAG", "restaurantSearcher: removed list based on hazard lvl");
+//                        Log.d("TAG", "restaurantSearcher: removed list based on hazard lvl");
                     }
                 }
             }
