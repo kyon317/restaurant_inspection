@@ -133,6 +133,10 @@ public class DBAdapter {
                 rowCount++;
                 cursor.moveToNext();
             }
+            Type type = new TypeToken<ArrayList<InspectionData>>() {}.getType();
+            List<InspectionData> tempList =
+                    gson.fromJson(cursor.getString(DBAdapter.COL_INSPECTION), type);
+
             restaurant.setTrackNumber(cursor.getString(DBAdapter.COL_TRACK_NUM));
             restaurant.setRestaurantName(cursor.getString(DBAdapter.COL_RES_NAME));
             restaurant.setPhysicalAddress(cursor.getString(DBAdapter.COL_ADDRESS));
@@ -140,6 +144,7 @@ public class DBAdapter {
             restaurant.setFacType(cursor.getString(DBAdapter.COL_FAC_TYPE));
             restaurant.setLatitude(cursor.getDouble(DBAdapter.COL_LATITUDE));
             restaurant.setLongitude(cursor.getDouble(DBAdapter.COL_LONGITUDE));
+            restaurant.setInspectionDataList(tempList);
         }
         cursor.close();
         return restaurant;
@@ -212,7 +217,7 @@ public class DBAdapter {
                 List<InspectionData> tempList = gson.fromJson(cursor.getString(DBAdapter.COL_INSPECTION), type);
 
                 //Printer test to check injection
-                System.out.println("Injected: \n"
+                System.out.println("DB ENTRIES: \n"
                         + "\tDB-ID#: " + cursor.getInt(DBAdapter.COL_ROWID) + "\n"
                         + "\tTrack#: " + cursor.getString(DBAdapter.COL_TRACK_NUM) + "\n"
                         + "\tName: " + cursor.getString(DBAdapter.COL_RES_NAME) + "\n"
