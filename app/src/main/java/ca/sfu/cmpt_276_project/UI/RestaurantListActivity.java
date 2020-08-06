@@ -47,6 +47,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 
 import ca.sfu.cmpt_276_project.CsvIngester.InspectionDataCSVIngester;
@@ -109,15 +110,9 @@ public class RestaurantListActivity extends AppCompatActivity {
         int savedMaxCritIssuesInput = getMaxCritIssuesInput(this);
         String savedHazardChecked = getHazardLevelChecked(this);
         boolean getFavouritesCheck = getFavouritesChecked(this);
-//        Log.d("General", "restaurantSearcher: "
-//                +"saved search: "+savedSearch
-//                +"saved Min: "+savedMinCritIssuesInput
-//                +"saved Max: "+savedMaxCritIssuesInput
-//                +"saved Hazard: "+savedHazardChecked
-//                +"favoriteCheck: "+getFavouritesCheck);
         List<Restaurant> restaurantList = new ArrayList<>();
         if (getFavouritesCheck){
-            //TODO: Waiting for DB data, once DB is provided, uncomment this block will finish favourite btn behaviour
+
             dbAdapter = new DBAdapter(this);
             dbAdapter.open();
             int size = dbAdapter.getAllRows().getCount();
@@ -130,7 +125,6 @@ public class RestaurantListActivity extends AppCompatActivity {
         else {
             restaurantList = findRestaurantByNames(savedSearch);
         }
-
             for (int i = 0;i<restaurantList.size();i++) {
 //                Log.d("TAG", "restaurantSearcher: size of list: "+restaurantList.size()
 //                +"i: "+i);
@@ -141,15 +135,31 @@ public class RestaurantListActivity extends AppCompatActivity {
                     continue;
                 }
                 if (restaurantList.get(i).getInspectionDataList().isEmpty()){
-                    if (!savedHazardChecked.equals(String.valueOf(R.string.all))){
+                    if (!(savedHazardChecked.equals(String.valueOf("All"))||savedHazardChecked.equalsIgnoreCase("Toutes"))){
                         restaurantList.remove(restaurantList.get(i));
                         i--;
                     }
-                }else if (!savedHazardChecked.equals(String.valueOf(R.string.all))){
+                }else if (!(savedHazardChecked.equals(String.valueOf("All"))||savedHazardChecked.equalsIgnoreCase("Toutes"))){
                     Hazard this_hazard = restaurantList.get(i).getInspectionDataList().get(0).getHazard();
+                    String hazardLevelTranslated  = this_hazard.toString();
+                    if (Locale.getDefault().getLanguage().equals("fr")){
+                        switch (this_hazard){
+                            case LOW:
+                                hazardLevelTranslated = String.valueOf("BAS");
+                                break;
+                            case MEDIUM:
+                                hazardLevelTranslated = String.valueOf("MOYEN");
+                                break;
+                            case HIGH:
+                                hazardLevelTranslated = String.valueOf("HAUT");
+                                break;
+                            default:
+                                hazardLevelTranslated = String.valueOf("Toutes");
+                        }
+                    }
 //                    System.out.println("this_hazard: "+this_hazard);
 //                    System.out.println("hazard_check: "+savedHazardChecked);
-                    if (!this_hazard.toString().equals(savedHazardChecked)){
+                    if (!hazardLevelTranslated.equals(savedHazardChecked)){
                         restaurantList.remove(restaurantList.get(i));
                         i--;
 //                        Log.d("TAG", "restaurantSearcher: removed list based on hazard lvl");
@@ -445,31 +455,6 @@ public class RestaurantListActivity extends AppCompatActivity {
 
     }
 
-
-    /**
-     * Get restaurant obj from DB by ROW_ID
-     * */
-//    private Restaurant getRestaurantFromDB(int ROW_ID){
-//        Cursor cursor = dbAdapter.getAllRows();
-//        Restaurant restaurant = new Restaurant();
-//        if (cursor.move(ROW_ID)){
-//            Type type = new TypeToken<ArrayList<InspectionData>>() {}.getType();
-//            List<InspectionData> tempList = gson.fromJson(cursor.getString(DBAdapter.COL_INSPECTION), type);
-//
-//            restaurant.setTrackNumber(cursor.getString(DBAdapter.COL_TRACK_NUM));
-//            restaurant.setRestaurantName(cursor.getString(DBAdapter.COL_RES_NAME));
-//            restaurant.setPhysicalAddress(cursor.getString(DBAdapter.COL_ADDRESS));
-//            restaurant.setPhysicalCity(cursor.getString(DBAdapter.COL_CITY));
-//            restaurant.setFacType(cursor.getString(DBAdapter.COL_FAC_TYPE));
-//            restaurant.setLatitude(cursor.getDouble(DBAdapter.COL_LATITUDE));
-//            restaurant.setLongitude(cursor.getDouble(DBAdapter.COL_LONGITUDE));
-//            if(!tempList.isEmpty()) {
-//                restaurant.setInspectionDataList(tempList);
-//            }
-//        }
-//        cursor.close();
-//        return restaurant;
-//    }
 
     public void initializeRestaurantList() {
         //get Restaurants from CSV
