@@ -664,7 +664,7 @@ public class RestaurantListActivity extends AppCompatActivity {
             //Fill hazard level with color
             TextView hazardLevelView = (TextView) restaurantView.findViewById(R.id.hazard_level);
             if (currentRestaurant.getInspectionDataList().isEmpty()) {
-                hazardLevelView.setText(R.string.all);
+                hazardLevelView.setText(R.string.none);
             } else {
                 Hazard hazard = currentRestaurant.getInspectionDataList().get(0).getHazard();
                 if (hazard == Hazard.LOW) {

@@ -92,5 +92,6 @@
     <string name="opens_search_window_on_click">" ouvre la fenêtre de recherche en cliquant"</string>
     <string name="reset">" Réinitialiser"</string>
     <string name="unfavourite">défavoriser</string>
+    <string name="none">Aucun</string>
 
 </resources>
