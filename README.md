@@ -18,5 +18,12 @@
 * Product Owner: Jimmy
 * Repo Manager: Vincent
 * Team Member: Simon
+* 
+
+**Scrum Roles (3rd iteration)**
+* Scrum Master: Jimmy
+* Product Owner: Kabir
+* Repo Manager: Simon
+* Team Member: Vincent
 
 The first run might take a while to download data
