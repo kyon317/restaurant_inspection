@@ -25,22 +25,23 @@ import ca.sfu.cmpt_276_project.UI.LoadingActivity;
 import ca.sfu.cmpt_276_project.R;
 
 public class CSVDownloader extends AsyncTask<String, String, String> {
-//    private ProgressDialog progreassDiag;
+    private ProgressDialog progreassDiag;
     private String filename = "";
     private Context context;
+
     public CSVDownloader(String filename, Context context) {
         this.filename = filename;
-        //setPdialog(context);
+        setPdialog(context);
     }
 
     public void setFilename(String filename) {
         this.filename = filename;
     }
 
-//    public void setPdialog(Context context) {
-//        progreassDiag = new ProgressDialog(context);
-//        this.context = context;
-//    }
+    public void setPdialog(Context context) {
+        progreassDiag = new ProgressDialog(context);
+        this.context = context;
+    }
     public boolean checkFileExistence(String filename){
         File dummyFile = new File(Environment.getExternalStorageDirectory().getPath() + "/Download/"+filename);
         return dummyFile.exists();
@@ -74,30 +75,30 @@ public class CSVDownloader extends AsyncTask<String, String, String> {
             backupFile(filename);
         }
 
-//        progreassDiag.setTitle(R.string.Hold_on);
-//        progreassDiag.setIndeterminate(false);
-//        progreassDiag.setProgress(0);
-//        progreassDiag.setCancelable(false);
-//        progreassDiag.setMax(100);
+        progreassDiag.setTitle(R.string.Hold_on);
+        progreassDiag.setIndeterminate(false);
+        progreassDiag.setProgress(0);
+        progreassDiag.setCancelable(false);
+        progreassDiag.setMax(100);
 
-//        progreassDiag.setButton(DialogInterface.BUTTON_NEGATIVE, context.getResources().getString(R.string.Cancel), new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialogInterface, int i) {
-//                        CSVDownloader.this.cancel(true);
-//                        deleteFile(filename);//TODO: correctly delete file
-//                        restoreFile(filename+"(1)");
-//                        progreassDiag.cancel();
-//                        progreassDiag.dismiss();
-//                    }
-//                });
-//        progreassDiag.setCanceledOnTouchOutside(false);
-//        progreassDiag.setButton(DialogInterface.BUTTON_POSITIVE, context.getResources().getString(R.string.Done), new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialogInterface, int i) {
-//                progreassDiag.dismiss();
-//            }
-//        });
-//        progreassDiag.show();
+        progreassDiag.setButton(DialogInterface.BUTTON_NEGATIVE, context.getResources().getString(R.string.Cancel), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        CSVDownloader.this.cancel(true);
+                        deleteFile(filename);
+                        restoreFile(filename+"(1)");
+                        progreassDiag.cancel();
+                        progreassDiag.dismiss();
+                    }
+                });
+        progreassDiag.setCanceledOnTouchOutside(false);
+        progreassDiag.setButton(DialogInterface.BUTTON_POSITIVE, context.getResources().getString(R.string.Done), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                progreassDiag.dismiss();
+            }
+        });
+        progreassDiag.show();
     }
 
     /**

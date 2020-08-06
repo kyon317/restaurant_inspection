@@ -157,7 +157,6 @@ public class SingleRestaurantActivity extends AppCompatActivity {
         registerOnClick();
     }
 
-
     private void registerOnClick() {
         ListView list = findViewById(R.id.inspectionsListView);
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {

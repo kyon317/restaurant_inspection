@@ -172,7 +172,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         List<Restaurant> restaurantList = new ArrayList<>();
         if(getFavouritesCheck) {
-
             dbAdapter = new DBAdapter(this);
             dbAdapter.open();
             int size = dbAdapter.getAllRows().getCount();
@@ -210,9 +209,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             hazardLevelTranslated= String.valueOf(R.string.all);
         }else{
             hazardLevel = currentRestaurant.getInspectionDataList().get(0).getHazard().toString();
-            if(hazardLevel == "LOW"){
+            if(hazardLevel.equals("LOW")){
                 hazardLevelTranslated = String.valueOf("BAS");
-            }else if(hazardLevel == "MEDIUM"){
+            }else if(hazardLevel.equals("MEDIUM")){
                 hazardLevelTranslated = String.valueOf("MOYEN");
             }else{
                 hazardLevelTranslated = String.valueOf("HAUT");
@@ -434,7 +433,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     public void onClick(View view) {
                         if(favouritesSwitch.isChecked()){
                             //favourites has been checked
-                            //Todo: only display favourites
                             editor.putBoolean("Display Favourites", true);
                             editor.apply();
                             List<Restaurant> temp_restaurant_list = restaurantSearcher();
@@ -471,7 +469,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     }
                 });
-                //Todo: make the search layout change what pegs are displayed
                 mBuilder.setView(mView);
                 AlertDialog dialog = mBuilder.create();
                 dialog.show();
@@ -517,7 +514,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     restaurantLat = currentRestaurant.getLatitude();
                     restaurantLng = currentRestaurant.getLongitude();
 
-                    if (currentRestaurant.getInspectionDataList().isEmpty() == false) {
+                    if (!currentRestaurant.getInspectionDataList().isEmpty()) {
 
                         Hazard hazard = currentRestaurant.getInspectionDataList().get(0).getHazard();
                         if (hazard == Hazard.HIGH) {
@@ -647,7 +644,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onDestroy() {
-        android.os.Process.killProcess(android.os.Process.myPid());
+//        android.os.Process.killProcess(android.os.Process.myPid());
         super.onDestroy();
 
     }

@@ -247,7 +247,7 @@ public class RestaurantListActivity extends AppCompatActivity {
                 minCritIssues.addTextChangedListener(new TextWatcher() {
                     @Override
                     public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                        //todo: fix crashes on delete ( leading to empty search)
+
                         List<Restaurant> temp_restaurant_list = restaurantSearcher();
                         restaurants = temp_restaurant_list;
                         refreshListView(temp_restaurant_list);
@@ -255,7 +255,6 @@ public class RestaurantListActivity extends AppCompatActivity {
 
                     @Override
                     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                        //TODO: Limit min smaller than max
                         if (!charSequence.toString().equals("")) {
                             String minvalue = String.valueOf(charSequence);
                             editor.putInt("Minimum Issues Input", Integer.parseInt(minvalue));
@@ -288,7 +287,6 @@ public class RestaurantListActivity extends AppCompatActivity {
 
                     @Override
                     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                        //TODO: Limit max larger than min
                         if (!charSequence.toString().equals("")){
                             String maxValue = String.valueOf(charSequence);
                             editor.putInt("Maximum Issues Input", Integer.parseInt(maxValue));
@@ -355,7 +353,6 @@ public class RestaurantListActivity extends AppCompatActivity {
                     public void onClick(View view) {
                         if(favouritesSwitch.isChecked()){
                             //favourites has been checked
-                            //Todo: only display favourites ... waiting for DB
                             editor.putBoolean("Display Favourites", true);
                             editor.apply();
                             List<Restaurant> temp_restaurant_list = restaurantSearcher();
@@ -364,7 +361,6 @@ public class RestaurantListActivity extends AppCompatActivity {
                         }
                         else{
                             //favourites not checked
-                            //Todo: display all ... waiting for DB
                             editor.putBoolean("Display Favourites", false);
                             editor.apply();
                             List<Restaurant> temp_restaurant_list = restaurantSearcher();
@@ -506,12 +502,9 @@ public class RestaurantListActivity extends AppCompatActivity {
 
     @Override
     public void onDestroy() {
-        android.os.Process.killProcess(android.os.Process.myPid());
+//        android.os.Process.killProcess(android.os.Process.myPid());
         super.onDestroy();
-
     }
-
-
 
     private void populateRestaurantIcons() {
         restaurantIcons = new int[8];

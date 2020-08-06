@@ -297,8 +297,8 @@ public class DBAdapter {
         /*
          * CHANGE 3:
          */
-        // TODO: Update data in the row with new fields.
-        // TODO: Also change the function's arguments to be what you need!
+        // Update data in the row with new fields.
+        // Also change the function's arguments to be what you need!
         // Create row's data:
         ContentValues initialValues = new ContentValues();
         initialValues.put(KEY_TRACK_NUM, trackNumber);
@@ -382,8 +382,10 @@ public class DBAdapter {
         /*
          * CHANGE 4:
          */
-        // TODO: Update data in the row with new fields.
-        // TODO: Also change the function's arguments to be what you need!
+        /**
+         * Update data in the row with new fields.
+         * Also change the function's arguments to be what you need!
+         * */
         // Create row's data:
         ContentValues newValues = new ContentValues();
         newValues.put(KEY_TRACK_NUM, trackNumber);
