@@ -63,6 +63,7 @@ public class RestaurantListActivity extends AppCompatActivity {
 
     private RestaurantManager restaurantManager;
     private List<Restaurant> restaurants = new ArrayList<>();
+    private List<Restaurant> dbRestaurants = new ArrayList<>();
     private int[] restaurantIcons;
     private Gson gson = new Gson();
     private DBAdapter dbAdapter;
@@ -96,6 +97,7 @@ public class RestaurantListActivity extends AppCompatActivity {
 //        dummyRestaurant.Display();
 
         populateRestaurantIcons();
+
         populateListView();
         registerClickCallback();
         setUpSearchWindow();
@@ -565,6 +567,10 @@ public class RestaurantListActivity extends AppCompatActivity {
         restaurantManager = RestaurantManager.getInstance();
         restaurants = restaurantManager.getRestaurants();
         ArrayAdapter<Restaurant> adapter = new MyListAdapter();
+        dbAdapter = new DBAdapter(this);
+        dbAdapter.open();
+        dbRestaurants = dbAdapter.getAllRestaurants();
+
         ListView list = (ListView) findViewById(R.id.restaurantsListView);
         list.setAdapter(adapter);
     }
@@ -642,8 +648,11 @@ public class RestaurantListActivity extends AppCompatActivity {
             resImageView.setImageResource(currentRestaurant.getIcon());
 
             ImageView favIconView = (ImageView) restaurantView.findViewById(R.id.favouriteIcon);
-            if(!currentRestaurant.getFavourite()){
-                favIconView.setVisibility(View.INVISIBLE);
+            if(dbRestaurants.get(0)!=null) {
+                if (currentRestaurant.getId()==dbRestaurants.get(0).getId()){
+                    favIconView.setVisibility(View.VISIBLE);
+                    dbRestaurants.remove(0);
+                }
             }
 
             // Fill hazard icon

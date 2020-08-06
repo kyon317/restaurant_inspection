@@ -6,8 +6,8 @@
 
     <ImageView
         android:id="@+id/restaurant_icon"
-        android:layout_width="79dp"
-        android:layout_height="107dp"
+        android:layout_width="54dp"
+        android:layout_height="53dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_marginTop="0dp"
@@ -82,9 +82,10 @@
         android:id="@+id/favouriteIcon"
         android:layout_width="50dp"
         android:layout_height="36dp"
-        android:layout_alignParentTop="true"
-        android:layout_marginStart="6dp"
-        android:layout_marginTop="8dp"
-        android:layout_toEndOf="@+id/restaurant_txtName"
+        android:layout_below="@+id/restaurant_icon"
+
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="9dp"
+        android:layout_marginTop="6dp"
         app:srcCompat="@drawable/ic_baseline_star_24" />
 </RelativeLayout>
