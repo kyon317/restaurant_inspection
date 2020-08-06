@@ -123,6 +123,10 @@ public class DBAdapter {
         myDBHelper.close();
     }
 
+    public int count(){
+        return this.getAllRows().getCount();
+    }
+
     public Restaurant getRestaurant(int rowNum){
         int rowCount = 0;
         Restaurant restaurant = new Restaurant();
@@ -148,6 +152,38 @@ public class DBAdapter {
         }
         cursor.close();
         return restaurant;
+    }
+
+    public List<Restaurant> getAllRestaurants(){
+        List<Restaurant> restaurants = new ArrayList<>();
+
+        Cursor cursor = this.getAllRows();
+        if(cursor.moveToFirst()){
+            do{
+                //temp restaurant container
+                Restaurant restaurant = new Restaurant();
+
+                //THIS PAIR OF LINES ARE USED TO DESERIALIZE THE JSON STRING EXTRACTED FROM DB
+                Type type = new TypeToken<ArrayList<InspectionData>>() {}.getType();
+                List<InspectionData> tempList =
+                        gson.fromJson(cursor.getString(DBAdapter.COL_INSPECTION), type);
+
+                restaurant.setTrackNumber(cursor.getString(DBAdapter.COL_TRACK_NUM));
+                restaurant.setRestaurantName(cursor.getString(DBAdapter.COL_RES_NAME));
+                restaurant.setPhysicalAddress(cursor.getString(DBAdapter.COL_ADDRESS));
+                restaurant.setPhysicalCity(cursor.getString(DBAdapter.COL_CITY));
+                restaurant.setFacType(cursor.getString(DBAdapter.COL_FAC_TYPE));
+                restaurant.setLatitude(cursor.getDouble(DBAdapter.COL_LATITUDE));
+                restaurant.setLongitude(cursor.getDouble(DBAdapter.COL_LONGITUDE));
+                restaurant.setInspectionDataList(tempList);
+
+                //add retrieved restaurant into Array List
+                restaurants.add(restaurant);
+            }while (cursor.moveToNext());
+        }
+        cursor.close();
+
+        return restaurants;
     }
 
     public void addRestaurant(Restaurant restaurant, int arrListNum){
@@ -211,7 +247,6 @@ public class DBAdapter {
 
         if(cursor.moveToFirst()){
             do{
-                System.out.println(cursor.getString(DBAdapter.COL_INSPECTION));
                 //THIS PAIR OF LINES ARE USED TO DESERIALIZE THE JSON STRING EXTRACTED FROM DB
                 Type type = new TypeToken<ArrayList<InspectionData>>() {}.getType();
                 List<InspectionData> tempList = gson.fromJson(cursor.getString(DBAdapter.COL_INSPECTION), type);
