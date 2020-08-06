@@ -62,6 +62,7 @@ public class RestaurantListActivity extends AppCompatActivity {
 
     private RestaurantManager restaurantManager;
     private List<Restaurant> restaurants = new ArrayList<>();
+    private List<Restaurant> dbRestaurants = new ArrayList<>();
     private int[] restaurantIcons;
     private Gson gson = new Gson();
     private DBAdapter dbAdapter;
@@ -95,6 +96,7 @@ public class RestaurantListActivity extends AppCompatActivity {
 //        dummyRestaurant.Display();
 
         populateRestaurantIcons();
+
         populateListView();
         registerClickCallback();
         setUpSearchWindow();
@@ -446,31 +448,6 @@ public class RestaurantListActivity extends AppCompatActivity {
     }
 
 
-    /**
-     * Get restaurant obj from DB by ROW_ID
-     * */
-//    private Restaurant getRestaurantFromDB(int ROW_ID){
-//        Cursor cursor = dbAdapter.getAllRows();
-//        Restaurant restaurant = new Restaurant();
-//        if (cursor.move(ROW_ID)){
-//            Type type = new TypeToken<ArrayList<InspectionData>>() {}.getType();
-//            List<InspectionData> tempList = gson.fromJson(cursor.getString(DBAdapter.COL_INSPECTION), type);
-//
-//            restaurant.setTrackNumber(cursor.getString(DBAdapter.COL_TRACK_NUM));
-//            restaurant.setRestaurantName(cursor.getString(DBAdapter.COL_RES_NAME));
-//            restaurant.setPhysicalAddress(cursor.getString(DBAdapter.COL_ADDRESS));
-//            restaurant.setPhysicalCity(cursor.getString(DBAdapter.COL_CITY));
-//            restaurant.setFacType(cursor.getString(DBAdapter.COL_FAC_TYPE));
-//            restaurant.setLatitude(cursor.getDouble(DBAdapter.COL_LATITUDE));
-//            restaurant.setLongitude(cursor.getDouble(DBAdapter.COL_LONGITUDE));
-//            if(!tempList.isEmpty()) {
-//                restaurant.setInspectionDataList(tempList);
-//            }
-//        }
-//        cursor.close();
-//        return restaurant;
-//    }
-
     public void initializeRestaurantList() {
         //get Restaurants from CSV
         RestaurantCSVIngester restaurantImport = new RestaurantCSVIngester();
@@ -580,7 +557,10 @@ public class RestaurantListActivity extends AppCompatActivity {
         restaurantManager = RestaurantManager.getInstance();
         restaurants = restaurantManager.getRestaurants();
         ArrayAdapter<Restaurant> adapter = new MyListAdapter();
-        ListView list = (ListView) findViewById(R.id.restaurantsListView);
+        dbAdapter = new DBAdapter(this);
+        dbAdapter.open();
+
+                ListView list = (ListView) findViewById(R.id.restaurantsListView);
         list.setAdapter(adapter);
     }
 
@@ -657,9 +637,6 @@ public class RestaurantListActivity extends AppCompatActivity {
             resImageView.setImageResource(currentRestaurant.getIcon());
 
             ImageView favIconView = (ImageView) restaurantView.findViewById(R.id.favouriteIcon);
-            if(!currentRestaurant.getFavourite()){
-                favIconView.setVisibility(View.INVISIBLE);
-            }
 
             // Fill hazard icon
             ImageView hazardIconView = (ImageView) restaurantView.findViewById(
