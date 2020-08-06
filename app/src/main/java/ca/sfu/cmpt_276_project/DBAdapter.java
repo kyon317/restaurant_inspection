@@ -264,11 +264,7 @@ public class DBAdapter {
                         + "\tArrList#: " + cursor.getDouble(DBAdapter.COL_ARRLIST_NUM) + "\n"
                         + "---------------------------------------------------------------------\n");
 
-                /*if(!tempList.isEmpty()) {
-                    System.out.println("\tInspection Details: ");
-                    for(InspectionData inspectionData: tempList)
-                        inspectionData.Display();
-                }*/
+
             }while (cursor.moveToNext());
         }
 

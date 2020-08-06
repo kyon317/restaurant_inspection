@@ -559,8 +559,9 @@ public class RestaurantListActivity extends AppCompatActivity {
         ArrayAdapter<Restaurant> adapter = new MyListAdapter();
         dbAdapter = new DBAdapter(this);
         dbAdapter.open();
+        dbRestaurants = dbAdapter.getAllRestaurants();
 
-                ListView list = (ListView) findViewById(R.id.restaurantsListView);
+        ListView list = (ListView) findViewById(R.id.restaurantsListView);
         list.setAdapter(adapter);
     }
 
@@ -637,6 +638,12 @@ public class RestaurantListActivity extends AppCompatActivity {
             resImageView.setImageResource(currentRestaurant.getIcon());
 
             ImageView favIconView = (ImageView) restaurantView.findViewById(R.id.favouriteIcon);
+            if(dbRestaurants.get(0)!=null) {
+                if (currentRestaurant.getId()==dbRestaurants.get(0).getId()){
+                    favIconView.setVisibility(View.VISIBLE);
+                    dbRestaurants.remove(0);
+                }
+            }
 
             // Fill hazard icon
             ImageView hazardIconView = (ImageView) restaurantView.findViewById(
