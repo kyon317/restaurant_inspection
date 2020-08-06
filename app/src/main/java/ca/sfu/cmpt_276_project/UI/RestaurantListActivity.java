@@ -176,6 +176,10 @@ public class RestaurantListActivity extends AppCompatActivity {
         SharedPreferences savePreferences = this.getSharedPreferences("SavePrefs",
                 MODE_PRIVATE);
         SharedPreferences.Editor editor = savePreferences.edit();
+
+        List<Restaurant> temp_list = restaurantSearcher();
+        refreshListView(temp_list);
+
         srchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

@@ -19,6 +19,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -30,6 +31,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -126,6 +128,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //Toast.makeText(MapsActivity.this,
         //        getSearchName(this),Toast.LENGTH_SHORT).show(); test to see savedpref works
+
 
         init();
 
@@ -243,25 +246,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         boolean getFavouritesCheck = getFavouritesChecked(this);
 
         List<Restaurant> restaurantList = new ArrayList<>();
-        if(getFavouritesCheck){
-            /*
-            // waiting for DB
+        if(getFavouritesCheck) {
+
             dbAdapter = new DBAdapter(this);
             dbAdapter.open();
             int size = dbAdapter.getAllRows().getCount();
-            for (int i = 0;i<size;i++){
-                restaurantList.add(getRestaurantFromDB(i));
+            for (int i = 0; i < size; i++) {
+                restaurantList.add(dbAdapter.getRestaurant(i));
             }
             dbAdapter.close();
-
-            for (Restaurant res: restaurantList.getRestaurants()) {
+            for (int i = 0;i<restaurantList.size();i++){
                 if (!qualifiedRestaurant(savedMinCritIssuesInput,savedMaxCritIssuesInput,
-                        savedSearch,savedHazardChecked,res)) {
-                    restaurantList.remove(restaurantList.get(i);
+                        savedSearch,savedHazardChecked,restaurantList.get(i))){
+                    restaurantList.remove(restaurantList.get(i));
                     i--;
                 }
             }
-             */
         }else{
             for (Restaurant res: restaurantManager.getRestaurants()) {
                 if (qualifiedRestaurant(savedMinCritIssuesInput,savedMaxCritIssuesInput,
@@ -279,17 +279,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                          Restaurant currentRestaurant){
         String restaurantName = currentRestaurant.getRestaurantName().toLowerCase();
         String hazardLevel;
+        String hazardLevelTranslated;
         if (currentRestaurant.getInspectionDataList().isEmpty()){
-            hazardLevel= String.valueOf(R.string.all);
+            hazardLevel = String.valueOf(R.string.all);
+            hazardLevelTranslated= String.valueOf(R.string.all);
         }else{
             hazardLevel = currentRestaurant.getInspectionDataList().get(0).getHazard().toString();
+            if(hazardLevel == "LOW"){
+                hazardLevelTranslated = String.valueOf("BAS");
+            }else if(hazardLevel == "MEDIUM"){
+                hazardLevelTranslated = String.valueOf("MOYEN");
+            }else{
+                hazardLevelTranslated = String.valueOf("HAUT");
+            }
         }
 
         if(  (restaurantName.isEmpty() || restaurantName.contains(savedSearch.toLowerCase())) &&
-                (savedHazardCheck.equalsIgnoreCase(String.valueOf(R.string.all)) || hazardLevel.equalsIgnoreCase(savedHazardCheck)) &&
-                withinAYear(savedMin,savedMax,currentRestaurant)
-                // && favourite
-                ){
+                (savedHazardCheck.equalsIgnoreCase(String.valueOf(R.string.all)) ||
+                        savedHazardCheck.equalsIgnoreCase("Toutes") || hazardLevel.equalsIgnoreCase(savedHazardCheck) ||
+                        hazardLevelTranslated.equalsIgnoreCase(savedHazardCheck)) &&
+                withinAYear(savedMin,savedMax,currentRestaurant)){
             return true;
         }
         else{
@@ -301,7 +310,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         int count = 0;
         if (currentRestaurant.getInspectionDataList().isEmpty()) {
-            if(savedMin == 0 || savedMax == 0){
+            if(savedMin == 0 || savedMax <= 0){
                 return true;
             }
             else{
@@ -328,8 +337,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public static MapsActivity getInstance() {
         return instance;
     }
-
-
 
     // allows MapsActivity to be accessed
     public static Intent makeIntent(Context context) {
@@ -358,6 +365,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 MODE_PRIVATE);
         SharedPreferences.Editor editor = savePreferences.edit();
 
+        /*
+        if(we go back from RestaurantList)
+        List<Restaurant> temp_restaurant_list = restaurantSearcher();
+        refreshMapView(temp_restaurant_list);
+        
+         */
 
         ImageButton srchBtn = (ImageButton) findViewById(R.id.searchBtn);
         srchBtn.setOnClickListener(new View.OnClickListener() {
@@ -445,8 +458,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         String maxValue = String.valueOf(charSequence);
 
                         if(!maxValue.equals("")){
-                            editor.putInt("Maximum Issues Input", Integer.parseInt(maxValue));
-                            editor.apply();
+                            if(!(maxValue.equals(""))){
+                                editor.putInt("Maximum Issues Input", Integer.parseInt(maxValue));
+                                editor.apply();
+                            }else{
+                                editor.putInt("Maximum Issues Input", 0);
+                                editor.apply();
+                            }
                             List<Restaurant> temp_restaurant_list = restaurantSearcher();
                             refreshMapView(temp_restaurant_list);
                         }
@@ -461,19 +479,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 RadioGroup hazardLevelGroup = (RadioGroup) mView.findViewById(
                         R.id.search_hazard_group);
-                if(savedHazardChecked.contains(String.valueOf(R.string.all))){
+                if(savedHazardChecked.contains("NONE")){
                     RadioButton noneRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonNone);
                     noneRadioButton.setChecked(true);
                 }
-                else if(savedHazardChecked.contains(String.valueOf(R.string.low))){
+                else if(savedHazardChecked.contains("LOW")){
                     RadioButton lowRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonLow);
                     lowRadioButton.setChecked(true);
                 }
-                else if(savedHazardChecked.contains(String.valueOf(R.string.medium))){
+                else if(savedHazardChecked.contains("MEDIUM")){
                     RadioButton mediumRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonMedium);
                     mediumRadioButton.setChecked(true);
                 }
-                else if(savedHazardChecked.contains(String.valueOf(R.string.high))){
+                else if(savedHazardChecked.contains("HIGH")){
                     RadioButton highRadioButton = (RadioButton) mView.findViewById(R.id.radioButtonHigh);
                     highRadioButton.setChecked(true);
                 }
@@ -541,7 +559,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 mBuilder.setView(mView);
                 AlertDialog dialog = mBuilder.create();
                 dialog.show();
+                dialog.setCanceledOnTouchOutside(true);
+                dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        Log.d("TAG", "onCancel: ");
+                        String savedSearch = getSearchName(MapsActivity.this);
+                        int savedMinCritIssuesInput = getMinCritIssuesInput(MapsActivity.this);
+                        int savedMaxCritIssuesInput = getMaxCritIssuesInput(MapsActivity.this);
+                        String savedHazardChecked = getHazardLevelChecked(MapsActivity.this);
+                        boolean getFavouritesCheck = getFavouritesChecked(MapsActivity.this);
+                        editor.putString("Search Name Input", savedSearch);
+                        editor.putInt("Minimum Issues Input", savedMinCritIssuesInput);
+                        editor.putInt("Maximum Issues Input", savedMaxCritIssuesInput);
+                        editor.putString("Hazard Check Change", savedHazardChecked);
 
+                        editor.putBoolean("Display Favourites", getFavouritesCheck);
+                        editor.apply();
+                        List<Restaurant> temp_list = restaurantSearcher();
+                        refreshMapView(temp_list);
+                    }
+                });
             }
         });
     }
@@ -550,8 +588,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         MapsActivity.this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mClusterManager.clearItems();
-                mMap.clear();
+
+                    mClusterManager.clearItems();
+                    mMap.clear();
+
+
                 for (int i = 0; i < restaurants.size(); i++) {
 
                     Restaurant currentRestaurant = restaurants.get(i);
@@ -573,6 +614,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             hazardIcon = bitmapDescriptorFromVector(getApplicationContext(),
                                     R.drawable.icon_map_low);
                         }
+                    }
+
+                    if(currentRestaurant.getInspectionDataList().isEmpty()){
+                        MarkerOptions options = new MarkerOptions().title(restaurantName).
+                                position(new LatLng(restaurantLat, restaurantLng));
+
+                        mMarker = mMap.addMarker(options);
+
                     }
 
                     PegItem newItem = new PegItem(currentRestaurant.getLatitude(),
@@ -960,7 +1009,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             TextView restaurantLevel = itemView.findViewById(R.id.info_restaurant_level);
             if (restaurant.getInspectionDataList().isEmpty()) {
-                restaurantLevel.setText(R.string.all);
+                restaurantLevel.setText("None");
             } else {
                 Hazard hazard = restaurant.getInspectionDataList().get(0).getHazard();
                 if (hazard == Hazard.LOW) {
