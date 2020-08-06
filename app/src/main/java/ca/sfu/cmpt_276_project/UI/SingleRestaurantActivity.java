@@ -115,13 +115,13 @@ public class SingleRestaurantActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if(restaurant.getFavourite()){
-                    dbAdapter.addRestaurant(restaurant, restaurantPosition);
+                    dbAdapter.deleteRestaurant(restaurantPosition);
                     dbAdapter.print();
                     restaurant.setFavourite(false);
                     favouriteText.setText(R.string.favourite);
                 }
                 else {
-                    dbAdapter.deleteRestaurant(restaurantPosition);
+                    dbAdapter.addRestaurant(restaurant, restaurantPosition);
                     dbAdapter.print();
                     restaurant.setFavourite(true);
                     favouriteText.setText(R.string.unfavourite);

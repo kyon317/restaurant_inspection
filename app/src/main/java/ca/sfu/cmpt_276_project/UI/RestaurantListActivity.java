@@ -457,7 +457,6 @@ public class RestaurantListActivity extends AppCompatActivity {
 
     }
 
-
     public void initializeRestaurantList() {
         //get Restaurants from CSV
         RestaurantCSVIngester restaurantImport = new RestaurantCSVIngester();
@@ -570,7 +569,7 @@ public class RestaurantListActivity extends AppCompatActivity {
         dbAdapter = new DBAdapter(this);
         dbAdapter.open();
         dbRestaurants = dbAdapter.getAllRestaurants();
-
+        dbAdapter.close();
         ListView list = (ListView) findViewById(R.id.restaurantsListView);
         list.setAdapter(adapter);
     }
@@ -597,6 +596,17 @@ public class RestaurantListActivity extends AppCompatActivity {
         });
     }
 
+    private boolean searchDbForTrack(Restaurant currentRestaurant){
+        if (!dbRestaurants.isEmpty())
+        {
+            for (Restaurant dbRes:dbRestaurants
+                 ) {
+                if (dbRes.getTrackNumber().equals(currentRestaurant.getTrackNumber()))
+                    return true;
+            }
+        }
+        return false;
+    }
 
     private class MyListAdapter extends ArrayAdapter<Restaurant> {
 
@@ -612,9 +622,7 @@ public class RestaurantListActivity extends AppCompatActivity {
                 restaurantView = getLayoutInflater().inflate(R.layout.restaurants_view, parent, false);
             }
 
-//            System.out.println("position: "+position);
             Restaurant currentRestaurant = restaurants.get(position);
-//            Restaurant currentRestaurant = getRestaurantFromDB(position);
 
             // Fill restaurant image
             ImageView resImageView = (ImageView) restaurantView.findViewById(R.id.restaurant_icon);
@@ -648,12 +656,12 @@ public class RestaurantListActivity extends AppCompatActivity {
             resImageView.setImageResource(currentRestaurant.getIcon());
 
             ImageView favIconView = (ImageView) restaurantView.findViewById(R.id.favouriteIcon);
-            if(dbRestaurants.get(0)!=null) {
-                if (currentRestaurant.getId()==dbRestaurants.get(0).getId()){
-                    favIconView.setVisibility(View.VISIBLE);
-                    dbRestaurants.remove(0);
+            favIconView.setVisibility(View.INVISIBLE);
+                if(!dbRestaurants.isEmpty()) {
+                    if (searchDbForTrack(currentRestaurant)){
+                        favIconView.setVisibility(View.VISIBLE);
+                    }
                 }
-            }
 
             // Fill hazard icon
             ImageView hazardIconView = (ImageView) restaurantView.findViewById(

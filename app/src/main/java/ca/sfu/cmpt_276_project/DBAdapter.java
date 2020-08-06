@@ -34,7 +34,6 @@ public class DBAdapter {
     /*
      * CHANGE 1:
      */
-    // TODO: Setup your fields here:
     public static final String KEY_TRACK_NUM = "trackNumber";
     public static final String KEY_RES_NAME = "restaurantName";
     public static final String KEY_ADDRESS = "physicalAddress";
@@ -46,7 +45,6 @@ public class DBAdapter {
     public static final String KEY_INSPECTION = "inspection";
     public static final String KEY_ARRLIST_NUM = "arrlistNumber";
 
-    // TODO: Setup your field numbers here (0 = KEY_ROWID, 1=...)
     public static final int COL_TRACK_NUM = 1;
     public static final int COL_RES_NAME  = 2;
     public static final int COL_ADDRESS = 3;
@@ -76,7 +74,6 @@ public class DBAdapter {
                     /*
                      * CHANGE 2:
                      */
-                    // TODO: Place your fields here!
                     // + KEY_{...} + " {type} not null"
                     //	- Key is the column name you created above.
                     //	- {type} is one of: text, integer, real, blob
@@ -149,6 +146,7 @@ public class DBAdapter {
             restaurant.setLatitude(cursor.getDouble(DBAdapter.COL_LATITUDE));
             restaurant.setLongitude(cursor.getDouble(DBAdapter.COL_LONGITUDE));
             restaurant.setInspectionDataList(tempList);
+            restaurant.setIcon(cursor.getInt(DBAdapter.COL_ICON));
         }
         cursor.close();
         return restaurant;
@@ -176,6 +174,7 @@ public class DBAdapter {
                 restaurant.setLatitude(cursor.getDouble(DBAdapter.COL_LATITUDE));
                 restaurant.setLongitude(cursor.getDouble(DBAdapter.COL_LONGITUDE));
                 restaurant.setInspectionDataList(tempList);
+                restaurant.setIcon(cursor.getInt(DBAdapter.COL_ICON));
 
                 //add retrieved restaurant into Array List
                 restaurants.add(restaurant);
@@ -199,7 +198,7 @@ public class DBAdapter {
                         restaurant.getFacType(),
                         restaurant.getLatitude(),
                         restaurant.getLongitude(),
-                        0,
+                        restaurant.getIcon(),
                         inspectionJSON,
                         arrListNum);
 
@@ -269,6 +268,21 @@ public class DBAdapter {
         }
 
         cursor.close();
+    }
+
+    public boolean searchDBforRestaurant(Restaurant restaurant){
+        Cursor cursor = getAllRows();
+        if(cursor.moveToFirst()){
+            //search for row to delete
+            do{
+                if(restaurant.getTrackNumber() == cursor.getString(DBAdapter.COL_TRACK_NUM)){
+                    cursor.close();
+                    return true;
+                }
+            }while (cursor.moveToNext());
+        }
+        cursor.close();
+        return false;
     }
 
     // Add a new set of values to the database.

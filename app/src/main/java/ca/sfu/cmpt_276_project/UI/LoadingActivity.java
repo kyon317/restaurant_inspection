@@ -320,8 +320,7 @@ public class LoadingActivity extends AppCompatActivity {
 
                                 //if Tracking Number of restaurants matches
                                 //Add the new updated restaurant object to the database
-                                if(dbRestaurants.get(j).getTrackNumber() ==
-                                        restaurantManager.getRestaurants().get(k).getTrackNumber()){
+                                if(dbRestaurants.get(j).getTrackNumber() .equals(restaurantManager.getRestaurants().get(k).getTrackNumber())){
                                     dbAdapter.addRestaurant(restaurantManager.getRestaurants().get(k), k);
 
                                     //check if j has reached bounds
