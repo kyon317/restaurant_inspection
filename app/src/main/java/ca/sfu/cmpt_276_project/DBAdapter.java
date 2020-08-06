@@ -170,11 +170,12 @@ public class DBAdapter {
         if(cursor.moveToFirst()){
             //search for row to delete
             do{
-                if(cursor.getInt(DBAdapter.COL_ARRLIST_NUM) == arrListNum);
-                long rowToDelete = cursor.getInt(DBAdapter.COL_ROWID);
-                this.deleteRow(rowToDelete);
-                cursor.close();
-                return;
+                if(cursor.getInt(DBAdapter.COL_ARRLIST_NUM) == arrListNum){
+                    long rowToDelete = cursor.getInt(DBAdapter.COL_ROWID);
+                    this.deleteRow(rowToDelete);
+                    cursor.close();
+                    return;
+                }
             }while (cursor.moveToNext());
         }
         cursor.close();
@@ -186,9 +187,10 @@ public class DBAdapter {
         if(cursor.moveToFirst()){
             //search for row to delete
             do{
-                if(cursor.getInt(DBAdapter.COL_ARRLIST_NUM) == arrListNum);
-                cursor.close();
-                return true;
+                if(cursor.getInt(DBAdapter.COL_ARRLIST_NUM) == arrListNum){
+                    cursor.close();
+                    return true;
+                }
             }while (cursor.moveToNext());
         }
         cursor.close();
