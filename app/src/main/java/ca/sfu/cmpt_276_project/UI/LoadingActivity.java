@@ -305,6 +305,35 @@ public class LoadingActivity extends AppCompatActivity {
                         backgroundTask loading_task = new backgroundTask();
                         loading_task.execute("Load");
                         backgroundTask startMap_task = new backgroundTask();
+                        //UPDATE DB CODE
+
+                        if(dbAdapter.count() > 0){
+                            //saving previous entries into makeshift Array List
+                            List<Restaurant> dbRestaurants = dbAdapter.getAllRestaurants();
+
+                            //cleaning DB
+                            dbAdapter.deleteAll();
+
+                            //loop to add new restaurants into DB
+                            int j = 0;  //counter to keep track of dbRestaurants
+                            for(int k = 0; k < restaurantManager.getRestaurants().size(); k++){
+
+                                //if Tracking Number of restaurants matches
+                                //Add the new updated restaurant object to the database
+                                if(dbRestaurants.get(j).getTrackNumber() ==
+                                        restaurantManager.getRestaurants().get(k).getTrackNumber()){
+                                    dbAdapter.addRestaurant(restaurantManager.getRestaurants().get(k), k);
+
+                                    //check if j has reached bounds
+                                    if(j == (dbRestaurants.size() - 1))
+                                        break;
+                                    j++;    //else, increment j
+                                }
+
+                            }//endof for loop
+                        }//endof database update code
+
+                        //ENDOF UPDATE DB CODE
                         startMap_task.execute("startMapActivity");
                     }
                 })
