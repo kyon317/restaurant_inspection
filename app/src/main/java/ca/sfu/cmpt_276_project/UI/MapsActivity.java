@@ -91,6 +91,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final String EXTRA_LAT = "ca.sfu.cmpt_276_project.UI.extraLat";
     private static final String EXTRA_LNG = "ca.sfu.cmpt_276_project.UI.extraLng";
     private static final String EXTRA_BOOL = "ca.sfu.cmpt_276_project.UI.extraBool";
+    private static final String EXTRA_BOOL2 = "ca.sfu.cmpt_276_project.UI.extraBool2";
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
@@ -101,6 +102,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private double restaurantLat;
     private double restaurantLng;
     private Boolean fromRestaurant;
+    private Boolean fromRestaurantList;
     private GoogleMap mMap;
     private Marker mMarker;
     private UiSettings mUiSettings;
@@ -295,7 +297,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         if(  (restaurantName.isEmpty() || restaurantName.contains(savedSearch.toLowerCase())) &&
-                (savedHazardCheck.equalsIgnoreCase(String.valueOf(R.string.all)) ||
+                (savedHazardCheck.equalsIgnoreCase("All") ||
                         savedHazardCheck.equalsIgnoreCase("Toutes") || hazardLevel.equalsIgnoreCase(savedHazardCheck) ||
                         hazardLevelTranslated.equalsIgnoreCase(savedHazardCheck)) &&
                 withinAYear(savedMin,savedMax,currentRestaurant)){
@@ -308,16 +310,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private boolean withinAYear(int savedMin, int savedMax, Restaurant currentRestaurant){
 
-        int count = 0;
-        if (currentRestaurant.getInspectionDataList().isEmpty()) {
-            if(savedMin == 0 || savedMax <= 0){
-                return true;
-            }
-            else{
-                return false;
-            }
-        } else {
-
+            int count = 0;
             for(int i=0; i<currentRestaurant.getInspectionDataList().size(); i++){
                 int numCritical = currentRestaurant.getInspectionDataList().get(i).getCriticalViolations();
                 long date = currentRestaurant.getInspectionDataList().get(i).timeSinceInspection();
@@ -325,13 +318,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     count += numCritical;
                 }
             }
-            if(count >= savedMin && count <= savedMax){
+
+        if(count >= savedMin && count <= savedMax){
                 return true;
             }
             else{
                 return false;
             }
-        }
+
     }
 
     public static MapsActivity getInstance() {
@@ -341,6 +335,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     // allows MapsActivity to be accessed
     public static Intent makeIntent(Context context) {
         Intent intent = new Intent(context, MapsActivity.class);
+        return intent;
+    }
+
+    public static Intent makeIntent(Context context, boolean fromRestaurantList) {
+        Intent intent = new Intent(context, MapsActivity.class);
+        intent.putExtra(EXTRA_BOOL2, fromRestaurantList);
         return intent;
     }
 
@@ -364,13 +364,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SharedPreferences savePreferences = this.getSharedPreferences("SavePrefs",
                 MODE_PRIVATE);
         SharedPreferences.Editor editor = savePreferences.edit();
-
-        /*
-        if(we go back from RestaurantList)
-        List<Restaurant> temp_restaurant_list = restaurantSearcher();
-        refreshMapView(temp_restaurant_list);
-        
-         */
 
         ImageButton srchBtn = (ImageButton) findViewById(R.id.searchBtn);
         srchBtn.setOnClickListener(new View.OnClickListener() {
@@ -798,6 +791,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         restaurantLat = intent.getDoubleExtra(EXTRA_LAT, 49.1915);
         restaurantLng = intent.getDoubleExtra(EXTRA_LNG, 122.8456);
         fromRestaurant = intent.getBooleanExtra(EXTRA_BOOL, false);
+        fromRestaurantList = intent.getBooleanExtra(EXTRA_BOOL2, false);
+
         if (fromRestaurant == true) {
             mClusterManager.clearItems();
 
@@ -807,7 +802,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mMarker = mMap.addMarker(options);
             mMarker.showInfoWindow();
             moveCamera(new LatLng(restaurantLat, restaurantLng), DEFAULT_ZOOM);
-        } else if (mLocationPermissionGranted) {
+        }
+        else if(fromRestaurantList){
+            List<Restaurant> temp_restaurant_list = restaurantSearcher();
+            refreshMapView(temp_restaurant_list);
+        }
+        else if (mLocationPermissionGranted) {
             getDeviceLocation();
 
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)

@@ -544,7 +544,7 @@ public class RestaurantListActivity extends AppCompatActivity {
         btnMaps.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = MapsActivity.makeIntent(RestaurantListActivity.this);
+                Intent intent = MapsActivity.makeIntent(RestaurantListActivity.this, true);
                 startActivity(intent);
             }
         });
