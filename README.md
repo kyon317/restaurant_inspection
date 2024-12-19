@@ -1,12 +1,10 @@
 # CMPT 276 Group Project: Restaurant Quality App
 
 ## **Introduction**
-The app uses data from BC Health to show the quality of a restaurant in Surrey, Vancouver.
+The app uses data from BC Health to show the quality of a restaurant in Vancouver.
 
 <p align="center">
-  <img src="https://github.com/kyon317/restaurant_inspection/blob/master/res1.png" alt="App Screenshot" width="200">
-  <img src="https://github.com/kyon317/restaurant_inspection/blob/master/res2.png" alt="App Screenshot" width="200">
-  <img src="https://github.com/kyon317/restaurant_inspection/blob/master/res3.png" alt="App Screenshot" width="200">
+  <img src="https://github.com/kyon317/restaurant_inspection/blob/master/res1.png" alt="App Screenshot 1" width="300">
 </p>
 
 ---
@@ -16,6 +14,8 @@ The app uses data from BC Health to show the quality of a restaurant in Surrey, 
 - Kabir (<snooh@sfu.ca>)
 - Simon (<simon_eaton@sfu.ca>)
 - Vincent (<jiaqingh@sfu.ca>)
+
+---
 
 # Features
 
@@ -44,6 +44,10 @@ The app uses data from BC Health to show the quality of a restaurant in Surrey, 
 ### d. Clickable List
 - Users can click on a restaurant in the list to view detailed information (see **2. Display Details of Single Restaurant**).
 
+<p align="center">
+  <img src="https://github.com/kyon317/restaurant_inspection/blob/master/res3.png" alt="App Screenshot 3" width="300">
+</p>
+
 ---
 
 ## 2. Display Details of Single Restaurant
@@ -64,6 +68,10 @@ The app uses data from BC Health to show the quality of a restaurant in Surrey, 
   - **Hazard Level**:
     - Colour-coded.
     - Includes an icon for visual clarity.
+
+<p align="center">
+  <img src="https://github.com/kyon317/restaurant_inspection/blob/master/res2.png" alt="App Screenshot 2" width="300">
+</p>
 
 ---
 
