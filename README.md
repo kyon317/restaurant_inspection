@@ -1,7 +1,7 @@
 # Restaurant Quality App
 
 ## **Introduction**
-The app uses data from BC Health to show the quality of a restaurant in Vancouver.
+The app uses data from BC Health to show the quality of a restaurant in Surrey, Vancouver.
 
 <p align="center">
   <img src="https://github.com/kyon317/restaurant_inspection/blob/master/res1.png" alt="App Screenshot 1" width="300">
