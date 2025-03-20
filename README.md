@@ -1,4 +1,4 @@
-# CMPT 276 Group Project: Restaurant Quality App
+# Restaurant Quality App
 
 ## **Introduction**
 The app uses data from BC Health to show the quality of a restaurant in Vancouver.
